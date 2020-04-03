@@ -1,0 +1,107 @@
+		 
+
+function initFuctionSubsMonitor() {
+		$(".level>li>ul>li").click(function() {
+			
+					if(this.innerHTML=="短信管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src  = "business/comm/message/html/message.html";
+					}else if(this.innerHTML=="历史任务管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src  = "business/comm/historyTask/html/historyTask.html";
+					}
+					else if(this.innerHTML=="预置电文管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src  = "business/comm/preMessage/html/preMessage.html";
+					}else if(this.innerHTML=="黑名单管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/comm/blackList/html/blackList.html";
+					}else if(this.innerHTML=="用户管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src  = "business/system/user/html/user.html";
+					}
+					else if(this.innerHTML=="终端管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/system/terminal/html/terminal.html";
+					}
+					else if(this.innerHTML=="指挥机管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/system/zhj/html/zhj.html";
+					}
+					else if(this.innerHTML=="区域管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/system/area/html/area.html";
+					}else if(this.innerHTML=="北斗卡管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/system/card/html/card.html";
+					}
+					else if(this.innerHTML=="日志管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/system/log/html/log.html";
+					}
+					else if(this.innerHTML=="订单管理"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/system/orderform/html/orderform.html";
+					}
+					else if(this.innerHTML=="系统设置"){
+						document.getElementById('iframebottom').contentWindow.
+						document.getElementById('ri').src = "business/settings/setting/html/setting.html";
+					}
+					else {
+						document.getElementById("frame_content").src = beidou.linkurl[$(this).parent("li").index()];
+					}																				
+});
+		$.ajax({		
+			url:'/ZHRJSystem/user/getUserInfo',
+			type:'POST',	
+			async:false,
+			success : function(date) {				
+				document.getElementById("logininfo").innerHTML="<small>欢迎您</small>"+date.data.name;
+				}								
+		});	
+		
+}
+
+
+function initRefresher() {
+	var stateBarRefresher = new Refresher(1000, "stateBarRefresh");
+	stateBarRefresher.start();
+	var taskRefresher = new Refresher(5000, "taskRefresh");
+	taskRefresher.start();
+	/*var userLoginRefresh = new Refresher(5000, "userLoginRefresh");
+	userLoginRefresh.start();*/
+	/*var userLoginRefresh = new Refresher(2000, "finishHistoryTask");
+	userLoginRefresh.start();*/
+}
+
+function monitor(){
+	document.getElementById('iframebottom').contentWindow.
+	document.getElementById('ri').src  = "monitor.html";
+	
+}
+function setting(){
+	document.getElementById('iframebottom').contentWindow.
+	document.getElementById('ri').src  = "business/settings/setting/html/setting.html";
+	
+}
+function Logout() {
+	
+	$.ajax({		
+		url:'/ZHRJSystem/user/Logout',
+		type:'POST',	
+		async:false,
+		success : function(date) {
+			if (date.status == 200) {
+				
+					window.location = "index.html";
+				
+			}
+		},
+		complete:function(XMLHttpRequest){
+			if(XMLHttpRequest.status == 0)
+			{
+				window.location.href="index.html";
+			}			
+		}
+	});	
+}

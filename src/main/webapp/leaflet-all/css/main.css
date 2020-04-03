@@ -1,0 +1,158 @@
+@charset "utf-8";
+
+/*main.html*/
+.one {
+	margin: -44px 276px ;
+	color: #FFFFFF;
+	height: 25px;
+	clear: both;
+	list-style: none;
+}
+.two{
+	margin: 19px 399px;
+    color: #400040;
+    height: 25px;
+    clear: both;
+    list-style: none;
+}
+.user-info small {
+    display: block;
+}
+.three{
+	 margin: -43px 10px 10px 560px;
+    color: #400040;
+    height: 25px;
+    clear: both;
+    list-style: none;
+}
+.four{
+	margin: -36px 10px 10px 718px;
+    color: #400040;
+    height: 25px;
+    clear: both;
+    list-style: none;
+}
+
+.bdtime{
+    margin: -48px 10px -21px 1018px;
+    color: #eee;
+    height: 58px;
+    clear: both;
+    list-style: none;
+    vertical-align: middle;
+    width: 102px;
+}
+.user{
+    margin: -26px 10px -21px 1180px;
+    color: #400040;
+    height: 80px;
+    clear: both;
+    list-style: none;
+    vertical-align: middle;
+    width: 197px;
+}
+.ace-nav {
+    height: 100%;
+    margin: 0!important;
+}
+.ace-nav>li {
+    line-height: 45px;
+    height: 45px;
+    border-left: 1px solid #DDD;
+    padding: 0;
+    position: relative;
+    float: left!important;
+}
+.ace-nav>li.light-blue>a {
+    background-color: #62a8d1 !important;
+}
+
+.ace-nav>li>a {
+    background-color: #2e6589;
+    color: #FFF;
+    display: block;
+    line-height: inherit;
+    text-align: center;
+    height: 100%;
+    width: auto;
+    min-width: 50px;
+    padding: 0 8px;
+    position: relative;
+}
+
+.ace-nav .nav-user-photo {
+    margin: -5px 8px 0 0;
+    border-radius: 100%;
+    border: 2px solid #FFF;
+    max-width: 40px;
+}
+[class^="icon-"], [class*=" icon-"] {
+    display: inline;
+    width: auto;
+    height: auto;
+    line-height: normal;
+    vertical-align: baseline;
+    background-image: none;
+    background-position: 0% 0%;
+    background-repeat: repeat;
+    margin-top: 0;
+}
+.user-info {
+    max-width: 100px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+    vertical-align: top;
+    line-height: 15px;
+    position: relative;
+    top: 6px;
+}
+
+.tittle{
+	width:100px;
+	padding: 1px 1px 14px 35px;
+	font-size: 25px;
+}
+
+.image{
+	margin: -7px -123px;
+}
+nav .level>li{
+	z-index:10000;
+	font-size: 16px;
+	transition: .4s;
+}
+
+nav .level>li:hover{
+	background: none;
+} 
+nav .level>li:hover .child {
+	display: block;
+} 
+nav .child {
+    display: none;
+    margin: 0px 0px 0px 36px;
+    position: absolute;
+    z-index: 999;
+    text-align: center;
+    padding-left: 9px;
+    background-color: #d7e1ff;
+	
+} 
+ nav .child li{
+ 	padding: 3px 6px 0px 0px;
+ 	transition: .4s;
+ 	cursor: pointer;
+ }	
+ 
+
+a{
+	text-decoration-line: none;
+}
+ ul,li{
+ 	list-style: none;
+ }
+
+

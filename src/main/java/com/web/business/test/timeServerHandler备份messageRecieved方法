@@ -1,0 +1,358 @@
+
+
+TimeServerHandler
+
+@Override
+	public void messageReceived(IoSession session, Object message) throws Exception {
+		
+		//获取被spring管理的deviceInfoServiceImpl
+		DeviceInfoServiceImpl deviceInfoServiceImpl = (DeviceInfoServiceImpl) SpringContextUtil.getBean("deviceInfoServiceImpl");
+
+		System.out.println("收到数据:" + message.toString());
+		
+		String[] timeValues = message.toString().split(",");
+
+		// 将获取到的数据封装到实体类中----上报的第一次接入的标志为空
+		DeviceInfo tm = new DeviceInfo(timeValues);
+		tm.setOnlineTag("1");  //在线标志
+		
+		//判断新接入的设备是否存在设备id
+		try {
+			DeviceInfo deviceInfoExist = TimeCache.allNativeDevices.get(tm.getDeviceCode());
+			if (deviceInfoExist == null ) {
+				
+				//新接入的设备，赋予设备id
+				tm.setDeviceId(UUID.randomUUID().toString().toUpperCase().replaceAll("-", ""));
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String date = sdf.format(new Date());
+				String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+				tm.setDeviceId(uuid);
+				tm.setCreateTime(date);
+				tm.setUpdateTime(date);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+		
+		//判断是否为未经系统录入，临时扩充(没录入过数据库)
+		if ( TimeCache.allNativeDevices.containsKey( tm.getDeviceCode()) ) {
+			//数据库已有的设备
+			//当前设备的id
+			String deviceId = TimeCache.allNativeDevices.get(tm.getDeviceCode()).getDeviceId();
+			
+			tm.setDeviceId(deviceId);  //硬件上报的没有设备id,配置设备id
+			//tm.setDeviceState("1"); // 状态为在线
+			
+			//每次接入的设备都没有名称，平台给赋值，根据其编号类型
+			//设备名称--数显钟
+			if (tm.getDeviceCode().contains("ZCS") || tm.getDeviceCode().contains("HGSX-J")) {
+				tm.setDeviceName("数显钟"+tm.getDeviceCode());
+			}
+			
+			//三角钟
+			if (tm.getDeviceCode().contains("SCS") || tm.getDeviceCode().contains("HGSX-D20-J")) {
+				tm.setDeviceName("三角钟"+tm.getDeviceCode());
+			}
+			
+			//母钟
+			if (tm.getDeviceCode().contains("MCS") || tm.getDeviceCode().contains("HGDS-M")) {
+				tm.setDeviceName("母钟"+tm.getDeviceCode());
+			}
+			
+			//已录入的设备,根据上报的实时数据更新此设备的数据 
+			//判断是否第一次上报实时数据(数据库录入过该设备，只有静态数据)----只更新设备编号、设备名称、状态、部门id之外的属性
+			String tempFirstConnectTag = TimeCache.allNativeDevices.get(tm.getDeviceCode()).getFirstConnectTag();
+			if (  tempFirstConnectTag == null ) {
+				
+				tm.setFirstConnectTag("1");
+				//第一次上报，将数据库该设备进行更新
+				try {
+					tm.setDeviceState("0");  //设备初始状态为 ：离线0
+					int refreshTag = deviceInfoServiceImpl.updateByPrimaryKeySelective(tm);
+					if (refreshTag == 1) {
+						
+						//更新成功
+						System.out.println(tm.getDeviceCode()+"---第一次上报更新数据库成功");
+						
+						// 更新缓存--存储设备
+						TimeCache.times.put(tm.getDeviceCode(), tm);
+						
+						//更新所有设备缓存
+						TimeCache.allNativeDevices.put(tm.getDeviceCode(), tm);
+						
+					}else {
+						//失败,不更新缓存
+						System.out.println(tm.getDeviceCode()+"---第一次上报更新数据库失败");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println(tm.getDeviceCode()+"---第一次上报更新数据库失败,数据库出现异常");
+
+				}
+				
+			}else {
+				//更新数据（接入平台后第二次及之后再上报的数据）
+				//每一次硬件上报的标志位都为null，需要重新赋值为1
+				tm.setFirstConnectTag("1");
+				try {
+					//更新数据库设备信息
+//					int updateTag = deviceInfoServiceImpl.updateByPrimaryKeySelective(tm);
+//					if ( updateTag == 1 ) {
+						//更新成功
+						// 更新缓存--存储设备
+						TimeCache.times.put(tm.getDeviceCode(), tm);
+						TimeCache.allNativeDevices.put(tm.getDeviceCode(), tm);
+						System.out.println(tm.getDeviceCode()+"---第二次及以后上报更新缓存成功");
+						
+				} catch (Exception e) {
+					//失败，不更新缓存
+					System.out.println(tm.getDeviceCode()+"---第二次及以后上报更新缓存出现异常");
+				}
+				
+			}
+		}else {
+			//临时扩充的设备， 向数据库添加此设备，标志位置为1
+			//新增需要设备id
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date = sdf.format(new Date());
+			
+			tm.setCreateTime(date);
+			tm.setUpdateTime(date);
+			
+			String id = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+			
+			tm.setDeviceId(id);  //设备id
+			tm.setFirstConnectTag("1"); //接入了平台
+			tm.setDepId("-1");  //默认临时的分组
+			tm.setDepName("临时录入");
+			
+			//设备名称--数显钟
+			if (tm.getDeviceCode().contains("ZCS") || tm.getDeviceCode().contains("HGSX-J")) {
+				tm.setDeviceName("数显钟"+tm.getDeviceCode());
+			}
+			
+			//三角钟
+			if (tm.getDeviceCode().contains("SCS") || tm.getDeviceCode().contains("HGSX-D20-J")) {
+				tm.setDeviceName("三角钟"+tm.getDeviceCode());
+			}
+			
+			//母钟
+			if (tm.getDeviceCode().contains("MCS") || tm.getDeviceCode().contains("HGDS-M")) {
+				tm.setDeviceName("母钟"+tm.getDeviceCode());
+			}
+			
+			try {
+				//新增设备信息
+				int addTag = deviceInfoServiceImpl.insertSelective(tm);
+				if (addTag == 1) {
+					
+					//新增成功,更新时间缓存
+					TimeCache.times.put(tm.getDeviceCode(), tm);
+					
+					//更新所有设备的缓存
+					TimeCache.allNativeDevices.put(tm.getDeviceCode(), tm);
+					
+					//更新链路缓存
+					TimeServerHandler.sessions.put(tm.getDeviceCode(), session);
+					
+					System.out.println(tm.getDeviceCode()+"---临时接入的设备第一次上报更新数据库成功");
+					
+				}else {
+					//新增失败
+					System.out.println(tm.getDeviceCode()+"---临时接入的设备第一次上报更新数据库失败");
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println(tm.getDeviceCode()+"---临时接入的设备第一次上报更新数据库出现异常");
+
+			}
+			
+			
+		}
+		
+		System.out.println("当前缓存中所有设备数量---："+TimeCache.allNativeDevices.size());
+		
+		// 链路缓存
+		TimeServerHandler.sessions.put(tm.getDeviceCode(), session);
+		System.out.println("当前链路缓存中deviceCode:" + tm.getDeviceCode() + ":状态为" + tm.getOnlineTag());
+
+		// 加上时间戳
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SS");
+		System.out.println(TimeServerHandler.sessions);
+
+		// 将时间顺便推送到web前端-- 使用webstocket
+		TimeHandler.sendSocketTime(tm);
+
+		// 收集最新接入的五台设备
+		// 存放更新的设备信息数据
+		Map<String, String> newresult = new HashMap<>();
+		
+		//设备=5台,
+		if (TimeCache.topDeviceMap.size() == 5) {
+			System.out.println("进入if中topMap大小为：---"+TimeCache.topDeviceMap.size());
+
+			if (TimeCache.topDeviceMap.keySet().contains(tm.getDeviceCode())) {
+				
+				// 原有的设备，只更新时间
+				TimeCache.topDeviceMap.put(tm.getDeviceCode(), sdf.format(new Date()));
+				
+			} else {
+				//新进来的设备，遍历当前top5--map
+				Iterator<Map.Entry<String, String>> it = TimeCache.topDeviceMap.entrySet().iterator();
+				List<Long> sumTime = new ArrayList<>();
+
+				//将时间存储
+				while (it.hasNext()) {
+					
+					Map.Entry<String, String> entry = it.next();
+					String value = entry.getValue();
+					
+					//将string类型时间转换成long型,存储在list中
+					sumTime.add(ConvertStrToTime(value));
+
+				}
+				//找到最老的时间
+				Long minTime = Collections.min(sumTime);
+
+				//将当前top5中时间最久的找到并替换掉
+				Iterator<Map.Entry<String, String>> it1 = TimeCache.topDeviceMap.entrySet().iterator();
+				while (it1.hasNext()) {
+					
+					Map.Entry<String, String> entry = it1.next();
+					String value = entry.getValue();
+					
+					if ( minTime.equals(ConvertStrToTime(value))) {
+						//移除,缓存大小为4
+						it1.remove();
+						//更新时间
+						newresult.put(tm.getDeviceCode(), sdf.format(new Date()));
+					}
+
+				}
+				
+				//将top5更新,新加入一个为5个
+				TimeCache.topDeviceMap.putAll(newresult);  //newresult--null
+				System.out.println("进入if后topMap大小为：---"+TimeCache.topDeviceMap.size());
+
+			}
+
+		} else {
+			//top5缓存中数目小于5台
+			// 将前5台设备存入top5         
+			if ( !TimeCache.topDeviceMap.containsKey(tm.getDeviceCode())) {
+				//新接入设备
+				TimeCache.topDeviceMap.put(tm.getDeviceCode(), sdf.format(new Date()));
+
+			}else {
+				//更新top5缓存
+				TimeCache.topDeviceMap.put(tm.getDeviceCode(), sdf.format(new Date()));
+
+			}
+			
+			System.out.println("topMap大小为：---"+TimeCache.topDeviceMap.size());
+			
+		}
+
+	}
+	
+	------------------------------------------------------------------------------------------
+	TimeHandler
+	
+	public class TimeHandler {
+
+	public static void getTime() {
+		//拆包											|	6	 |         |   | |  |deviceCode| 
+		String time = "$RTZCS,4,2017,03,01,133456.00,03,10.0.0.85,10.0.0.81,441,8,0,7HGSX-001,1,10.0.0.85,*hh";
+		String[] times = time.split(",");
+		String status = times[0];
+		String status1 = times[1];
+		String year = times[2];
+		String month = times[3];
+		String day = times[4];
+		String tt = times[5];
+		String ip = times[6];
+		String ntp = times[7];
+		String mhz = times[8];
+		String timeare = times[9];//时区
+		String number = times[10];//编号
+		String wifi = times[11];//无线模块    ???
+		String server = times[12];//无线服务器IP地址
+		String port = times[13];//时钟端口
+		String work = times[14];//校验
+		
+	}
+	
+	//向设备下发命令
+	public static boolean sendMsg(String cmd,String deviceCode) {
+		
+		//根据deviceCode获取 链路缓存对应的session
+		IoSession session = TimeServerHandler.sessions.get(deviceCode);
+		
+		if( session != null ) {
+			System.out.println("----发送成功，当前指令为------"+cmd);
+			//发送到客户端 timeClient
+			session.write(cmd);  //$CCZZT,20181222120000,20181223120000,20181224120000,1,*hh
+			return true;
+			
+		}else {
+			return false;
+		}
+		
+	}
+	
+	//???作用
+	public static void sendSocketAllTime() {
+		try {
+			if(TimeController.getTimes) {
+				Map<String,DeviceInfo> times =  TimeCache.times;
+				if(times != null && times.size() != 0) {
+				Set<String> keys = times.keySet();
+					for(String key : keys) {
+						WebSocketServer.sendInfo(JSON.toJSONString(times.get(key)));
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// 将时间推送到web前端-- 使用webstocket
+	public static void sendSocketTime(DeviceInfo deviceInfo) {
+		try {
+			WebSocketServer.sendInfo(JSON.toJSONString(deviceInfo));
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//缓存排序方法
+	public static void sortTime() {
+		
+	}
+	
+	
+}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

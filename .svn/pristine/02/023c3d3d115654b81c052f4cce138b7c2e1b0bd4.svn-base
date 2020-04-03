@@ -1,0 +1,6 @@
+#report_title {
+    padding: 0 0 5px 0;
+    font:  30px "свт╡"";  
+    text-align: center;    
+    color: #aabbcc;   
+}

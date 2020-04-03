@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.area.dao.AreaMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.area.model.Area" >
+    <result column="area_id" property="areaId" jdbcType="VARCHAR" />
+    <result column="area_name" property="areaName" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="parent_id" property="parentId" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	area_id,
+     	area_name,
+     	level,
+     	parent_id,
+     	remark
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from area 
+    where  area_id = #{ areaId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByAreaId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		*
+    from area 
+    where  area_id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from area 
+    where area_id =  #{ areaId,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from area
+    where area_id in
+    <foreach collection="list" item="areaId" index="index"
+            open="(" close=")" separator=",">
+             #{ areaId,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.area.model.Area">
+		insert into area
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="areaId != null">
+				area_id,
+			</if>
+			<if test="areaName != null">
+				area_name,
+			</if>
+			<if test="level != null">
+				level,
+			</if>
+			<if test="parentId != null">
+				parent_id,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="areaId != null">
+				 #{ areaId,jdbcType= VARCHAR },
+			</if>
+			<if test="areaName != null">
+				 #{ areaName,jdbcType= VARCHAR },
+			</if>
+			<if test="level != null">
+				 #{ level,jdbcType= INTEGER },
+			</if>
+			<if test="parentId != null">
+				 #{ parentId,jdbcType= VARCHAR },
+			</if>
+			<if test="remark != null">
+				 #{ remark,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.area.model.Area">
+		select
+		<include refid="Base_Column_List" />
+		from area
+		where 1=1
+		  <if test="areaId != null">
+			AND area_id =  #{ areaId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="areaName != null">
+			AND area_name like  CONCAT('%',#{ areaName,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="level != null">
+			AND level =  #{ level,jdbcType= INTEGER }
+		  </if>
+		  <if test="parentId != null">
+			AND parent_id =  #{ parentId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.area.model.Area">
+		select
+		count(1)
+		from area
+		where 1=1
+		  <if test="areaId != null">
+			AND area_id =  #{ areaId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="areaName != null">
+			AND area_name =  #{ areaName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="level != null">
+			AND level =  #{ level,jdbcType= INTEGER }
+		  </if>
+		  <if test="parentId != null">
+			AND parent_id =  #{ parentId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.area.model.Area">
+			update area
+			<set>
+     			 area_id =  #{ areaId,jdbcType= VARCHAR },
+     			 area_name =  #{ areaName,jdbcType= VARCHAR },
+     			 level =  #{ level,jdbcType= INTEGER },
+     			 parent_id =  #{ parentId,jdbcType= VARCHAR },
+     			 remark =  #{ remark,jdbcType= VARCHAR }
+			</set>
+			where area_id =  #{ areaId,jdbcType=VARCHAR}
+	</update>
+	
+	<select id="selectAll"  resultMap="BaseResultMap">
+		select * from area
+	</select>
+	
+	<!--根据区域父节点id递归查询子节点所有信息-->
+	<select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.String" statementType="CALLABLE">
+		select <include refid="Base_Column_List" />from area where FIND_IN_SET(area_id,areaQuery(#{parentId ,jdbcType=VARCHAR}))
+	</select>
+	
+	<select id="selectParentNameById" resultType="java.lang.String" parameterType="java.lang.String" >
+		select area_name  from area where area_id = #{parentId,jdbcType=VARCHAR}
+	</select>
+	
+	<!--查询所有省份信息  -->
+	<select id="selectAllProvince"  resultMap="BaseResultMap">
+		select * from area where level = 0
+	</select>
+	
+	<!--根据省查询所有市信息  -->
+	<select id="selectAllCity"  resultMap="BaseResultMap"  parameterType="java.lang.String">
+		select * from area where level = 1 and parent_id = #{provinceId,jdbcType=VARCHAR}
+	</select>
+	
+	<!--根据市查询下属区县信息  -->
+	<select id="selectAllZone"  resultMap="BaseResultMap"  parameterType="java.lang.String">
+		select * from area where level = 2 and parent_id = #{cityId,jdbcType=VARCHAR}
+	</select>
+	
+	
+	<!--根据输入所属区域进行查询是否重复  -->
+	<!-- <select id="selectAreaName"  resultMap="BaseResultMap"  parameterType="java.lang.String">
+		select area_name from area where area_name like "%" #{areaName,jdbcType=VARCHAR}"%"
+	</select> -->
+	<select id="selectAreaName"  resultMap="BaseResultMap"  parameterType="java.lang.String">
+		select area_name from area where area_name = #{areaName,jdbcType=VARCHAR}
+	</select>
+	
+	
+	<select id="selectByName"  resultMap="BaseResultMap"  parameterType="java.lang.String">
+		select * from area where area_name like CONCAT('%',#{ areaName,jdbcType= VARCHAR },'%')
+	</select>
+	
+
+	<!-- 根据父id查儿子id -->
+	<select id="selectSonIdsByParentId" resultType="java.lang.String" parameterType="java.lang.String" >
+		select area_id  from area where parent_id = #{parentid,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 根据父id查儿子id集合 -->
+	<select id="selectSonIdListByParentId" resultType="java.lang.String" parameterType="java.lang.String" >
+		select area_id from area where FIND_IN_SET(area_id,areaQuery(#{parentid ,jdbcType=VARCHAR}))
+	</select>
+	
+  	<!--根据AreaName模糊查询id 集合  -->
+  	<select id="selectByIds" resultType="java.lang.String"  >
+		select area_id from area where  area_name like  CONCAT('%',#{ areaName,jdbcType= VARCHAR },'%')
+	</select>
+	
+	<!-- 根据父id和区域名称查儿子id集合 -->
+	<select id="selectSonIdsByParentIdAndName" resultType="java.lang.String">
+		select area_id from area where FIND_IN_SET(area_id,areaQuery(#{parentid ,jdbcType=VARCHAR})) 
+		   and area_name like  CONCAT('%',#{ areaName,jdbcType= VARCHAR },'%')
+	</select>
+	
+	<!--根据AreaName模糊查询id 集合  -->
+  	<select id="selectBySonIdsByName" resultType="java.lang.String"  >
+		select area_id from area where  area_name like  CONCAT('%',#{ areaName,jdbcType= VARCHAR },'%')
+	</select>
+	
+	
+	<!--根据id集合查找区域 -->
+  	<select id="selectAreaByIds" resultMap="BaseResultMap" parameterType="java.util.List"  >
+		select <include refid="Base_Column_List" />
+		 from area where  area_id in  
+		<foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+   		</foreach>
+	</select>
+	
+	<!--根据父id集合查找区域 -->
+  	<select id="selectAreaByPIds" resultMap="BaseResultMap" parameterType="java.util.List"  >
+		select <include refid="Base_Column_List" />
+		 from area where  parent_id in  
+		<foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+   		</foreach>
+	</select>
+	
+	
+  <!--根据AreaName模糊查询id 集合  -->
+  	<select id="selectAllAreaIds" resultType="java.lang.String"  >
+		select area_id from area
+	</select>
+	
+	
+</mapper>

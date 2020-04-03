@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuiji.dao.TbPositionMapper">
+  <resultMap id="BaseResultMap" type="com.zhihuiji.model.TbPosition">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="LocateTime" jdbcType="TIMESTAMP" property="locateTime" />
+    <result column="latitude" jdbcType="REAL" property="latitude" />
+    <result column="longitude" jdbcType="REAL" property="longitude" />
+    <result column="altitude" jdbcType="REAL" property="altitude" />
+    <result column="terminalId" jdbcType="VARCHAR" property="terminalId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, LocateTime, latitude, longitude, altitude, terminalId
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_position
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_position
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zhihuiji.model.TbPosition">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_position (LocateTime, latitude, longitude, 
+      altitude, terminalId)
+    values (#{locateTime,jdbcType=TIMESTAMP}, #{latitude,jdbcType=REAL}, #{longitude,jdbcType=REAL}, 
+      #{altitude,jdbcType=REAL}, #{terminalId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhihuiji.model.TbPosition">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_position
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="locateTime != null">
+        LocateTime,
+      </if>
+      <if test="latitude != null">
+        latitude,
+      </if>
+      <if test="longitude != null">
+        longitude,
+      </if>
+      <if test="altitude != null">
+        altitude,
+      </if>
+      <if test="terminalId != null">
+        terminalId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="locateTime != null">
+        #{locateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=REAL},
+      </if>
+      <if test="longitude != null">
+        #{longitude,jdbcType=REAL},
+      </if>
+      <if test="altitude != null">
+        #{altitude,jdbcType=REAL},
+      </if>
+      <if test="terminalId != null">
+        #{terminalId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhihuiji.model.TbPosition">
+    update tb_position
+    <set>
+      <if test="locateTime != null">
+        LocateTime = #{locateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="latitude != null">
+        latitude = #{latitude,jdbcType=REAL},
+      </if>
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=REAL},
+      </if>
+      <if test="altitude != null">
+        altitude = #{altitude,jdbcType=REAL},
+      </if>
+      <if test="terminalId != null">
+        terminalId = #{terminalId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhihuiji.model.TbPosition">
+    update tb_position
+    set LocateTime = #{locateTime,jdbcType=TIMESTAMP},
+      latitude = #{latitude,jdbcType=REAL},
+      longitude = #{longitude,jdbcType=REAL},
+      altitude = #{altitude,jdbcType=REAL},
+      terminalId = #{terminalId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

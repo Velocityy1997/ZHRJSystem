@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuiji.dao.TbSysInfoMapper">
+  <resultMap id="BaseResultMap" type="com.zhihuiji.model.TbSysInfo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="port" jdbcType="VARCHAR" property="port" />
+    <result column="zhjNum" jdbcType="VARCHAR" property="zhjNum" />
+    <result column="baudRate" jdbcType="INTEGER" property="baudRate" />
+    <result column="shakeTime" jdbcType="INTEGER" property="shakeTime" />
+    <result column="mmTime" jdbcType="INTEGER" property="mmTime" />
+    <result column="reConnect" jdbcType="INTEGER" property="reConnect" />
+    <result column="reSend" jdbcType="INTEGER" property="reSend" />
+    <result column="baud" jdbcType="INTEGER" property="baud" />
+    <result column="bdTimeFrequence" jdbcType="INTEGER" property="bdTimeFrequence" />
+    <result column="selfCheckFrequence" jdbcType="INTEGER" property="selfCheckFrequence" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, port, zhjNum, baudRate, shakeTime, mmTime, reConnect, reSend, baud, bdTimeFrequence, 
+    selfCheckFrequence
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_sys_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_sys_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zhihuiji.model.TbSysInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_sys_info (port, zhjNum, baudRate, 
+      shakeTime, mmTime, reConnect, 
+      reSend, baud, bdTimeFrequence, 
+      selfCheckFrequence)
+    values (#{port,jdbcType=VARCHAR}, #{zhjNum,jdbcType=VARCHAR}, #{baudRate,jdbcType=INTEGER}, 
+      #{shakeTime,jdbcType=INTEGER}, #{mmTime,jdbcType=INTEGER}, #{reConnect,jdbcType=INTEGER}, 
+      #{reSend,jdbcType=INTEGER}, #{baud,jdbcType=INTEGER}, #{bdTimeFrequence,jdbcType=INTEGER}, 
+      #{selfCheckFrequence,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhihuiji.model.TbSysInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_sys_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="port != null">
+        port,
+      </if>
+      <if test="zhjNum != null">
+        zhjNum,
+      </if>
+      <if test="baudRate != null">
+        baudRate,
+      </if>
+      <if test="shakeTime != null">
+        shakeTime,
+      </if>
+      <if test="mmTime != null">
+        mmTime,
+      </if>
+      <if test="reConnect != null">
+        reConnect,
+      </if>
+      <if test="reSend != null">
+        reSend,
+      </if>
+      <if test="baud != null">
+        baud,
+      </if>
+      <if test="bdTimeFrequence != null">
+        bdTimeFrequence,
+      </if>
+      <if test="selfCheckFrequence != null">
+        selfCheckFrequence,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="port != null">
+        #{port,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjNum != null">
+        #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="baudRate != null">
+        #{baudRate,jdbcType=INTEGER},
+      </if>
+      <if test="shakeTime != null">
+        #{shakeTime,jdbcType=INTEGER},
+      </if>
+      <if test="mmTime != null">
+        #{mmTime,jdbcType=INTEGER},
+      </if>
+      <if test="reConnect != null">
+        #{reConnect,jdbcType=INTEGER},
+      </if>
+      <if test="reSend != null">
+        #{reSend,jdbcType=INTEGER},
+      </if>
+      <if test="baud != null">
+        #{baud,jdbcType=INTEGER},
+      </if>
+      <if test="bdTimeFrequence != null">
+        #{bdTimeFrequence,jdbcType=INTEGER},
+      </if>
+      <if test="selfCheckFrequence != null">
+        #{selfCheckFrequence,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhihuiji.model.TbSysInfo">
+    update tb_sys_info
+    <set>
+      <if test="port != null">
+        port = #{port,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjNum != null">
+        zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="baudRate != null">
+        baudRate = #{baudRate,jdbcType=INTEGER},
+      </if>
+      <if test="shakeTime != null">
+        shakeTime = #{shakeTime,jdbcType=INTEGER},
+      </if>
+      <if test="mmTime != null">
+        mmTime = #{mmTime,jdbcType=INTEGER},
+      </if>
+      <if test="reConnect != null">
+        reConnect = #{reConnect,jdbcType=INTEGER},
+      </if>
+      <if test="reSend != null">
+        reSend = #{reSend,jdbcType=INTEGER},
+      </if>
+      <if test="baud != null">
+        baud = #{baud,jdbcType=INTEGER},
+      </if>
+      <if test="bdTimeFrequence != null">
+        bdTimeFrequence = #{bdTimeFrequence,jdbcType=INTEGER},
+      </if>
+      <if test="selfCheckFrequence != null">
+        selfCheckFrequence = #{selfCheckFrequence,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhihuiji.model.TbSysInfo">
+    update tb_sys_info
+    set port = #{port,jdbcType=VARCHAR},
+      zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      baudRate = #{baudRate,jdbcType=INTEGER},
+      shakeTime = #{shakeTime,jdbcType=INTEGER},
+      mmTime = #{mmTime,jdbcType=INTEGER},
+      reConnect = #{reConnect,jdbcType=INTEGER},
+      reSend = #{reSend,jdbcType=INTEGER},
+      baud = #{baud,jdbcType=INTEGER},
+      bdTimeFrequence = #{bdTimeFrequence,jdbcType=INTEGER},
+      selfCheckFrequence = #{selfCheckFrequence,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

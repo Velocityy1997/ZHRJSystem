@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.orderform.dao.OrderFormMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.orderform.model.OrderForm" >
+    <id column="orderId" property="orderId" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="card_num" property="cardNum" jdbcType="VARCHAR" />
+    <result column="invest_time" property="investTime" jdbcType="VARCHAR" />
+    <result column="invest_date" property="investDate" jdbcType="VARCHAR" />
+    <result column="balance" property="balance" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	order_id,
+     	order_num,
+     	card_id,
+     	card_num,
+     	invest_time,
+     	invest_date,
+     	balance,
+     	create_time
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from order_form 
+    where  orderId = #{ orderId,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from order_form 
+    where orderId =  #{ orderId,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from order_form
+    where orderId in
+    <foreach collection="list" item="orderId" index="index"
+            open="(" close=")" separator=",">
+             #{ orderId,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.orderform.model.OrderForm">
+		insert into order_form
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="orderId != null">
+				order_id,
+			</if>
+			<if test="orderNum != null">
+				order_num,
+			</if>
+			<if test="cardId != null">
+				card_id,
+			</if>
+			<if test="cardNum != null">
+				card_num,
+			</if>
+			<if test="investTime != null">
+				invest_time,
+			</if>
+			<if test="investDate != null">
+				invest_date,
+			</if>
+			<if test="balance != null">
+				balance,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="orderId != null">
+				 #{ orderId,jdbcType= VARCHAR },
+			</if>
+			<if test="orderNum != null">
+				 #{ orderNum,jdbcType= VARCHAR },
+			</if>
+			<if test="cardId != null">
+				 #{ cardId,jdbcType= VARCHAR },
+			</if>
+			<if test="cardNum != null">
+				 #{ cardNum,jdbcType= VARCHAR },
+			</if>
+			<if test="investTime != null">
+				 #{ investTime,jdbcType= VARCHAR },
+			</if>
+			<if test="investDate != null">
+				 #{ investDate,jdbcType= VARCHAR },
+			</if>
+			<if test="balance != null">
+				 #{ balance,jdbcType= VARCHAR },
+			</if>
+			<if test="createTime != null">
+				 #{ createTime,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.orderform.model.OrderForm">
+		select
+		<include refid="Base_Column_List" />
+		from order_form
+		where 1=1
+		  <if test="orderNum != null">
+			AND order_num =  #{ orderNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardNum != null">
+			AND card_num =  #{ cardNum,jdbcType= VARCHAR }
+		  </if>
+		  
+		ORDER BY create_time desc
+	
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.orderform.model.OrderForm">
+		select
+		count(1)
+		from order_form
+		where 1=1
+		  <if test="orderId != null">
+			AND order_id =  #{ orderId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="orderNum != null">
+			AND order_num =  #{ orderNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardId != null">
+			AND card_id =  #{ cardId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardNum != null">
+			AND card_num =  #{ cardNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="investTime != null">
+			AND invest_time =  #{ investTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="investDate != null">
+			AND invest_date =  #{ investDate,jdbcType= VARCHAR }
+		  </if>
+		  <if test="balance != null">
+			AND balance =  #{ balance,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createTime != null">
+			AND create_time =  #{ createTime,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.orderform.model.OrderForm">
+		<if test="orderId !=null">
+			update order_form
+			<set>
+     			 order_id =  #{ orderId,jdbcType= VARCHAR },
+     			 order_num =  #{ orderNum,jdbcType= VARCHAR },
+     			 card_id =  #{ cardId,jdbcType= VARCHAR },
+     			 card_num =  #{ cardNum,jdbcType= VARCHAR },
+     			 invest_time =  #{ investTime,jdbcType= VARCHAR },
+     			 invest_date =  #{ investDate,jdbcType= VARCHAR },
+     			 balance =  #{ balance,jdbcType= VARCHAR },
+     			 create_time =  #{ createTime,jdbcType= VARCHAR }
+			</set>
+			where orderId =  #{ orderId,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

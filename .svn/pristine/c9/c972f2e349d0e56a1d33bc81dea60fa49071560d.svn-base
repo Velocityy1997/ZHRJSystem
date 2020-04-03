@@ -1,0 +1,955 @@
+/**
+ * @description: 工具类，一些常用的工具方法，字符串日期，数据格式化等等
+ * @author: 刘明明
+ * @time: 2015-07-26
+ */
+var toolMethod = {
+	/** 
+	 * 路径配置
+	 */
+	errorPath : {
+		baseUrl : "/GDYY/view/error/"
+	},
+	/**
+	 * 获取用户权限信息
+	 * @param id 当前传入的数据信息
+	 * @returns 返回具有的权限实体
+	 */
+	getModuleEntity : function(id) {
+		var list = JSON.parse(localStorage.getItem("gdyy_list"));
+		var result;
+		if (!list) {
+			window.location.href = "/GDYY";
+		} else {
+			if (id === undefined) {
+				result = list["id" + toolMethod.getHrefValue()["id"]];
+			} else {
+				result = list["id" + id];
+			}
+		}
+		return result;
+	},
+	/**
+	 * 获取用户登录的信息
+	 * @param id 取字段的任意一个值
+	 */
+	getUserEnitiy: function(id){
+		var userInfo = JSON.parse(decodeURI(localStorage.getItem("gdyy_userInfo")));
+		if(id){
+			return userInfo["id"];
+		}else{
+			return userInfo;
+		}
+	},
+	/**
+	 * 序列数组转换成对象
+	 * @param array
+	 */
+	getSerializeArrayChangeObject : function(array){
+		var formData = {};
+		for(var key in array){
+		   formData[array[key].name] = array[key].value;
+		}
+		return formData;
+	},
+	
+	/**
+	 * 数据字典转换成文本信息
+	 * @param target 定位布标
+	 * @param dicArray 数据集合
+	 */
+	changeDicToText: function(target, dicArray){
+		$.each(target, function(index, value){
+            var $this = $(this);
+            var $code = $this.text();
+            var id = $code.substr(0,6);
+            var obj = dicArray[id];
+            $.each(obj, function(indexChild, valueChild){
+                if(obj[indexChild].code === $code){
+                    $this.text(obj[indexChild].name);
+                    return;
+                }
+            });
+        });
+	},
+	
+	/**
+	 * 精确小数位数
+	 * @param x 传入的数据 1.256521
+	 * @param num 精确小数点后几位 2
+	 * @return 返回的数据信息
+	 */
+	toFiexd: function(x, num){
+		return Math.round(x*Math.pow(10,num)) / Math.pow(10,num);
+	},
+	/**
+	 * 除去重复的元素
+	 * @param data 需要删除的数据
+	 * @returns {Array} 返回数组内容 1 2 3 4 5 6
+	 */
+	removeRepeatArray : function(data) {
+		var result = [], hash = [];
+		for (var i = 0, elem; (elem = data[i]) != null; i++) {
+			if (!hash[elem]) {
+				result.push(elem);
+				hash[elem] = true;
+			}
+		}
+		return result;
+	},
+	/* 浮点数转为度分秒 */
+	floatToGreenMs : function(data) {
+		var getValueString = data.toString();
+		var getValue = getValueString.split(".");
+		var getLen = getValue.length;
+		var degreeLon = 0 ,minuteLon = 0, secondLon = 0, result = 0;
+		var bIsNeg = false; 
+		if( -1 !== getValue[0].indexOf("-")){
+			bIsNeg = true;
+		}
+		if (1 == getLen) {// 整数
+			degreeLon = Math.abs(data);
+			secondLon = secondLon.toFixed(4);
+		} else if (2 == getLen) {// 小数
+			degreeLon = Math.abs(parseInt(getValue[0]));
+			var getLocationMinuteE = '0.' + getValue[1];
+			getLocationMinuteE = parseFloat(getLocationMinuteE) * 60;
+			getLocationMinuteE = getLocationMinuteE.toString().split(".");
+			var len = getLocationMinuteE.length;
+			if (1 == len) {
+				minuteLon = parseInt(getLocationMinuteE);
+				secondLon = parseFloat(secondLon).toFixed(4);
+			} else if (2 == len) {
+				minuteLon = parseInt(getLocationMinuteE[0]);
+				var getLocationSecondE = '0.' + getLocationMinuteE[1];
+				getLocationSecondE = parseFloat(getLocationSecondE) * 60;
+				secondLon = getLocationSecondE.toFixed(4);
+			}
+		}
+		if(bIsNeg){
+			  degreeLon = "-" + degreeLon;
+		}
+		return result = degreeLon + "°" + minuteLon + "'" + secondLon + "&quot;";
+	},
+
+	/**
+	 * data 为 parseFloat型() 度分秒转化小数时，小数不超过6位 result为获取的浮点数
+	 */
+ 	 
+	getValueLogLat : function(data) {
+		var res;
+		var bIsNeg = false;
+        var getValue = data.toString().split(".");
+		if( -1 !== getValue[0].indexOf("-")){
+			bIsNeg = true;
+		}
+		//统一转换为正数
+		res = Math.abs(parseFloat(getValue[0]));		
+		for(var i = 1,len = getValue.length; i < len; i++){
+		   var temp = parseFloat(getValue[i])/Math.pow(60,i);
+		   res += temp;
+		}
+		if(bIsNeg){
+		  res = "-" + res;
+		}
+		res = parseFloat(res).toFixed(6);
+		return res;
+	},
+	/**
+	 * 格式化输出错误信息
+	 * @param obj 传入对象
+	 * @returns {String} 返回字符串
+	 */
+	writeObj : function(obj) {
+		var description = "";
+		for ( var i in obj) {
+			var property = obj[i];
+			description += property + "<br>";
+		}
+		return description;
+	},
+
+	/**
+	 * 获取年月日为了显示在nav上面的用户信息旁边
+	 */
+	getYearMonthDay : function() {
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1;
+		if(month <= 9){
+			month = "0" + month;
+		}
+		var day = date.getDate();
+		if(day <= 9){
+			day = "0" + day;
+		}
+		var hours = date.getHours();
+		if(hours <= 9){
+			hours = "0" + hours;
+		}
+		var minutes = date.getMinutes();
+		if(minutes <= 9){
+			minutes = "0" + minutes;
+		}
+		var seconds = date.getSeconds();
+		if(seconds <= 9){
+			seconds = "0" + seconds;
+		}
+		return year + "/" + month + "/" + day;
+	},
+
+	/**
+	 * 判断日期大小
+	 * @param date_1 小的日期
+	 * @param date_2 大的日期
+	 * @returns {Boolean}
+	 */
+	doCheckMinDate : function(date_1, date_2) {
+		var dateFormatt_1 = new Date(date_1.replace(/-/g, "/"));
+		var dateFormatt_2 = new Date(date_2.replace(/-/g, "/"));
+		return Date.parse(dateFormatt_1) < Date.parse(dateFormatt_2);
+	},
+
+	/**
+	 * 判断传入的值是否是数字
+	 * @param value
+	 * @returns {boolean}
+	 */
+	isDigit : function(value) {
+		var pattern = /^[0-9]*$/;
+		if (pattern.exec(value) == null || value == "") {
+			return false;
+		} else {
+			return true;
+		}
+	},
+
+	/**
+	 * 获取url的值中
+	 * @returns {Array}
+	 */
+	getHrefValue : function() {
+		var search = {};
+		search.pathName = window.location.pathname;
+		var tabName = (window.location.href).split("#")[1];
+		if (tabName) {
+			search.tabName = tabName;
+		}
+		if (window.location.search) {
+			var queryStr = window.location.search.split("?");
+			gets = queryStr[1].split("&");
+			for (var i = 0; i < gets.length; i++) {
+				temp_arr = gets[i].split("=");
+				search[temp_arr[0]] = temp_arr[1];
+			}
+		}
+		return search;
+	},
+	
+	/**
+	 * 后台传过来的数据表单自己进行封装
+	 * @param data
+	 * @param formId
+	 */
+	setFormField : function(data, formId) {
+		// 先赋值给 给文本框和下拉
+		for ( var key in data) {
+			formId.find("input[name=" + key + "][type!=radio][type!=checkbox]").val(data[key]);
+			formId.find("select[name=" + key + "]").val(data[key]);
+			formId.find("textarea[name=" + key + "]").val(data[key]);
+			if (data[key] == null) {
+				formId.find("label[name=" + key + "]").text("");
+				formId.find("span[name=" + key + "]").text("");
+				formId.find("div[name=" + key + "]").text("");
+			} else {
+				formId.find("label[name=" + key + "]").html(data[key]);
+				formId.find("span[name=" + key + "]").text(data[key]);
+				formId.find("div[name=" + key + "]").text(data[key]);
+			}
+		}
+	},
+	/**
+	 * 向后端传递数据表单,自己进行封装,为解决多文本回车键导致前后表单验证的问题,
+	 * @param formId
+	 */
+	saveEditData:function(idFrom){
+		var getFlag = /^#/.test(idFrom);
+		var getFromId = getFlag ? idFrom :'#'+ getFlag ;
+		var param = $(getFromId).find("input[type=text],select,textarea");
+		var dataObject = {};
+		$.each(param, function(index,value){
+		   var $this = $(this);
+		   var thisName = $this.attr("name");
+		   var thisValue = $this.val();
+		   dataObject[thisName]= thisValue;  
+		});
+		return dataObject;
+	},
+	/**
+	 * 关闭弹框的公共方法
+	 * @param target 当前需要关闭的表单id 或者 面板id
+	 * @param flag 是否是模态框
+	 * @param isRemove 是否将节点删除(单独用于js生成的弹框使用)
+	 * @returns {Boolean} 显示弹框
+	 */
+	closePanel : function(target, flag, isRemove) {
+		var args = arguments.length;
+		var panel = $(target).parents(".panel");
+		var modal = $("#modal-bg");
+		if (!target || args <= 1) {
+			throw new Error("你输入的target为:" + target + ";参数个数为：" + args);
+			return false;
+		} else {
+			var _panel = panel.length !== 0 ? panel : $(target);
+			// 重置表单,高级查询的表单不要重置
+			if (_panel.find("form")[0] && (_panel.attr("id") != "advancedSearch")) {
+				_panel.find("form")[0].reset();
+			}
+			// 判断是否需要移除模态层
+			if (flag) {
+				// 新增需求，同时探出几层对话框的时候使用 层层覆盖使用
+				if (modal.attr("style")) {
+					modal.removeAttr("style");
+				} else {
+					modal.removeClass("modal-backdrop fade in");
+				}
+			}
+			if (isRemove === true) {
+				_panel.remove();
+				return;
+			}
+			panel.find(".panel-shrink").unbind("click",toolMethod.closePanelBody);
+			// 非模态弹框和模态弹框进行隐藏
+			_panel.fadeOut(300);
+			return {
+				// 回调函数
+				on : function(callback) {
+					if (callback && callback instanceof Function) {
+						callback();
+					}
+				}
+			};
+		}
+	},
+
+	/**
+	 * 点击显示按钮显示对话框
+	 * @param target 传入当前上下文
+	 * @param domName 需要修改的dom节点
+	 * @param titleName 弹出框的名字
+	 */
+	showPanel : function(domName, titleName, isModel) {
+		var args = arguments.length;
+		if (!domName) {
+			throw new Error("你输入的target为:" + domName + ";参数个数为：" + args);
+			return false;
+		} else {
+			var $domName = $(domName);
+			if (titleName != "") {
+				$domName.find(".panle-title").html(titleName);
+			}
+            //是否需要模态
+			if (!isModel) {$("#modal-bg").addClass("modal-backdrop fade in");}
+			//移除用户折叠选项
+			if($domName.find('.panel-body').is(":hidden")){
+				$domName.find('.panel-heading .panel-shrink').text("▲");
+				$domName.find('.panel-body').removeAttr('style');
+			}
+			if($domName.find(".panel-shrink")){
+				$domName.find(".panel-shrink").bind("click",toolMethod.closePanelBody);
+			}
+			/*可以拖动*/
+			$domName.draggable({handle:'.panel-heading', containment:'body'}); 
+			/*js原生态设置居中显示*/
+			var top = document.documentElement.scrollTop;
+			var left = document.documentElement.scrollLeft;
+			var width = document.documentElement.clientWidth;
+			var height = document.documentElement.clientHeight;
+			$domName.css({
+				'top':'86px',
+				'left':left + (width - $domName.width())/2 +'px',
+				'right':'auto',
+				'width': $domName.width() + 'px'
+			});
+			$domName.fadeIn(300);
+		}
+	},
+
+	/**
+	 * 关闭弹框身体
+	 * @param target 当前事件关闭
+	 */
+	closePanelBody: function(){
+		var $this = $(this);
+		var panelBody = $this.parent('.panel-heading').next(".panel-body"); 
+		panelBody.slideToggle(100, function(){
+			if(panelBody.is(":hidden")){
+				$this.text("▼");
+			}else{
+				$this.text("▲");
+			}
+		});
+	},
+	/**
+	 * 文件上传中的文件类型、大小验证
+	 * @param fileId 文本域的Id
+	 * @param validate_Size 上传文件的大小
+	 * @param validate_Type 上传文件的类型(数组类型)
+	 * @returns {Boolean} 返回通过的true和false
+	 */
+	checkUploadFile : function(fileId, validate_Size, validate_Type) {
+		var file = $("#" + fileId)[0].files[0];
+		if (!file) {
+			Messager.show({Msg : "请选择文件",isModal : false,isHideDate : 2000});
+			return false;
+		} else {
+			var file_size = (file.size) / (1024 * 1000);
+			var file_type = file.name.substr(file.name.lastIndexOf("."));
+			if ($.inArray(file_type, validate_Type) !== -1) {
+				if (file_size <= validate_Size) {
+					return true;
+				} else {
+					Messager.show({Msg : "你选择的文件过大",isModal : false,isHideDate : 2000});
+				}
+			} else {
+				Messager.show({Msg : "你选择的类型不是Excel",isModal : false,isHideDate : 2000});
+				return false;
+			}
+		}
+	},
+
+	/**
+	 * 用户选择的上传文件进行显示
+	 * @param multipleType 多选还是单选
+	 */
+	onchangeFile : function(multipleType) {
+		var showName = $("#showFileList");
+		var fileList = $("#fileUploadFileName")[0].files;
+		var content = "";
+		for (var i = 0; i < fileList.length; i++) {
+			content += "<li>" + fileList[i].name + "</li>";
+		}
+		// 单个文件上传
+		if (multipleType) {
+			showName.find("li").remove();
+			showName.append(content);
+		} else {
+			// 多个文件上传
+			showName.append(content);
+		}
+	},
+	/*
+	 * 用户取消选择时，移除数组 @param 移除数名 @Array 数组
+	 */
+	arrayRemove : function(param, Array) {
+		var length = Array.length;
+		var newArray = [];
+		var j = 0;
+		for (var i = 0; i < length; i++) {
+			if (param != Array[i]) {
+				newArray[j++] = Array[i];
+			}
+		}
+		return newArray;
+	},
+	/**
+	 * 后台传过来的数据表单自己进行封装 用于span的查看
+	 * @param data
+	 * @param formId
+	 */
+	setFormFieldHtml : function(data, formId) {
+		// 先赋值给 给文本框和下拉
+		for ( var key in data) {
+			formId.find("span[name=" + key + "]").html(data[key]);
+		}
+	},
+	/**
+	 * 后台传过来的数据表单自己进行封装 用于div块的查看
+	 * @param data
+	 * @param formId
+	 */
+	setFormFieldDivHtml : function(data, formId) {
+		// 先赋值给 给文本框和下拉
+		for ( var key in data) {
+			formId.find("div[name=" + key + "]").html(data[key]);
+		}
+	},
+	/**
+	 * 返回Time值
+	 * @param date 毫秒数
+	 * @param arr 需要的年月日格式
+	 * @returns 时间格式化
+	 */
+	DateTimeYMS : function(date, arr) {
+		var dutyDate = new Date(parseInt(date));
+		var getHours = "", getMinutes = "",getSeconds = "";
+		if (dutyDate.getHours() < 10) {
+			getHours = "0" + dutyDate.getHours();
+		} else {
+			getHours = dutyDate.getHours();
+		}
+		if (dutyDate.getMinutes() < 10) {
+			getMinutes = "0" + dutyDate.getMinutes();
+		} else {
+			getMinutes = dutyDate.getMinutes();
+		}
+		if (dutyDate.getSeconds() < 10) {
+			getSeconds = "0" + dutyDate.getSeconds();
+		} else {
+			getSeconds = dutyDate.getSeconds();
+		}
+		var time;
+		var dateTime = dutyDate.getFullYear() + '-' + (dutyDate.getMonth() + 1) + '-' + dutyDate.getDate() + " " + getHours + ":" + getMinutes + ":" + getSeconds;
+		if (arr === 'ymdhms') {
+			time = dateTime;// 返回时间yyyy-mm-dd HH:mm:ss
+		} else if (arr === 'ymdhm') {
+			time = dutyDate.getFullYear() + '-' + (dutyDate.getMonth() + 1) + '-' + dutyDate.getDate() + " " + getHours + ":" + getMinutes;// 返回时间yyyy-mm-dd
+			// HH:mm
+		} else {
+			time = dateTime.split(" ")[0];// 返回时间yyyy-mm-dd
+		}
+		return time;
+	},
+
+	/**
+	 * 
+	 * @param time:Date对象
+	 * @param format:时间格式，格式中的年用＂yyyy＂表示，月用“MM”表示，日用“dd”表示，时用“HH”表示，分用"mm"表示，秒用"ss"表示，年月日的间隔符可以是"/"或“-”，时分秒的间隔符只为“:”
+	 * @returns 符合format格式的日期,例：2015-06-11 05:56:20 、 2015/02/20 、2015/03/05 12:30 备注：月份用大写M，分钟用小写mm
+	 */
+	DateFormat : function(time, format) {
+		var dutyTime = new Date();
+		var fmt = "yyyy-MM-dd HH:mm:ss";
+		if (time) {
+			dutyTime = time;
+		}
+		if (format) {
+			fmt = format;
+		}
+		var timeFmt = "";
+		var obj = {
+			"year" : dutyTime.getFullYear(),
+			"month" : function() {
+				var month = dutyTime.getMonth() + 1;
+				if (Number(month) < 10) {
+					month = "0" + month;
+				} else {
+					month = month.toString();
+				}
+				return month;
+			},
+			"day" : function() {
+				var day = dutyTime.getDate();
+				if (Number(day) < 10) {
+					day = "0" + day;
+				} else {
+					day = day.toString();
+				}
+				return day;
+			},
+			"hour" : function() {
+				var hour = dutyTime.getHours();
+				if (Number(hour) < 10) {
+					hour = "0" + hour;
+				} else {
+					hour = hour.toString();
+				}
+				return hour;
+			},
+			"minutes" : function() {
+				var minutes = dutyTime.getMinutes();
+				if (Number(minutes) < 10) {
+					minutes = "0" + minutes;
+				} else {
+					minutes = minutes.toString();
+				}
+				return minutes;
+			},
+			"seconds" : function() {
+				var seconds = dutyTime.getSeconds();
+				if (Number(seconds) < 10) {
+					seconds = "0" + seconds;
+				} else {
+					seconds = seconds.toString();
+				}
+				return seconds;
+			}
+		};
+		// 判断年月日的间隔符是“-”还是"/"
+		var spaceMark = "/";
+		if (/\//.test(fmt)) {
+			spaceMark = "/";
+		} else {
+			spaceMark = "-";
+		}
+		if (/yyyy/.test(fmt)) {
+			timeFmt = timeFmt + obj["year"] + spaceMark;
+		}
+		if (/MM/.test(fmt)) {
+			timeFmt = timeFmt + obj.month() + spaceMark;
+		}
+		if (/dd/.test(fmt)) {
+			timeFmt = timeFmt + obj.day();
+		}
+		if (/HH/.test(fmt)) {
+			timeFmt = timeFmt + " " + obj.hour() + ":";
+		}
+		if (/mm/.test(fmt)) {
+			timeFmt = timeFmt + obj.minutes() + ":";
+		}
+		if (/ss/.test(fmt)) {
+			timeFmt = timeFmt + obj.seconds();
+		}
+		timeFmt = timeFmt.trim();
+		// 去掉字符串末尾可能存在的“-”、"/"、":"符号；
+		var endChar = timeFmt[timeFmt.length - 1];
+		if (("-" === endChar) || ("/" === endChar) || (":" === endChar)) {
+			timeFmt = timeFmt.substr(0, Number(timeFmt.length) - 1);
+		}
+		timeFmt = timeFmt.replace(/-\s|\/\s|\s\:/, " ");// 去掉字符串中间的-空格、/空格、空格：三种符号；
+		return timeFmt;
+	},
+
+	/**
+	 * input表单只能输入数字
+	 * @param e 传入输入的值
+	 */
+	onlyNum : function(obj, flag) {
+		if(!flag){
+			obj.value = obj.value.replace(/[^\d]/g, "");
+		}else{
+			obj.value = obj.value.replace(/[^\d.]/g, "");
+			obj.value = obj.value.replace(/^\./g, "");
+			obj.value = obj.value.replace(/^\.{2,}/g, ".");
+			obj.value = obj.value.replace(".", "#$#").replace(/\./g, "").replace("#$#", ".");
+		}
+	},
+
+	/**
+	 * ajax全局配置使用,主要用于没有权限的操作
+	 */
+	onSuccess : function(a, b, c, d) {
+		// 无权限访问资源,将被拦截
+		if (d.code === 4) {
+			window.location.href = "/GDYY/view/error/noAuth.html";
+		} else if (d.code === 5) {//没有权限
+			window.location.href = "/GDYY/view/error/timeout.html";
+		}
+	},
+	
+	/**
+	 * 全屏弹窗展示（菜单以下）
+	 * @param divId 需要显示的窗口的div
+	 */
+	showWindowPanel: function(divId, titleName){
+		//清空表单之后再转换页面
+		$(divId).addClass("active").siblings(".tab-pane").removeClass("active");
+		//根据新增编辑查看判断，显示名字
+		if(titleName){
+			$(divId).find(".locationNav span .title-locationNav").html(titleName);
+		}
+	},
+
+	/**
+	 * 浮点数转为度分秒
+	 * @param origin 传入数字或者浮点数
+	 * @param type  判断值是否超限制的类型，默认为false，为经度，传入true为纬度
+	 * @returns {*}
+	 */
+    changeToDMS: function(origin, type){
+    	if(typeof origin === "number"){
+    		du = String(origin);
+    	} else if (typeof origin === "string"){
+    		du = origin.split('°')[0];
+    	}
+    	var max = 180;//经度限制
+    	if(type){//纬度限制
+    		max = 90;
+    	}
+    	//判断数值是否超过限制
+    	if (Math.abs(Number(du))  > max) {
+    		return false;
+    	}
+    	var str1 = du.split(".");
+    	var deg = str1[0];   //度
+    	var min = 0;
+    	var sec = 0.0000;
+    	//分
+    	if(str1[1]){
+    		var tp = "0." + str1[1];
+    		var tp = String(tp * 60);  //进行强制转换
+        	var str2 = tp.split(".");
+        	min = str2[0]; //parseFloat(fen).toFixed(0)
+        	//秒
+        	if(str2[1]){
+        		tp = "0." + str2[1];
+            	tp = tp*60;
+        	}
+        	sec = tp;//
+    	}
+    	var string = deg + '\u00b0 ' + min + '\u2032 ' + parseFloat(sec).toFixed(4) + '\u2033 ';
+    	return string;
+    },
+
+	/**
+	 * 
+	 * 度分秒转浮点数
+	 * @param arr  传入数组或者度分秒的字符串 数组项为字符串不是数字
+	 * @param type 判断值是否超限制的类型，默认为false，为经度，传入true为纬度
+	 * @returns {*} 返回浮点数字符串
+	 */
+	changeToFloat: function(arr, type){
+		var deg  = "0", min = "0", sec = "0.0000";
+		if(typeof arr === "string"){//传入字符串
+			var du = arr.split("°");
+			deg = du[0];
+			if ((du[1] !== undefined) && (du[1] !== "")){
+				min = du[1].split("′")[0];
+				if ((du[1].split("′")[1] !== undefined) && (du[1].split("′")[1] !== "")){
+					sec = du[1].split("′")[1].split("″")[0];
+				}
+			}
+		} else if (typeof arr === "object"){//传入数组
+			deg = arr[0];
+			if(arr[1] !== undefined){
+				min = arr[1];
+				if(arr[2] !== undefined){
+					sec = arr[2];
+				}
+			}
+		}
+		var number = parseFloat(min) + parseFloat(sec/60);
+		if ((parseFloat(deg) < 0) || (deg === "-0")){//为负数的时候
+			number = 0 - number;
+		}
+		var float = parseFloat(deg) + parseFloat(number/60);
+		//判断数值是否超过限制
+		var max = 180;//经度限制
+    	if(type){
+    		max = 90;//纬度限制
+    	}
+    	if (Math.abs(float)  > max) {
+    		return false;
+    	} else {
+    		return parseFloat(float.toFixed(6));
+    	}
+	},
+	
+	/**
+	 * 
+	 *将数组按指定个数分组并返回新的数组，例如：var a =[1,2,3,4,5,6,7,8];var b= groupData(a,3);b=[[1,2,3],[4,5,6,],[7,8]];
+	 * @param data  传入数组的数据
+	 * @param num 指定的个数
+	 * @returns {*} 返回浮点数字符串
+	 */
+	groupData: function(data, num){
+		var origalData=data;
+		var tempData = [];
+		var groupData=[];
+		var gruopLength = (origalData.length)%num;
+		if(gruopLength !== 0){
+			gruopLength = Math.ceil((origalData.length)/num);
+		}else{
+			gruopLength = (origalData.length)/num;
+		}
+		var k=0;
+		for(var j = 0; j <gruopLength; j++){
+			for(k; k < origalData.length; k++){
+				if(((k+1)%num) !== 0){
+					tempData.push(origalData[k]);
+				}else{
+					tempData.push(origalData[k]);
+					break;
+				}
+			}
+			groupData.push(tempData);
+				tempData=[];
+		}
+		return groupData;
+	},
+	
+	/**
+	 *去出JSON数组中属性值重复的元素，
+	 *var a=[{"name":"A","Id":"01"},{"name":"B","Id":"02"},{"name":"A","Id":"01"}];
+	 *var b =  toolMethod.removeJosnSame(a,name); b =[{"name":"A","Id":"01"},{"name":"B","Id":"02"}];
+	 * @param data  传入数组的数据
+	 * @param sameElemt  判定属性值是否相同的属性
+	 * @returns {*} 返回新数组
+	 */
+	removeJosnSame:function(data,sameElemt){
+		var a =data;
+		var temp =[];
+		var returnArry =[];
+		for(var i =0; i < a.length; i++){
+			temp[a[i][sameElemt]]=a[i];
+		};
+		for(var j in temp){
+			returnArry.push(temp[j]);
+		}
+		return returnArry;
+	},
+	
+	/**
+	 * 数据信息
+	 */
+	windowPrint: function(url, data){
+		window.sessionStorage.setItem("url", url);
+		window.sessionStorage.setItem("data", JSON.stringify(data));
+		var _iframePrevious = $("#print-window");
+		if(_iframePrevious){
+			_iframePrevious.remove();
+		}
+		window.open("/GDYY/view/print/print.html");
+	},
+	
+	/**
+	 * 使用javascript模拟MAP集合 主要的方法有
+	 * put、get、size、remove、isEmpty、containsKey、containsValue、clear、keys、values
+	 */
+	MapUtil : {
+
+		dataMap : {},
+
+		/**
+		 * 根据key值 取出对应的值
+		 * 
+		 * @param key
+		 * @returns {*}
+		 */
+		get : function(key) {
+			return this.dataMap[key];
+		},
+
+		/**
+		 * 存放一个值
+		 * 
+		 * @param key
+		 * @param value
+		 */
+		put : function(key, value) {
+			this.dataMap[key] = value;
+		},
+
+		/**
+		 * 获取map数组的大小
+		 * 
+		 * @returns {*}
+		 */
+		size : function() {
+			return this.values().length;
+		},
+
+		/**
+		 * 根据key的值移除对应的value值
+		 * 
+		 * @param key
+		 */
+		remove : function(key) {
+			delete this.dataMap[key];
+		},
+
+		/**
+		 * 判断map集合是否为空
+		 * 
+		 * @returns {boolean}
+		 */
+		isEmpty : function() {
+			return this.size === 0;
+		},
+
+		/**
+		 * 判断所给的key是否在集合中
+		 * 
+		 * @param key
+		 * @returns {boolean}
+		 */
+		containsKey : function(key) {
+			return key in this.dataMap;
+		},
+
+		/**
+		 * 判断所给的value是否在集合中
+		 * 
+		 * @param value
+		 * @returns {boolean}
+		 */
+		containsValue : function(value) {
+			return this.values().indexOf(value) > -1;
+		},
+		
+		/**
+		 * 返回所给的value在集合中的位置，需要走过containsValue方法判断是否在集合中才能调用
+		 * @param value
+		 * @returns {boolean}
+		 */
+		positionValue : function(value) {
+			return this.values().indexOf(value);
+		},
+
+		/**
+		 * 清除集合里面的数据
+		 */
+		clear : function() {
+			for (key in this.dataMap) {
+				delete this.dataMap[key];
+			}
+		},
+
+		/**
+		 * 返回出所有的key值
+		 * 
+		 * @param key
+		 * @returns {boolean}
+		 */
+		keys : function() {
+			keyList = [];
+			for (key in this.dataMap) {
+				keyList.push(key);
+			}
+			return keyList;
+		},
+
+		/**
+		 * 返回所有的value值
+		 * 
+		 * @param value
+		 * @returns {boolean}
+		 */
+		values : function() {
+			valueList = [];
+			for (key in this.dataMap) {
+				valueList.push(this.dataMap[key]);
+			}
+			return valueList;
+		}
+	}
+};
+
+// 统一提示语
+var prompt = {
+	noSelectedLook : "没有选中要查看的数据",
+	noSelectedEdit : "没有选中要编辑的数据",
+	noSelectedDelete : "没有选中要删除的数据",
+	noSelectedVerify : "没有选中要审核的数据",
+	moreSelectedLook : "选中查看的记录不能超过1条",
+	moreSelectedEdit : "选中编辑的记录不能超过1条",
+	moreSelectedExport : "选中导出的记录不能超过1条",
+	moreSelectedVerify : "选中审核的记录不能超过1条",
+	moreSelectedDelete : "选中删除的记录不能超过1条",
+	noSelectdExport : "没有选中要导出的数据",
+	sureDelete : "确认删除数据吗?",
+	editSuccess : "编辑成功",
+	deleteSuccess : "删除成功",
+	saveSuccess : "保存成功",
+	handleSuccess : "操作成功",
+	importSuccess : "导入成功",
+	sureDeleteAll : "确认清空所有数据吗？",
+	setPassw: "修改成功,请重新登录.",
+	noImgUpload: "你没有选择上传的图片",
+	uploadImgType:"请选择图片类型进行上传",
+	fileType:'*.png;*.PNG;*.jpg;*.JPG;*.jpeg;*.JPEG;*.doc;*.xlsx;*.xls;*.pdf;*.docx;*.xls'
+};
+/**
+ * 全局配置ajax方法
+ */
+$(document).ajaxSuccess(toolMethod.onSuccess).ajaxComplete(toolMethod.onComplete);

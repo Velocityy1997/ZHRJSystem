@@ -1,0 +1,364 @@
+		
+			var grid_data = [];
+		
+
+			var queryBuilder= "";//查询初始化
+			var  queryName = "";
+			var  hisType = "";
+			var  statrTime = "";
+			var  endTime = "";
+			
+			getHistoryTaskGrid();
+			/**
+			 从后台读取终端数据，并加载jqjrid表格
+			*/
+		    function getHistoryTaskGrid() {
+		    	jQuery(function($) {
+					$(window).resize(function(){   
+			        	$("#grid-table").setGridWidth($(window).width());
+			        });
+					
+					var grid_selector = "#grid-table";
+					var pager_selector = "#grid-pager";
+					jQuery(grid_selector).jqGrid({						
+						//扩展配置项,是否开启顶部工具栏
+						topToolbar:true,
+						//扩展配置项,jqGrid顶部工具栏ID,此id必须唯一，在创建顶部工具栏时，将会使用此ID
+						topToolbarId:'grid-table-top-toolbar',
+						url:"/ZHRJSystem/historyTask/list", //这是数据的请求地址 
+						mtype: 'POST',
+						datatype: "json", //将这里改为使用JSON数据
+						postData: {queryBuilder:queryBuilder},
+						ajaxEditOptions: {contentType: 'application/json; charset=utf-8'},
+						height: "100%",
+						colNames:['编号', '任务类型','开始时间', '结束时间', '用户名', '任务内容', '任务描述', '发送方', '接收方', '发送类型'],
+						colModel:[
+							{name:'taskId', index:'taskId', sorttype:"int",  hidden:true},			//, hidden:true
+							{name:'taskType', index:'taskType', width:100, fixed:true, resize:false, sortable:true, editable: true},
+							{name:'startTime', index:'startTime', width:130, fixed:true, resize:false, sortable:true, editable: true},												
+							{name:'endTime', index:'endTime', width:130, fixed:true, resize:false, sortable:true, editable: true},				
+							{name:'taskName', index:'taskName', width:70, fixed:true, resize:false, sortable:true, editable: true},	
+							{name:'taskContent', index:'taskContent', width:240, fixed:true, resize:false, sortable:true, editable: true},
+							{name:'taskDescription', index:'taskDescription', width:150, fixed:true, resize:false, sortable:true, editable: true},
+							{name:'taskSender', index:'taskSender', width:80, fixed:true, resize:false, sortable:true, editable: true},
+							{name:'taskReceiver', index:'taskReceiver', width:80, fixed:true, resize:false, sortable:true, editable: true},
+							{name:'taskSendType', index:'taskSendType', width:70, fixed:true, resize:false, sortable:true, editable: true}
+							
+							],
+	                                       
+				        rownumbers: true,
+						viewrecords: true,
+						rowNum: 10,
+						rowList: [10,20,50],
+						jsonReader: {  
+							root:"rows", page:"page", total:"total",
+							records:"records", repeatitems:false, id:"taskId"
+						},
+						pager: pager_selector,
+						altRows: true,
+						prmNames: {
+							page:"page",
+							rows:"rows",
+							oper:"oper",
+							clearoper:"clear",
+							deloper:"del",
+						},
+																
+						multiselect: true,					
+				        multiboxonly: true,
+						loadComplete : function() {
+							$(grid_selector).closest(".ui-jqgrid-bdiv").css({ 'overflow-y' : 'scroll' });
+							$(grid_selector).closest(".ui-jqgrid-bdiv").css({ 'overflow-x' : 'scroll' });
+							
+							var table = this;
+							setTimeout(function(){
+								styleCheckbox(table);
+								
+								updateActionIcons(table);
+								updatePagerIcons(table);
+								enableTooltips(table);
+							}, 0);
+						},						
+						caption: "历史任务管理",
+						autowidth: true
+					});
+				
+					//enable search/filter toolbar
+					//jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
+					//switch element when editing inline
+					function aceSwitch( cellvalue, options, cell ) {
+						setTimeout(function(){
+							$(cell) .find('input[type=checkbox]')
+									.wrap('<label class="inline" />')
+								.addClass('ace ace-switch ace-switch-5')
+								.after('<span class="lbl"></span>');
+						}, 0);
+					}
+					//enable datepicker
+					function pickDate( cellvalue, options, cell ) {
+						setTimeout(function(){
+							$(cell) .find('input[type=text]')
+									.datepicker({format:'yyyy-mm-dd hh:mm:ss' , autoclose:true}); 
+						}, 0);
+					}
+				
+					//navButtons
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar",
+						{ 	//navbar options
+						edit : false,
+						editicon : 'icon-pencil blue',
+						edittitle : '修改',
+						edittext : '修改',
+						add : false,
+						addicon : 'icon-plus-sign purple',
+						addtitle : '新增',
+						addtext : '新增',
+						del : false,
+						delicon : 'icon-trash red',
+						deltext : '删除',
+						deltitle : '删除',
+						search : false,
+						searchicon : 'icon-search orange',
+						refresh : true,
+						refreshicon : 'icon-refresh green',
+						refreshtext : '刷新',
+						view : false,
+						viewicon : 'icon-zoom-in grey',
+					},						
+						{
+							//search form
+							recreateForm: true,
+							afterShowSearch: function(e){
+								var form = $(e[0]);
+								form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
+								style_search_form(form);
+							},
+							afterRedraw: function(){
+								style_search_filters($(this));
+							}
+							,
+							multipleSearch: true,						
+						}
+					)
+						
+					
+				jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+				).navSeparatorAdd("#grid-table-top-toolbar",				//navSeparatorAdd是增加一个|进行按钮分割.
+						{sepclass : "ui-separator",sepcontent: ''}
+				).navButtonAdd("#grid-table-top-toolbar",{	
+						caption:"删除",
+						title:"删除",
+						buttonicon : 'icon-trash red',
+						onClickButton:function()
+						{
+							var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+							if (ids.length == 0){
+								mizhu.toast("请选择记录");
+							} else {
+								$("#deleteHistoryTaskDialog").dialog({ 
+									autoOpen: true,
+									height: 180, 
+									width: 300,  
+									resizable: false, 
+									modal: true
+								});	
+							}
+						}
+					}).navButtonAdd("#grid-table-top-toolbar",{
+						//清空所有的数据	
+						caption:"清空",
+						title:"清空",
+						buttonicon : 'icon-trash red',
+						onClickButton:function()
+						{
+							var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+								$("#clearHistoryTaskDialog").dialog({ 
+									autoOpen: true,
+									height: 180, 
+									width: 300,  
+									resizable: false, 
+									modal: true
+								});	
+						}
+					})
+					var trtr = ($("#grid-table-top-toolbar").find("table"))[1].getElementsByTagName("tr")[0];		  	
+					trtr.appendChild(document.createElement('td'));
+					var length = trtr.getElementsByTagName("td").length;
+					trtr.getElementsByTagName("td")[length-1].innerHTML = "<input type='text' id='queryName'placeholder='请输入用户名'  style = 'margin-left: 50px;'/>";
+					trtr.appendChild(document.createElement('td'));
+					length = trtr.getElementsByTagName("td").length;
+					trtr.getElementsByTagName("td")[length-1].innerHTML = "<select id= 'hisType' name = 'hisType' style = 'margin-left:  10px;width:150px;'> <option value=''>请选择任务类型</option><option value='101'>发送消息</option><option value='102'>接收消息</option> <option value='103'>指挥机本机定位</option> <option value='104'>通播</option> <option value='105'>友邻位置</option> <option value='106'>指令导航</option> <option value='107'>路径规划</option> <option value='108'>融合通信</option> <option value='109'>监控短信</option></select>";
+					trtr.appendChild(document.createElement('td'));
+					length = trtr.getElementsByTagName("td").length;
+					trtr.getElementsByTagName("td")[length-1].innerHTML = "	<input autocomplete='off'  class='form_datetime' type='text' id='statrTime' placeholder='请选择起始时间'    data-date-format='yyyy-mm-dd hh:mm:ss'  style = 'margin-left:  10px;width:150px;'/>";
+					trtr.appendChild(document.createElement('td'));
+					length = trtr.getElementsByTagName("td").length;
+					trtr.getElementsByTagName("td")[length-1].innerHTML = "<input autocomplete='off' type='text'  class='form_datetime' id='endTime'placeholder='请选结束时间'    data-date-format='yyyy-mm-dd hh:mm:ss' style = 'margin-left:  10px;width:150px;'/>";
+					
+					
+					
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+					).navButtonAdd("#grid-table-top-toolbar",{
+							
+						caption:"查询",
+						title:"查询",
+						buttonicon : 'icon-search orange',			
+						onClickButton:function()
+						{
+							var  queryName = document.getElementById('queryName').value;
+							var  hisType = document.getElementById('hisType').value;
+							var  statrTime = document.getElementById('statrTime').value;
+							var  endTime = document.getElementById('endTime').value;
+							
+							var arr =  statrTime.split("-");
+							startDate = new Date(arr[0], arr[1], arr[2]);
+							var arr = endTime.split("-");
+							endDate =  new Date(arr[0], arr[1], arr[2]);
+							if(startDate > endDate){
+								mizhu.toast("起始时间不能大于结束时间");
+								return false;
+							}
+							
+							
+							$("#grid-table").jqGrid('setGridParam', {
+						  		datatype : 'json',
+						  		postData : {queryName:queryName , hisType:hisType , statrTime:statrTime , endTime :endTime},
+						  		page : 1
+						  	}).trigger("reloadGrid");
+						}
+						})
+					
+						  $('.form_datetime').datetimepicker({
+							    format: 'yyyy-mm-dd hh:ii:ss',
+							    autoclose: true,
+							    /* minView: "month",  *///选择日期后，不会再跳转去选择时分秒 
+							    language: 'zh-CN',
+							    dateFormat: 'yyyy-mm-dd',//日期显示格式
+							    timeFormat: 'HH:mm:ss',//时间显示格式
+							    todayBtn: 1,
+							    autoclose: 1,
+							    minView: 0,  //0表示可以选择小时、分钟   1只可以选择小时
+							    minuteStep: 1,//分钟间隔1分钟
+							});
+						
+						  
+			});
+																			
+					function style_delete_form(form) {
+						var buttons = form.next().find('.EditButton .fm-button');
+						buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
+						buttons.eq(0).addClass('btn-danger').prepend('<i class="icon-trash"></i>');
+						buttons.eq(1).prepend('<i class="icon-remove"></i>');
+					}
+					
+					function style_search_filters(form) {
+						form.find('.delete-rule').val('X');
+						form.find('.add-rule').addClass('btn btn-xs btn-primary');
+						form.find('.add-group').addClass('btn btn-xs btn-success');
+						form.find('.delete-group').addClass('btn btn-xs btn-danger');
+					}
+					function style_search_form(form) {
+						var dialog = form.closest('.ui-jqdialog');
+						var buttons = dialog.find('.EditTable')
+						buttons.find('.EditButton a[id*="_reset"]').addClass('btn btn-sm btn-info').find('.ui-icon').attr('class', 'icon-retweet');
+						buttons.find('.EditButton a[id*="_query"]').addClass('btn btn-sm btn-inverse').find('.ui-icon').attr('class', 'icon-comment-alt');
+						buttons.find('.EditButton a[id*="_search"]').addClass('btn btn-sm btn-purple').find('.ui-icon').attr('class', 'icon-search');
+					}
+					
+					function beforeDeleteCallback(e) {
+						var form = $(e[0]);
+						if(form.data('styled')) return false;
+						
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_delete_form(form);
+						
+						form.data('styled', true);
+					}
+					
+					function beforeEditCallback(e) {
+						var form = $(e[0]);
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_edit_form(form);
+					}
+								
+					function styleCheckbox(table) {
+					
+					}
+				
+					//unlike navButtons icons, action icons in rows seem to be hard-coded
+					//you can change them like this in here if you want
+					function updateActionIcons(table) {
+						
+					}
+					
+					//replace icons with FontAwesome icons like above
+					function updatePagerIcons(table) {
+						var replacement = 
+						{
+							'ui-icon-seek-first' : 'icon-double-angle-left bigger-140',
+							'ui-icon-seek-prev' : 'icon-angle-left bigger-140',
+							'ui-icon-seek-next' : 'icon-angle-right bigger-140',
+							'ui-icon-seek-end' : 'icon-double-angle-right bigger-140'
+						};
+						$('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function(){
+							var icon = $(this);
+							var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+							
+							if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
+						})
+					}
+				
+					function enableTooltips(table) {
+						$('.navtable .ui-pg-button').tooltip({container:'body'});
+						$(table).find('.ui-pg-div').tooltip({container:'body'});
+					}
+				
+		    	
+			}
+		    
+		    
+		   
+		    function deleteHistoryTask() {
+		    	var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+		    	$.ajax({
+        			type : "POST",
+        			url : "/ZHRJSystem/historyTask/del",
+        			data : "id=" + ids,
+        			dataType : "json",
+        			success : function(result) {      				
+        		    		mizhu.toast(result.message);
+        					setTimeout(function() {
+        						location.reload();
+        					}, 2000); 
+        			},
+        			error : function(result) {
+
+        				mizhu.toast("删除失败");
+        			}
+        		});
+		    }
+		    
+		    
+		  //清空所有数据
+		    function clearHistoryTask() {
+		    	//var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+		    	$.ajax({
+        			type : "POST",
+        			url : "/ZHRJSystem/historyTask/clearTask",
+        			/*data : "id=" + ids,
+        			dataType : "json",*/
+        			success : function(result) {      				
+        		    		mizhu.toast(result.message);
+        					setTimeout(function() {
+        						location.reload();
+        					}, 2000); 
+        			},
+        			error : function(result) {
+
+        				mizhu.toast("清空失败");
+        			}
+        		});
+		    }
+		    
+		
+		    

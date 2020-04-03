@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.comm.preMessage.dao.PreMessageMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.comm.preMessage.model.PreMessage" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	content,
+     	time
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from pre_message 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  <!-- 根据content查询对象 -->
+  <select id="selectByPreContent" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from pre_message 
+    where  content = #{ content,jdbcType= VARCHAR }
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from pre_message 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from pre_message
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.comm.preMessage.model.PreMessage">
+		insert into pre_message
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="content != null">
+				content,
+			</if>
+			<if test="time != null">
+				time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="content != null">
+				 #{ content,jdbcType= VARCHAR },
+			</if>
+			<if test="time != null">
+				 #{ time,jdbcType= TIMESTAMP },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.comm.preMessage.model.PreMessage">
+		select
+		<include refid="Base_Column_List" />
+		from pre_message
+		where 1=1
+		 
+		 <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content like  CONCAT('%',#{ content,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="time != null">
+			AND time =  #{ time,jdbcType= TIMESTAMP }
+		  </if>
+		 
+		ORDER BY time desc
+	</select>
+	
+	 <select id="selectAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from pre_message
+		
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.comm.preMessage.model.PreMessage">
+		select
+		count(1)
+		from pre_message
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="time != null">
+			AND time =  #{ time,jdbcType= TIMESTAMP }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.comm.preMessage.model.PreMessage">
+		<if test="id !=null">
+			update pre_message
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 content =  #{ content,jdbcType= VARCHAR },
+     			 time =  #{ time,jdbcType= TIMESTAMP }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

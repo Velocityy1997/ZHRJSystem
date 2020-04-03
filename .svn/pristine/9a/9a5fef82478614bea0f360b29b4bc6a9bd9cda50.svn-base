@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.common.menu.dao.mysql.mybatis.MenuMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.common.menu.model.MenuBean" >
+    <id column="act_id" property="id" jdbcType="BIGINT" />
+    <result column="act_name" property="text" jdbcType="VARCHAR" />
+    <result column="act_url" property="url" jdbcType="BIGINT" />
+    <result column="act_icon" property="icon" jdbcType="VARCHAR" />
+    <result column="act_parent_id" property="pid" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	act_id,
+     	act_name,
+     	act_parent_id
+     	,act_url,act_icon
+  </sql>
+   
+  <select id="selectMenusByUser"  parameterType="Map" resultMap="BaseResultMap" >
+  select sa.act_id as act_id,sa.act_name as act_name,sa.act_url as act_url,
+    sa.act_icon as act_icon from system_user su left join
+   system_user_role_ra surr on su.user_id=surr.user_id
+   left join system_role sr on sr.role_id=surr.role_id
+   left join system_role_action_ra srar on sr.role_id = srar.role_id
+   left join system_action sa on sa.act_id=srar.action_id 
+   where su.user_id=#{userId} and sa.act_parent_id=0 group by sa.act_id
+  </select>
+  
+   <select id="selectChildMenusByUser" resultMap="BaseResultMap" parameterType="Map" >
+     select sa.act_id as act_id,sa.act_name as act_name,sa.act_url as act_url,
+    sa.act_icon as act_icon,sa.act_parent_id from
+  system_user su left join
+   system_user_role_ra surr on su.user_id=surr.user_id
+   left join system_role sr on sr.role_id=surr.role_id
+   left join system_role_action_ra srar on sr.role_id = srar.role_id
+   left join (
+  select <include refid="Base_Column_List" />from system_action where FIND_IN_SET(act_id,queryChildrenMenuTree(#{pid}))
+   
+   ) sa on sa.act_id=srar.action_id 
+   where su.user_id=#{userId}  group by sa.act_id
+  </select>
+</mapper>

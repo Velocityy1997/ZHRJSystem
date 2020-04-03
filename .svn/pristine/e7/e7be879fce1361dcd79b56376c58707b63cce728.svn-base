@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.industry.dao.IndustryMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.industry.model.Industry" >
+    <result column="indust_id" property="industId" jdbcType="VARCHAR" />
+    <result column="indust_name" property="industName" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	indust_id,
+     	indust_name,
+     	remark
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from industry 
+    where  indust_id = #{ industId,jdbcType=VARCHAR}
+  </select>
+  
+  
+   <!-- 查询所有数据 -->
+  <select id="selectByPrimaryList" resultMap="BaseResultMap" parameterType="java.util.List" >
+    select  <include refid="Base_Column_List" />
+     from industry where 1=1
+  </select>
+  
+  
+  <!--根据行业name 查询对应ID  -->
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select  indust_id from industry where indust_name = #{industName , jdbcType=VARCHAR}
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from industry 
+    where indust_id =  #{ industId,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from industry
+    where indust_id in
+    <foreach collection="list" item="industId" index="index"
+            open="(" close=")" separator=",">
+             #{ industId,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.industry.model.Industry">
+		insert into industry
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="industId != null">
+				indust_id,
+			</if>
+			<if test="industName != null">
+				indust_name,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="industId != null">
+				 #{ industId,jdbcType= VARCHAR },
+			</if>
+			<if test="industName != null">
+				 #{ industName,jdbcType= VARCHAR },
+			</if>
+			<if test="remark != null">
+				 #{ remark,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.industry.model.Industry">
+		select
+		<include refid="Base_Column_List" />
+		from industry
+		where 1=1
+		  <if test="industId != null">
+			AND indust_id =  #{ industId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="industName != null">
+			AND indust_name =  #{ industName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY update_time desc
+		<if test="start != null and max != null">
+			limit    #{  start},   #{  max }
+		 </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.industry.model.Industry">
+		select
+		count(1)
+		from industry
+		where 1=1
+		  <if test="industId != null">
+			AND indust_id =  #{ industId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="industName != null">
+			AND indust_name =  #{ industName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.industry.model.Industry">
+		<if test="industId !=null">
+			update industry
+			<set>
+     			 indust_id =  #{ industId,jdbcType= VARCHAR },
+     			 indust_name =  #{ industName,jdbcType= VARCHAR },
+     			 remark =  #{ remark,jdbcType= VARCHAR }
+			</set>
+			where indust_id =  #{ industId,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

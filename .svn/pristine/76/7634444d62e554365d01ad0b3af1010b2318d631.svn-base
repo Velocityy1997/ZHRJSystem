@@ -1,0 +1,31 @@
+﻿.postionbar-container{
+    min-width:280px;
+}
+
+.postionbar-li-item-lable{
+    margin-left:10px;
+}
+
+.postionbar-li-item-icon-p{
+	float:right;
+	margin-left:10px;
+    padding:1px;
+}
+
+/*.postionbar-li-item-icon-p:hover{
+    border-radius:4px;
+    border-width:2px;
+    border-color:blue;
+    border-style:solid;
+}*/
+
+.postionbar-li-item-header-icon{
+	float:right;
+	margin-left:10px;
+}
+
+.postionbar-ul-container-ul{
+	margin-top:0px;
+	max-height:400px;
+    overflow:auto;
+}

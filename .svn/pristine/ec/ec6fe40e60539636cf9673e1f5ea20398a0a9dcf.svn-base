@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.comm.message.dao.MessageMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.comm.message.model.Message" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="zhj_num" property="zhjNum" jdbcType="VARCHAR" />
+    <result column="sender" property="sender" jdbcType="VARCHAR" />
+    <result column="receiver" property="receiver" jdbcType="VARCHAR" />
+    <result column="send_type" property="sendType" jdbcType="VARCHAR" />
+    <result column="user_ip" property="userIp" jdbcType="VARCHAR" />
+    <result column="receiver_state" property="receiverState" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="message_state" property="messageState" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	type,
+     	content,
+     	user_name,
+     	zhj_num,
+     	sender,
+     	receiver,
+     	send_type,
+     	user_ip,
+     	receiver_state,
+     	create_time,
+     	message_state
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from message 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteAll" parameterType="java.lang.String" >
+    delete
+		
+    from message 
+   
+  </delete>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from message 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from message
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.comm.message.model.Message">
+		insert into message
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="content != null">
+				content,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="zhjNum != null">
+				zhj_num,
+			</if>
+			<if test="sender != null">
+				sender,
+			</if>
+			<if test="receiver != null">
+				receiver,
+			</if>
+			<if test="sendType != null">
+				send_type,
+			</if>
+			<if test="userIp != null">
+				user_ip,
+			</if>
+			<if test="receiverState != null">
+				receiver_state,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="messageState != null">
+				message_state,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="type != null">
+				 #{ type,jdbcType= VARCHAR },
+			</if>
+			<if test="content != null">
+				 #{ content,jdbcType= VARCHAR },
+			</if>
+			<if test="userName != null">
+				 #{ userName,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjNum != null">
+				 #{ zhjNum,jdbcType= VARCHAR },
+			</if>
+			<if test="sender != null">
+				 #{ sender,jdbcType= VARCHAR },
+			</if>
+			<if test="receiver != null">
+				 #{ receiver,jdbcType= VARCHAR },
+			</if>
+			<if test="sendType != null">
+				 #{ sendType,jdbcType= VARCHAR },
+			</if>
+			<if test="userIp != null">
+				 #{ userIp,jdbcType= VARCHAR },
+			</if>
+			<if test="receiverState != null">
+				 #{ receiverState,jdbcType= VARCHAR },
+			</if>
+			<if test="createTime != null">
+				 #{ createTime,jdbcType= VARCHAR },
+			</if>
+			<if test="messageState != null">
+				 #{ messageState,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.comm.message.model.Message">
+		select
+		<include refid="Base_Column_List" />
+		from message
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userName != null">
+			AND user_name =  #{ userName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null and  sender !=''">
+			AND  sender  like  CONCAT('%',#{ sender,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="receiver != null and receiver != '' ">
+			AND  receiver  like  CONCAT('%',#{ receiver,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="sendType != null">
+			AND send_type =  #{ sendType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiverState != null">
+			AND receiver_state =  #{ receiverState,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createTime != null">
+			AND create_time =  #{ createTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="messageState != null">
+			AND message_state =  #{ messageState,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY create_time desc
+			</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.comm.message.model.Message">
+		select
+		count(1)
+		from message
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userName != null">
+			AND user_name =  #{ userName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null">
+			AND sender =  #{ sender,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiver != null">
+			AND receiver =  #{ receiver,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sendType != null">
+			AND send_type =  #{ sendType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiverState != null">
+			AND receiver_state =  #{ receiverState,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createTime != null">
+			AND create_time =  #{ createTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="messageState != null">
+			AND message_state =  #{ messageState,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.comm.message.model.Message">
+		<if test="id !=null">
+			update message
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 type =  #{ type,jdbcType= VARCHAR },
+     			 content =  #{ content,jdbcType= VARCHAR },
+     			 user_name =  #{ userName,jdbcType= VARCHAR },
+     			 zhj_num =  #{ zhjNum,jdbcType= VARCHAR },
+     			 sender =  #{ sender,jdbcType= VARCHAR },
+     			 receiver =  #{ receiver,jdbcType= VARCHAR },
+     			 send_type =  #{ sendType,jdbcType= VARCHAR },
+     			 user_ip =  #{ userIp,jdbcType= VARCHAR },
+     			 receiver_state =  #{ receiverState,jdbcType= VARCHAR },
+     			 create_time =  #{ createTime,jdbcType= VARCHAR },
+     			 message_state =  #{ messageState,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

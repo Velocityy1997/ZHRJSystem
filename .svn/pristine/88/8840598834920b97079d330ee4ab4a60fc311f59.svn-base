@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.bdcard.dao.BdCardMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.bdcard.model.BdCard" >
+    <id column="cardId" property="cardId" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="card_num" property="cardNum" jdbcType="VARCHAR" />
+    <result column="broadcast_num" property="broadcastNum" jdbcType="VARCHAR" />
+    <result column="user_feature" property="userFeature" jdbcType="VARCHAR" />
+    <result column="comm_fre" property="commFre" jdbcType="VARCHAR" />
+    <result column="comm_grade" property="commGrade" jdbcType="VARCHAR" />
+    <result column="sub_user_num" property="subUserNum" jdbcType="VARCHAR" />
+    <result column="invest_date" property="investDate" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="VARCHAR" />
+    <result column="invest_time" property="investTime" jdbcType="VARCHAR" />
+    <result column="remain_time" property="remainTime" jdbcType="VARCHAR" />
+    <result column="is_exceed" property="isExceed" jdbcType="VARCHAR" />
+    <result column="exceed_time" property="exceedTime" jdbcType="VARCHAR" />
+    <result column="balance" property="balance" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+      <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="card_remark" property="cardRemark" jdbcType="VARCHAR" />
+   
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	card_id,
+     	card_num,
+     	broadcast_num,
+     	user_feature,
+     	comm_fre,
+     	comm_grade,
+     	sub_user_num,
+     	invest_date,
+     	create_date,
+     	invest_time,
+     	remain_time,
+     	is_exceed,
+     	exceed_time,
+     	balance,
+     	status,
+     	create_time,
+     	card_remark
+     	
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from bd_card 
+    where  card_id = #{ cardId,jdbcType=VARCHAR}
+  </select>
+  
+	<!--   根据卡号查询 -->
+   <select id="selectByCardNum"   resultMap="BaseResultMap"   parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from bd_card  where  card_num =  #{cardNum,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from bd_card 
+    where card_id =  #{ cardId,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from bd_card
+    where card_id in
+    <foreach collection="list" item="cardId" index="index"
+            open="(" close=")" separator=",">
+             #{ cardId,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.bdcard.model.BdCard">
+		insert into bd_card
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="cardId != null">
+				card_id,
+			</if>
+			<if test="cardNum != null">
+				card_num,
+			</if>
+			<if test="broadcastNum != null">
+				broadcast_num,
+			</if>
+			<if test="userFeature != null">
+				user_feature,
+			</if>
+			<if test="commFre != null">
+				comm_fre,
+			</if>
+			<if test="commGrade != null">
+				comm_grade,
+			</if>
+			<if test="subUserNum != null">
+				sub_user_num,
+			</if>
+			<if test="investDate != null">
+				invest_date,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="investTime != null">
+				invest_time,
+			</if>
+			<if test="remainTime != null">
+				remain_time,
+			</if>
+			<if test="isExceed != null">
+				is_exceed,
+			</if>
+			<if test="exceedTime != null">
+				exceed_time,
+			</if>
+			<if test="balance != null">
+				balance,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="cardRemark != null">
+				card_remark,
+			</if>
+			
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="cardId != null">
+				 #{ cardId,jdbcType= VARCHAR },
+			</if>
+			<if test="cardNum != null">
+				 #{ cardNum,jdbcType= VARCHAR },
+			</if>
+			<if test="broadcastNum != null">
+				 #{ broadcastNum,jdbcType= VARCHAR },
+			</if>
+			<if test="userFeature != null">
+				 #{ userFeature,jdbcType= VARCHAR },
+			</if>
+			<if test="commFre != null ">
+				 #{ commFre,jdbcType= VARCHAR },
+			</if>
+			<if test="commGrade != null">
+				 #{ commGrade,jdbcType= VARCHAR },
+			</if>
+			<if test="subUserNum != null">
+				 #{ subUserNum,jdbcType= VARCHAR },
+			</if>
+			<if test="investDate != null">
+				 #{ investDate,jdbcType= VARCHAR },
+			</if>
+			<if test="createDate != null">
+				 #{ createDate,jdbcType= VARCHAR },
+			</if>
+			<if test="investTime != null">
+				 #{ investTime,jdbcType= VARCHAR },
+			</if>
+			<if test="remainTime != null">
+				 #{ remainTime,jdbcType= VARCHAR },
+			</if>
+			<if test="isExceed != null">
+				 #{ isExceed,jdbcType= VARCHAR },
+			</if>
+			<if test="exceedTime != null">
+				 #{ exceedTime,jdbcType= VARCHAR },
+			</if>
+			<if test="balance != null">
+				 #{ balance,jdbcType= VARCHAR },
+			</if>
+			<if test="status != null">
+				 #{ status,jdbcType= VARCHAR },
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType= VARCHAR}
+			</if>
+			<if test="cardRemark != null  ">
+				 #{ cardRemark,jdbcType= VARCHAR },
+			</if>
+			
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.bdcard.model.BdCard">
+		select
+		*
+		from bd_card
+		where 1=1  
+		  <if test="cardNum != null">
+			AND card_num =  #{ cardNum,jdbcType= VARCHAR }
+		  </if>
+		  and status ='0'
+		ORDER BY  create_date desc
+		
+	</select>
+	
+	
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.bdcard.model.BdCard">
+		select
+		count(1)
+		from bd_card
+		where 1=1
+		 
+		  <if test="cardNum != null">
+			AND card_num =  #{ cardNum,jdbcType= VARCHAR }
+		  </if>
+		  and status ='0'
+		  
+		 
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.bdcard.model.BdCard">
+		<if test="cardId !=null">
+			update bd_card
+			<set>
+     			 card_id =  #{ cardId,jdbcType= VARCHAR },
+     			 card_num =  #{ cardNum,jdbcType= VARCHAR },
+     			 broadcast_num =  #{ broadcastNum,jdbcType= VARCHAR },
+     			 user_feature =  #{ userFeature,jdbcType= VARCHAR },
+     			 comm_fre =  #{ commFre,jdbcType= VARCHAR },
+     			 comm_grade =  #{ commGrade,jdbcType= VARCHAR },
+     			 sub_user_num =  #{ subUserNum,jdbcType= VARCHAR },
+     			 invest_date =  #{ investDate,jdbcType= VARCHAR },
+     			 create_date =  #{ createDate,jdbcType= VARCHAR },
+     			 invest_time =  #{ investTime,jdbcType= VARCHAR },
+     			 remain_time =  #{ remainTime,jdbcType= VARCHAR },
+     			 is_exceed =  #{ isExceed,jdbcType= VARCHAR },
+     			 exceed_time =  #{ exceedTime,jdbcType= VARCHAR },
+     			 balance =  #{ balance,jdbcType= VARCHAR },
+     			 status =  #{ status,jdbcType= VARCHAR },
+     			  create_time =  #{ createTime,jdbcType= VARCHAR },
+     			 card_remark =  #{ cardRemark,jdbcType= VARCHAR },
+     			
+			</set>
+			where card_id =  #{ cardId,jdbcType=VARCHAR}
+		</if>
+	</update>
+
+
+
+	 
+   <select id="getList" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		SELECT * FROM bd_card WHERE    card_num =  #{ cardNum,jdbcType= VARCHAR }
+		
+		
+	</select>	
+	
+	<update id="getCardList" parameterType="java.util.List">
+		update bd_card
+		<set>
+		status = '1'
+		</set>
+		where card_id  
+		in
+		<foreach collection="list" item="cardId" index="index"
+            open="(" close=")" separator=",">
+             #{ cardId,jdbcType=VARCHAR}
+    </foreach>
+	</update>
+	
+	
+	<!-- 查询是否存在重复北斗卡号 -->
+	<select id="findCardNum"  resultMap="BaseResultMap" parameterType="java.util.List" >
+		SELECT * FROM bd_card WHERE card_id =  #{ cardId,jdbcType= VARCHAR }
+	</select>
+	
+	<!--Excel插入数据  -->
+	
+	<insert id="insertData" parameterType="java.util.List">
+	INSERT INTO bd_card (card_id,card_num,comm_fre,broadcast_num,card_remark,comm_grade) VALUES
+	<foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+		( #{ cardId,jdbcType= VARCHAR }, #{ cardNum,jdbcType= VARCHAR },
+		#{ commFre,jdbcType= VARCHAR },#{ broadcastNum,jdbcType= VARCHAR },#{ cardRemark,jdbcType= VARCHAR },#{ commGrade,jdbcType= VARCHAR })
+	</foreach>
+	</insert>
+  
+  		<update id="update" parameterType="com.web.business.generator.system.bdcard.model.BdCardModel">
+		<if test="cardId !=null">
+			update bd_card
+			<set>
+     			 card_id =  #{ cardId,jdbcType= VARCHAR },
+     			 card_num =  #{ cardNum,jdbcType= VARCHAR },
+     			 broadcast_num =  #{ broadcastNum,jdbcType= VARCHAR },
+     			 comm_fre =  #{ commFre,jdbcType= VARCHAR },
+     			 comm_grade =  #{ commGrade,jdbcType= VARCHAR },
+     			 remain_time =  #{ remainTime,jdbcType= VARCHAR },
+     			 is_exceed =  1,
+     			 status =  1,
+     			 card_remark =  #{ cardRemark,jdbcType= VARCHAR },
+     			
+			</set>
+			where card_id =  #{ cardId,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

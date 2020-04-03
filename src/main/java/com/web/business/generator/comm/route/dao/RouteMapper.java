@@ -1,0 +1,67 @@
+package com.web.business.generator.comm.route.dao;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import com.web.business.generator.comm.route.model.Route;
+@Mapper
+public interface RouteMapper {
+
+	 
+     /*****
+     *根据主键查询
+     ****/
+     Route selectByPrimaryKey(String routeId);
+     
+     Route selectByName(String name);
+     
+     /*****
+      *全查
+      ****/
+      List<Route> selectAll();
+	
+	 /****
+	 *根据主键删除
+	 ****/
+     int deleteByPrimaryKey(String routeId);
+     
+     
+     /****
+ 	 *根据路线名删除
+ 	 ****/
+      int deleteByName(String name);
+     
+     /****
+	 *根据主键批量删除
+	 ****/
+     int deleteBatchByPrimaryKey(List<String> list);
+     
+     /****
+	 *新增
+	 ****/
+     int insertSelective(Route record);
+     
+     /****
+	 *根据属性分页查询
+	 ****/
+     List<Route> selectByPropertyByPage(Route record);
+	 
+	 /****
+     *根据主键更新记录
+	 ****/
+	 int updateByPrimaryKeySelective(Route record);
+	 
+	 
+	 /****
+	 、*根据名称更新记录
+	****/
+	int updateByName(String  routeName,Route route);
+	 
+	 
+	 
+	 /**
+	  * 分页总数
+	  * @param record
+	  * @return
+	  */
+	 int selectCountByProperty(Route record);
+}

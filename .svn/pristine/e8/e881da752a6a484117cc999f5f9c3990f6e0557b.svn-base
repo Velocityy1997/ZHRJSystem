@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html style="width: 100%">
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		
+		<link rel="stylesheet" href="plugins/assets/css/bootstrap.min.css"  />
+		<link rel="stylesheet" href="plugins/assets/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-rtl.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-skins.min.css" />
+		<link rel="stylesheet" href="css/main.css"  />
+		<link rel="stylesheet" href="plugins/assets/css/jquery-ui-1.10.3.full.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-rtl.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-skins.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/style.css">
+		<link rel="stylesheet" href="plugins/assets/css/datepicker.css" />
+		<link rel="stylesheet" href="plugins/assets/css/bootstrap-datetimepicker.min.css" >		
+		
+		<script src="plugins/assets/js/jquery-1.10.2.min.js"></script>
+		<script type="text/javascript" src="plugins/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="plugins/assets/js/ace-elements.min.js"></script>
+		<script src="plugins/assets/js/ace.min.js"></script>
+		<script src="plugins/assets/js/ace-extra.min.js"></script>	
+		<script src="plugins/assets/js/bootstrap.min.js"></script>
+		<script src="plugins/assets/js/jquery.form.js"></script>
+		<script src="plugins/assets/js/ui.js"></script>
+		<script src="plugins/js/bootstrap-datetimepicker.js"></script>
+		<script src="plugins/js/bootstrap-datetimepicker.zh-CN.js"></script>
+		<script src="plugins/js/bottom.js"></script>
+		
+		<style type="text/css">
+	           *{padding:0px;margin:0px;}
+	           html,body{width:100%;height:100%;}
+      </style>	
+      <script>
+      function init(){
+ 
+             var li = $("#li");//left iframe
+             var ri = $("#ri");//right iframe
+             var s = $("#s");//中间分割条
+             var img = s.children("img").eq(0);
+             var drag = $("#drag");//分隔条中的拖拽层.
+ 
+             var clientWidth = $(window).width();
+             var li_init_width=270;//上边iframe要显示的宽度,若需要调整默认宽度,请改此值即可.
+             var s_init_width=10;//分隔条宽度默认值
+             var ri_width=clientWidth-li_init_width-s_init_width;//底部iframe要显示的宽度 
+             //初始化
+             li.css("width",li_init_width+"px");
+             ri.css("width",ri_width+"px");
+             s.css("left",li_init_width+"px").css("width",s_init_width+"px");
+             img.css("width",s_init_width+"px").css("box-shadow","0 0 6px #666");
+ 
+             var is_drag = false;//是否点住并进行了拖拽
+  
+ 
+             /***
+              * 分隔条事件处理,如果用户执行了mousedown,mousemove,mouseup说明是拖拽,
+              * 如果只执行了mousedown,mouseup说明是点击.
+              */
+ 
+ 
+             drag.unbind("mousedown").mousedown(function () {
+                 //获得分隔条内拖拽层离顶边的距离
+                 debugger
+                 var li_width = parseInt(li.css("width"));
+                 var ri_width = parseInt(ri.css("width"));
+ 
+                 //分隔条div宽度设为100%,撑满屏,只有这样才能在拖拽分隔条时,有效的控制mouseup事件.
+                 s.css("width","100%").css("left","0px");
+                 img.css("left",li_width);
+ 
+                 var start_x = event.clientX;
+ 
+                 drag.unbind("mousemove").mousemove(function (event) {
+                     is_drag = true;
+                     var current_x = event.clientX;
+                     var cha = current_x - start_x;//算偏移差量 
+                     li.css("width",(li_width+cha)+"px");
+                     ri.css("width",(ri_width-cha)+"px");
+                     img.css("left",(li_width+cha)+"px");
+  
+                 });
+ 
+                 drag.unbind("mouseup").mouseup(function (event) {
+                     var left = parseInt(img.css("left"));
+                     s.css("width",s_init_width+"px").css("left",left+"px");
+                     img.css("left","0px");
+ 
+                     //处理非拖拽的click情况
+                     if(!is_drag){
+ 
+                         //直接设定固定值
+                         var src=img.attr("src");
+                         if(src.indexOf("toleft")!=-1){
+                             li.css("width","0px");
+                             s.css("left","0px");
+                             clientWidth = $(window).width();
+                             ri.css("width",(clientWidth-s_init_width)+"px");
+                             img.attr("src",src.replace("toleft","toright"));
+                         }else{
+                             li.css("width",li_init_width+"px");
+                             s.css("left",li_init_width+"px");
+                             clientWidth = $(window).width();
+                             ri.css("width",(clientWidth-li_init_width-s_init_width)+"px");
+                             img.attr("src",src.replace("toright","toleft"));
+                         }
+
+                     }
+ 
+                    drag.unbind("mousemove");
+                     is_drag = false;
+ 
+                 });
+ 
+ 
+             });
+ 
+ 
+            //当窗口大小发生改变时,重新渲染页面,以使各组件自适应高宽度.
+            $(window).resize(function() {
+                 //顶部iframe保持高度不变,改变底部iframe高度
+                 var clientWidth = $(window).width();
+                 var li_width = parseInt(li.css("width"));
+                 var new_ri_width = clientWidth - li_width - s_init_width;
+                 ri.css("width",new_ri_width+"px");
+ 
+             });
+         }
+      
+         $(document).ready(function(){
+ 
+             init();
+            
+         });
+ 
+     </script>
+	
+	</head>
+   
+   <body scroll="no">
+   <div>
+		 <iframe id="li" name="left" src="terminalTree.html" frameborder="0" style="height:100%;border:none;position:absolute;left:0px;top:0px;z-index:1;"></iframe>
+	</div>	 
+		 <div id="s" style="height:100%;position:absolute;z-index:3;cursor:move;">
+		 <img style="height:100%;position:absolute;z-index:3;" src="images/toleft.png"/> 
+		 <div style="height:100%;width:100%;position:absolute;z-index:3;margin-left:0px;margin-top:0px;padding:0px;filter:alpha(opacity=0);opacity:0;background-color:#fee;" id="drag"></div>
+		 </div>
+	<div>
+		 <iframe id="ri" name="right" src="monitor.html" frameborder="0" style="height:100%;border:none;position:absolute;top:0px;right:0px;z-index:2;"></iframe>
+	</div>	 
+		 <div id="sendBroadcastDialog" title="短信通播" style="display:none;">
+	<h5>短信通播</h5>
+	    <form id="sendBroadcastForm"  class="dropzone dz-clickable" ">
+		<div class="dz-default dz-message">
+			
+			<table class="exhibit_table" style="font-size:13px; text-align:left;">  
+			    
+			    <tr>  
+			        <td style="width:100px;" align="right">发送次数<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<input type="number" id="sentTimes" name="sentTimes" min="0" max="100" value="1"
+			        	 style="width:230px;" />
+			        	<i class="icon-pencil blue" style="margin-top:10px; margin-right:10px;"></i>
+			        </td>
+			    </tr>
+			    			    			    
+			    <tr>  
+			        <td style="width:100px;" align="right">发送类型<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<select id="sendType" name="sendType"  style="width:230px;" >		   
+						    <option value="0">普通</option> 
+						    <option value="1">特快</option> 
+						</select>
+			        </td>
+			    </tr>
+			     <tr>  
+			        <td style="width:100px;" align="right">预置电文<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<select  style=" width: 230px;" id = "preMessage" name ="preMessage" 
+			        	onchange ="changepreMessage();" ></select>
+			        </td>
+			    </tr> 	
+			    <tr>  
+			        <td style="width:100px;" align="right">发送内容<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<textarea  id="contents" name="content" style="width:230px;height: 140px;"></textarea>
+			        </td>
+			    </tr>							    
+				<tr>
+				    <td colspan='2'>
+					    	<button class="btn btn-info btn-sm" type="submit" onclick="sendBroadcast()" style='border-radius:8px; margin-left:27%;'>
+								<i class="icon-ok bigger-110"></i>确定
+							</button>
+						    <span class="btn btn-sm" onclick="$('#sendBroadcastDialog').dialog('close')" style='border-radius:8px; margin-left:40px;'>
+								<i class="icon-remove bigger-110"></i>取消
+							</span>
+						</td>
+				</tr>  
+			</table>
+			<!-- <input name="file" type="file" multiple="" /> -->
+		    </div>
+	      </form>
+	</div>
+	
+	 <div id="sendMessageDialog" title="发送短信" style="display:none;">
+	<h5>发送短信</h5>
+	    <form id="sendMessageForm"  class="dropzone dz-clickable" ">
+		<div class="dz-default dz-message">
+			
+			<table class="exhibit_table" style="font-size:13px; text-align:left;">  
+			    <tr>  
+			        <td style="width:100px;" align="right">接收终端<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<textarea  id="cardNums" name="cardNums1" value = "" style="width:230px;height: 50px;"></textarea>
+			        	<textarea  id="cardNums1" name="cardNums" value = "" style="display:none;width:230px;height: 50px;"></textarea>
+			        	
+			        </td>
+			    </tr>
+			    <tr>  
+			        <td style="width:100px;" align="right">发送次数<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<input type="number" id="sendTime" name="sendTime" min="0" max="100" value="1"
+			        	 style="width:230px;" />
+			        	<i class="icon-pencil blue" style="margin-top:10px; margin-right:10px;"></i>
+			        </td>
+			    </tr>
+			    			    			    
+			    <tr>  
+			        <td style="width:100px;" align="right">发送类型<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<select id="sendTypeM" name="sendType"  style="width:230px;" >		   
+						    <option value="0">普通</option> 
+						    <option value="1">特快</option> 
+						</select>
+			        </td>
+			    </tr>
+			     <tr>  
+			        <td style="width:100px;" align="right">预置电文<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<select  style=" width: 230px;" id = "preMessageM" name ="preMessage" 
+			        	onchange ="changepreMessageM();" ></select>
+			        </td>
+			    </tr> 	
+			    <tr>  
+			        <td style="width:100px;" align="right">发送内容<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<textarea  id="contentM" name="content" style="width:230px;height: 140px;"></textarea>
+			        </td>
+			    </tr>							    
+				<tr>
+				    <td colspan='2'>
+					    	<button class="btn btn-info btn-sm" type="submit" onclick="sendMessagef()" style='border-radius:8px; margin-left:27%;'>
+								<i class="icon-ok bigger-110"></i>确定
+							</button>
+						    <span class="btn btn-sm" onclick="$('#sendMessageDialog').dialog('close')" style='border-radius:8px; margin-left:40px;'>
+								<i class="icon-remove bigger-110"></i>取消
+							</span>
+						</td>
+				</tr>  
+			</table>
+			<!-- <input name="file" type="file" multiple="" /> -->
+		    </div>
+	      </form>
+	</div>
+	
+	 <div id="sendZldhDialog" title="指令导航" style="display:none;">
+	<h5>发送短信</h5>
+	    <form id="sendZldhForm"  class="dropzone dz-clickable" ">
+		<div class="dz-default dz-message">
+			
+			<table class="exhibit_table" style="font-size:13px; text-align:left;">  
+			 <tr>  
+			        <td style="width:100px;" align="right">路线选择<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<select  style=" width: 230px;" id = "selectRote" name ="route"></select>
+			        </td>
+			    </tr> 	
+			    <tr>  
+			        <td style="width:100px;" align="right">接收终端<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<textarea  id="cardNumsz" name="cardNums1" value = "" style="width:230px;height: 50px;"></textarea>
+			        	<textarea  id="cardNumsz1" name="card" value = "" style="display:none;width:230px;height: 50px;"></textarea>
+			        	
+			        </td>
+			    </tr>			    			    			    			    			   			    
+			   						    
+				<tr>
+				    <td colspan='2'>
+					    	<button class="btn btn-info btn-sm" type="submit" onclick="sendZldhf()" style='border-radius:8px; margin-left:27%;'>
+								<i class="icon-ok bigger-110"></i>确定
+							</button>
+						    <span class="btn btn-sm" onclick="$('#sendZldhDialog').dialog('close')" style='border-radius:8px; margin-left:40px;'>
+								<i class="icon-remove bigger-110"></i>取消
+							</span>
+						</td>
+				</tr>  
+			</table>
+			<!-- <input name="file" type="file" multiple="" /> -->
+		    </div>
+	      </form>
+	</div>
+	<div id="historyTrack" title="历史轨迹" style="display:none;">
+	<h5>选择显示轨迹的时间段</h5>
+		<div class="dz-default dz-message">
+			
+			<table class="exhibit_table" style="font-size:13px; text-align:left;">  
+			    
+			    <tr>  
+			        <td style="width:100px;" align="right">开始时间<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<input class='form_datetime' type='text' id='dateTime' placeholder='请选择时间' autocomplete="off"   
+			        	data-date-format='yyyy-mm-dd hh:mm:ss'  style = 'margin-left:50px;width:200px;'/>
+			        </td>
+			    </tr>
+			    			    			    
+			  
+			     <tr>  
+			        <td style="width:100px;" align="right">结束时间<font color="red">*</font></td>
+			        <td style="padding:10px;" class="input-icon input-icon-right">
+			        	<input class='form_datetime' type='text' id='dateTime1' placeholder='请选择时间' autocomplete="off"  
+			        	data-date-format='yyyy-mm-dd hh:mm:ss'  style = 'margin-left:50px;width:200px;'/>
+			        </td>
+			    </tr> 	
+			   						    
+				<tr>
+				    <td colspan='2'>
+					    	<button class="btn btn-info btn-sm"  onclick="getHistoryTraceT()" style='border-radius:8px; margin-left:27%;'>
+								<i class="icon-ok bigger-110"></i>确定
+							</button>
+						    <span class="btn btn-sm" onclick="$('#historyTrack').dialog('close')" style='border-radius:8px; margin-left:40px;'>
+								<i class="icon-remove bigger-110"></i>取消
+							</span>
+						</td>
+				</tr>  
+			</table>
+			<!-- <input name="file" type="file" multiple="" /> -->
+		    </div>
+	</div>
+	
+	
+<div id="zhiSysinfoDialog" title="本机信息" style="display:none;">
+<div class="dz-default dz-message">
+			
+	<table style="border-collapse:separate;border-spacing:10px">
+	    <tr>
+			<td style="width: 75px">
+				指挥机名：
+			</td>
+			<td id="zhjName">
+				
+			</td>
+		</tr>
+		<tr>
+			<td id="cardNoName">
+				卡号：
+			</td>
+			<td id="zhjCardNo">
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				类型：
+			</td>
+			<td id="zhjLevel">
+				
+			</td>
+		</tr>			
+		<tr>
+			<td>
+				广播地址：
+			</td>
+			<td id="brocastAddr">
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				服务频度：
+			</td>
+			<td id="zhjFrequency">
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				服务状态：
+			</td>
+			<td id="zhjState">
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				通信等级：
+			</td>
+			<td id="txLevel">
+				
+			</td>
+		</tr>		
+		<tr>
+			<td>
+				通信长度：
+			</td>
+			<td id="zhjLength">
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				经度：
+			</td>
+			<td id="zhjLongitude">
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				纬度：
+			</td>
+			<td id="zhjLatitude">
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				定位时间：
+			</td>
+			<td id="locateTime">
+				
+			</td>
+		</tr>		
+</table>
+	</div>
+ </div>
+	
+ </body>
+   
+  
+</html>

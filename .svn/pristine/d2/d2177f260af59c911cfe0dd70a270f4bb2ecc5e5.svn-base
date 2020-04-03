@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html style="width: 100%">
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		
+		<link rel="stylesheet" href="plugins/assets/css/bootstrap.min.css"  />
+		<link rel="stylesheet" href="plugins/assets/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-rtl.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-skins.min.css" />
+		<link rel="stylesheet" href="css/main.css"  />
+		<link rel="stylesheet" href="plugins/assets/css/jquery-ui-1.10.3.full.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-rtl.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-skins.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/style.css">
+		<script src="plugins/assets/js/jquery-1.10.2.min.js"></script>
+		<script type="text/javascript" src="plugins/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="plugins/assets/js/ace-elements.min.js"></script>
+		<script src="plugins/assets/js/ace.min.js"></script>
+		<script src="plugins/assets/js/ace-extra.min.js"></script>	
+		<script src="plugins/assets/js/bootstrap.min.js"></script>
+		<script src="plugins/assets/js/jquery.form.js"></script>
+		<script src="plugins/assets/js/ui.js"></script>
+		<script src="plugins/js/bottom.js"></script>
+		<style type="text/css">
+	           *{padding:0px;margin:0px;}
+	           html,body{width:100%;height:100%;}
+      </style>	
+      <script>
+    
+ 
+     </script>
+	
+	</head>
+   
+   <body style="overflow-y: hidden">
+   
+		<div style="background: rgb(215, 225, 255) ; height:7%;line-height:31px; width:100%;"
+			align="right">			
+			<a id="top_status" style="padding-right:20px;">
+			<span style="text-align:left;font-weight:bold;color: #000;" type="text" id = "battery">
+					</span>
+			</a>
+		</div>
+		<div style="height: 93%; width:100%;">
+			<iframe id="frame_content" src="Map.html" style="height:100%;border:none;
+		left:0px;top:0px;z-index:1; width:100%;"></iframe>
+		</div>
+	
+	
+ </body>
+   
+  
+</html>

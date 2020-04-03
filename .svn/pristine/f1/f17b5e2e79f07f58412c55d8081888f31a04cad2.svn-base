@@ -1,0 +1,120 @@
+caption {    
+    padding: 0 0 5px 0;         
+    font: italic 35px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;    
+    text-align: center;    
+}    
+       
+/*    
+  
+    TableCloth     
+    by Alen Grakalic, brought to you by cssglobe.com   
+       
+*/ /* general styles */   
+table,td {   
+    font: 90% Arial, Helvetica, sans-serif;   
+}   
+  
+table {   
+    width: 100%;  
+    border-collapse: collapse;   
+    margin: 1em 0;   
+   overflow: scroll;
+	
+}   
+  
+th{   
+    text-align: left;   
+    padding: .7em;   
+    border: 1px solid #fff;   
+}
+td{
+	text-align: left;   
+    padding: .35em;   
+    border: 1px solid #fff;   
+    font:12px;
+}
+  
+th {   
+     background: #328aa4 repeat-x;    
+    color: #fff;   
+}   
+  
+tr {   
+    background: #e9f1EE;   
+      /*   font: smaller 15px "Trebuchet MS",bold, Verdana, Arial, sans-serif; */   
+	font: message-box 12px "Trebuchet MS";
+}   
+  
+/* tablecloth styles */   
+tr.even td {   
+    background: #e5f1f4;   
+}    
+  
+tr.odd td {   
+    background: #f8fbfc;  
+}    
+  
+ th.over,tr.even th.over,tr.odd th.over {   
+    background: #4a98af;   
+}   
+  
+th.down,tr.even th.down,tr.odd th.down {   
+    background: #bce774;   
+}   
+   
+th.selected,tr.even th.selected,tr.odd th.selected {   
+       
+}   
+  
+td.over,tr.even td.over,tr.odd td.over {   
+    background: #ecfbd4;   
+}   
+  
+td.down,tr.even td.down,tr.odd td.down {   
+    background: #bce774;   
+    color: #fff;   
+}   
+  
+td.selected,tr.even td.selected,tr.odd td.selected {   
+    background: #bce774;   
+    color: #555;   
+}   
+  
+/* use this if you want to apply different styleing to empty table cells*/   
+td.empty,tr.odd td.empty,tr.even td.empty {   
+    background: #fff;   
+}
+
+ #jPaginate0{
+	height: 25px;
+	padding-right: 0;
+	right: 0;
+	
+} 
+
+
+/* #btn_bar{
+	float:left;
+ } */
+ 
+.footer{
+	background-color: #CCCCCC;
+	height: 22px;
+}
+
+#datatable{
+	bottom:0px;;
+}
+
+table{
+	border:0;
+	padding:0;
+	margin:0;
+	padding-bottom: 0;
+	padding-top: 0;
+}
+
+#datadiv{
+	background: #CCCCCC;
+}
+

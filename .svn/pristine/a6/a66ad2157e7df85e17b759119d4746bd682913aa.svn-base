@@ -1,0 +1,698 @@
+package com.web.business.generator.system.area.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.web.common.util.spring.PageTool;
+import com.shara.common.util.page.PageUtil;
+import com.shara.common.util.page.ValidateUtil;
+import com.web.common.util.spring.RestResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+import com.web.business.generator.system.area.dao.AreaMapper;
+import com.web.business.generator.system.area.model.Area;
+import com.web.business.generator.system.area.services.impl.AreaServiceImpl;
+import com.web.business.generator.system.user.model.User;
+import com.web.business.generator.util.isNull.IsNullUtil;
+import com.web.business.generator.util.log.SystemControllerLog;
+
+@Api(description = "areaAPI", tags = "areaAPI")
+@Controller
+@RequestMapping("/area")
+public class AreaController {
+
+	@Autowired
+	private HttpServletRequest request;
+
+	@Resource
+	private AreaServiceImpl areaServiceImpl;
+
+	
+	/**
+	 * 查询Jqgrid
+	 * 
+	 * @author
+	 * @date
+	 * @return json
+	 */
+	@ApiOperation(value = "查询Jqgrid..", notes = "查询Jqgrid..")
+	@ResponseBody
+	@RequestMapping(value = "/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<Area> list(HttpServletRequest request, String pagination, String area) {
+		RestResponse result = new RestResponse();
+		PageTool<Area> pageInfo = null;
+		String page = request.getParameter("page");
+		String rows = request.getParameter("rows");
+		String queryName = request.getParameter("queryArea");
+		boolean tag = false;
+		try {
+			Area areaBean = new Area();
+			tag = IsNullUtil.isStrNull(queryName);
+			if (!tag) {
+				// 查询条件非空
+				areaBean.setAreaName(queryName);
+			}
+			// 判断是否有查询条件
+			if (ValidateUtil.isNullAndIsStr(area)) {
+				areaBean = JSON.parseObject(area, Area.class);
+			}
+
+			// 条件+分页查询
+			PageUtil pageUtil = PageUtil.getPageBean(request);
+			
+			// 条件+分页查询
+			// 1.获取当前session
+			HttpSession session = request.getSession();
+
+			// 2.获取当前用户信息
+			User user = (User) session.getAttribute("loginInfo");
+			Integer userType = user.getType();
+			
+			if (userType != null) {
+				// 测试数据
+				//userType = 1;
+				if (userType == 1) {
+					// 管理员,查所有区域信息
+					pageInfo = areaServiceImpl.selectAreaByPage(areaBean == null ? new Area() : areaBean,
+							Integer.valueOf(page) , Integer.valueOf(rows));
+					
+				} else {
+					// 非管理员查当前及以下的区域
+					pageInfo = areaServiceImpl.selectAreaByCommonUserPage(areaBean == null ? new Area() : areaBean,
+							Integer.valueOf(page) , Integer.valueOf(rows));
+
+				}
+			}
+			
+		} catch (Exception e) {
+			result.setSuccess(false).setMessage("操作失败");
+			e.printStackTrace();
+		}
+		return pageInfo;
+	}
+
+	/**
+	 * 搜索查询
+	 *
+	 * @param page
+	 * @param pageSize
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 *          <com.github.pagehelper.PageInfo>
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "搜索..", notes = "搜索..")
+	@ResponseBody
+	@RequestMapping(value = "/search", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<Area> search(HttpServletRequest request, String area) {
+		RestResponse result = new RestResponse();
+		PageTool<Area> pageInfo = null;
+		Area areaBean = null;
+		try {
+			// 判断是否有查询条件
+			if (ValidateUtil.isNullAndIsStr(area))
+				areaBean = JSON.parseObject(area, Area.class);
+			PageUtil pageUtil = PageUtil.getPageBean(request);
+			// 条件+分页查询
+			pageInfo = areaServiceImpl.selectAreaByPage(areaBean == null ? new Area() : areaBean,
+					pageUtil.getPage() == 0 ? 1 : pageUtil.getPage(),
+					pageUtil.getRows() == pageUtil.getRows() ? 10 : pageUtil.getRows());
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+		return pageInfo;
+//        return new RestResponse().setSuccess(true).setMessage("success").setData(pageInfo);
+	}
+
+	/**
+	 * 分页查询
+	 *
+	 * @param page
+	 * @param pageSize
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 *          <com.github.pagehelper.PageInfo>
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "查询..", notes = "查询..")
+	@ResponseBody
+	@RequestMapping(value = "/lists", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<Area> getList(@RequestBody(required = false) Area area,
+			@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+			@RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
+		RestResponse result = new RestResponse();
+		PageTool<Area> pageInfo = null;
+		try {
+			pageInfo = areaServiceImpl.selectAreaByPage(area == null ? new Area() : area, page == null ? 1 : page,
+					pageSize == null ? Integer.MAX_VALUE : pageSize);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+		return pageInfo;
+//        return new RestResponse().setSuccess(true).setMessage("success").setData(pageInfo);
+	}
+
+	/**
+	 * 新增
+	 *
+	 * @param device
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "新增..", notes = "新增..")
+	@ResponseBody
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	@SystemControllerLog(type = "新增区域" , actionType = "1")
+	public RestResponse doAdd(Area area) {
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String provinceId = null ;
+		String cityId = null; 
+		List<String> areaNameList = new ArrayList<String>();
+		List<String> cityNameList = new ArrayList<String>();
+		List<String> zoneNameList = new ArrayList<String>();
+		try {
+			
+			String areaName = area.getAreaName();
+			provinceId = area.getProvinceId();
+			cityId = area.getCityId();
+			//根据添加区域进行判断是否重复
+			
+			if(provinceId.equals("")  &&  cityId == null  &&  areaName !=null) {
+				// 输入区域进行查询是否有重复
+				List<Area> nameList = areaServiceImpl.selectAreaName(areaName);				
+				for(Area nameArea : nameList) {
+					String name = nameArea.getAreaName();
+					areaNameList.add(name);
+				}
+				if(areaNameList.contains(areaName)) {
+					result.setSuccess(false).setMessage("输入区域重复，请重新添加");
+					result.setDescription("添加一条区域");
+				}else {
+					String date = sdf.format(new Date());
+					String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+					area.setAreaId(uuid);
+					area.setLevel(0);
+					area.setParentId("0");
+					Integer r = areaServiceImpl.insertSelective(area);
+					if (r > 0) {
+						result.setSuccess(true).setMessage("添加成功").setDescription("添加一条区域");
+					} else {
+						result.setSuccess(false).setMessage("添加失败").setDescription("添加一条区域");
+					}
+				}
+				//根据输入和下拉框选择进行查询是否重复判断
+			} else  if(provinceId != null   &&  (cityId == null || cityId.equals(""))  && areaName !=null){
+				//查询provinceId=areaId对应的 所属区域是否重名	
+				List<Area> nameList = areaServiceImpl.selectAreaName(areaName);
+				for(Area nameArea : nameList) {
+					String name = nameArea.getAreaName();
+					areaNameList.add(name);
+				}
+				if(areaNameList.contains(areaName)) {
+					result.setSuccess(false).setMessage("输入区域重复，请重新添加");
+					result.setDescription("添加一条区域");
+				}else {
+					List<Area> cityList	 = areaServiceImpl.selectAllCity(provinceId);
+					for(Area areaCity : cityList) {
+						 	String cityName= areaCity.getCityName();
+						 	cityNameList.add(cityName);
+					}
+					if(cityNameList.contains(areaName)) {
+						 result.setSuccess(false).setMessage("添加区域重复，请重新添加");
+						 result.setDescription("添加一条区域");
+					}else{
+						 String date = sdf.format(new Date());
+						 String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+						 area.setAreaId(uuid);
+						 area.setLevel(1);
+						 area.setParentId(provinceId);
+						 Integer r = areaServiceImpl.insertSelective(area);
+						 if (r > 0) {
+								result.setSuccess(true).setMessage("添加成功").setDescription("添加一条区域");
+							} else {
+								result.setSuccess(false).setMessage("添加失败").setDescription("添加一条区域");
+							}
+					}
+				}								
+			}else {
+				List<Area> nameList = areaServiceImpl.selectAreaName(areaName);
+				for(Area nameArea : nameList) {
+					String name = nameArea.getAreaName();
+					areaNameList.add(name);
+				}
+				if(areaNameList.contains(areaName)) {
+					result.setSuccess(false).setMessage("输入区域重复，请重新添加");
+					result.setDescription("添加一条区域");
+				}else {
+					List<Area> cityList	 = areaServiceImpl.selectAllCity(provinceId);
+					for(Area areaCity : cityList) {
+						 	String cityName= areaCity.getCityName();
+						 	cityNameList.add(cityName);
+					}
+					
+					if(cityNameList.contains(areaName)) {
+						 result.setSuccess(false).setMessage("添加区域重复，请重新添加");
+						 result.setDescription("添加一条区域");
+					}else {
+						List<Area> zoneList	 = areaServiceImpl.selectAllZone(cityId);
+						for(Area zongArea : zoneList) {
+							String zoneName=  zongArea.getAreaName();
+							zoneNameList.add(zoneName);
+						}
+						if(zoneNameList.contains(areaName)) {
+							result.setSuccess(false).setMessage("添加区域重复，请重新添加");
+							result.setDescription("添加一条区域");
+						}else {
+							String date = sdf.format(new Date());
+					 		String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+					 		area.setAreaId(uuid);
+					 		area.setLevel(2);
+					 		area.setParentId(cityId);
+					 		Integer r = areaServiceImpl.insertSelective(area);
+					 		if (r > 0) {
+								result.setSuccess(true).setMessage("添加成功").setDescription("添加区域");
+							} else {
+								result.setSuccess(false).setMessage("添加失败").setDescription("添加区域");
+							}
+						}
+					}
+				}	
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("添加失败").setDescription("添加一条区域");
+			
+		}
+		return result;
+	}
+
+	/**
+	 * 根据不同角色进行修改区域
+	 * @param area
+	 * @return
+	 */
+	@ApiOperation(value = "修改..", notes = "修改..")
+	@ResponseBody
+	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+	@SystemControllerLog(type = "修改区域" , actionType = "2")
+	public RestResponse doUpdate(HttpServletRequest request , Area area) {
+		
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("loginInfo");
+		
+		try {
+			
+			String date = sdf.format(new Date());
+			Integer r = areaServiceImpl.updateByPrimaryKeySelective(area,user);
+			
+			//根据返回值来确定结果
+			if (r == 1 ) {
+				result.setSuccess(true).setMessage("修改成功").setDescription("修改区域数据");
+				
+			} else if(r == -1 ){
+				result.setSuccess(false).setMessage("修改失败").setDescription("修改区域数据");
+				
+			}else if(r == -2 ){
+				result.setSuccess(false).setMessage(user.getName()+":当前用户类型为空").setDescription("修改区域数据");
+				
+			}else if(r == -3 ){
+				result.setSuccess(false).setMessage(user.getName()+":用户区域为空").setDescription("修改区域数据");
+				
+			}else if(r == -4 ){
+				result.setSuccess(false).setMessage("修改的区域超出当前用户权限").setDescription("修改区域数据");
+				
+			}else if(r == 2 ){
+				result.setSuccess(false).setMessage("选中的市下属区已存在转移过去的区："+area.getAreaName()).setDescription("修改区域数据");
+				
+			}else if(r == 3 ){
+				result.setSuccess(false).setMessage("该省已有该市："+area.getAreaName()).setDescription("修改区域数据");
+				
+			}else {
+				// 4
+				result.setSuccess(false).setMessage("该省已经存在："+area.getAreaName()).setDescription("修改区域数据");
+
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("修改失败").setDescription("修改区域失败");
+		}
+
+		return result;
+	}
+
+	/**
+	 * 根据主键删除
+	 *
+	 * @param id
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "删除", notes = "删除")
+	@ResponseBody
+	@RequestMapping(value = "/del", method = RequestMethod.POST)
+	@SystemControllerLog(type = "删除区域" , actionType = "3")
+	public RestResponse doDelete( String id) {
+		RestResponse result = new RestResponse();
+		
+		try {
+			
+			Integer r = areaServiceImpl.deleteBatchByPrimaryKey(id);
+			if (r == -2) {
+				// 区域存在下属
+				result.setSuccess(false).setMessage("当前区域存在下属区域、用户、指挥机或终端").setDescription("删除区域数据");
+				
+			}else {
+				result.setSuccess(true).setMessage("删除成功").setDescription("删除区域数据");				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("删除失败").setDescription("删除区域数据");
+		}
+
+		return result;
+	}
+
+	/**
+	 * 根据主键获取详情
+	 *
+	 * @param id
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse<>
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "根据id获取详情", notes = "根据id获取详情")
+	@ResponseBody
+	@RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+	public RestResponse<Area> doGetDetail(@PathVariable String id) {
+		RestResponse result = new RestResponse();
+		try {
+			Area area = areaServiceImpl.selectByPrimaryKey(id);
+			result.setSuccess(true).setMessage("success").setData(area);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+
+	@ApiOperation(value = "查询所有的区域", notes = "查询所有的区域")
+	@ResponseBody
+	@RequestMapping(value = "/all", method = RequestMethod.POST)
+	public RestResponse<Area> doGetAll() {
+		RestResponse result = new RestResponse();
+		try {
+			List<Area> list = areaServiceImpl.selectAll();
+			result.setSuccess(true).setMessage("success").setData(list);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("查询失败，请重试！");
+		}
+
+		return result;
+	}
+
+	@ApiOperation(value = "查询用户所在区域的下属区域", notes = "查询用户所在区域的下属区域")
+	@ResponseBody
+	@RequestMapping(value = "/getUserAreas", method = RequestMethod.POST)
+	public RestResponse<Area> doGetUserArea() {
+
+		RestResponse result = new RestResponse();
+
+		List<Area> areas = new ArrayList<>();
+
+		// 1.获取当前session
+		HttpSession session = request.getSession();
+
+		// 2.获取当前用户信息
+		User user = (User) session.getAttribute("loginInfo");
+
+		// 3.获取用户所在区域id
+		// 3.1 管理员查询所有
+		// 3.2 普通用户查当前及下属
+		Integer userType = user.getType();
+		if (userType != null) {
+			if (userType == 1) {
+				// 管理员
+				areas = areaServiceImpl.selectAll();
+				result.setSuccess(true).setMessage("查询成功！").setData(areas);
+			} else {
+				// 普通用户
+				String userAreaID = user.getUserArea();
+				// 4.根据所在区域来迭代查询下属区域
+				if (userAreaID != null) {
+					try {
+						areas = areaServiceImpl.selectById(userAreaID);
+						result.setSuccess(true).setMessage("查询成功！").setData(areas);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						result.setSuccess(false).setMessage("查询失败，请重试！");
+					}
+
+				} else {
+					result.setSuccess(false).setMessage("用户所在区域id为空，请检查！");
+					return result;
+				}
+			}
+
+		} else {
+			result.setSuccess(false).setMessage("当前用户角色信息为空，请检查！");
+		}
+
+		return result;
+	}
+
+	@ApiOperation(value = "根据parentId查询父级区域名称", notes = "根据parentId查询父级区域名称")
+	@ResponseBody
+	@RequestMapping(value = "/getParentName", method = RequestMethod.POST)
+	public RestResponse<Area> doGetParentName(String parentId) {
+		RestResponse result = new RestResponse();
+		try {
+			String name = areaServiceImpl.selectParentNameById(parentId);
+			result.setSuccess(true).setMessage("success").setData(name);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+
+	@ApiOperation(value = "查所有省份的信息", notes = "查所有省份的信息")
+	@ResponseBody
+	@RequestMapping(value = "/getAllProvince", method = RequestMethod.POST)
+	public RestResponse<Area> doGetAllProvince() {
+		RestResponse result = new RestResponse();
+		try {
+
+			// 1.获取当前session
+			HttpSession session = request.getSession();
+
+			// 2.获取当前用户信息
+			User user = (User) session.getAttribute("loginInfo");
+
+			Integer userType = user.getType();
+
+			if (userType != null) {
+				if (userType == 1) {
+					// 管理员，查所有的省信息
+					List<Area> provinces = areaServiceImpl.selectAllProvince();
+					result.setSuccess(true).setMessage("查询成功").setData(provinces);
+
+				} else {
+					// 普通用户，查当前的省
+					String areaId = user.getUserArea();
+					if (areaId == null || areaId.equals("")) {
+						result.setSuccess(false).setMessage("当前用户的区域信息为空，请检查！");
+
+					} else {
+						List<Area> province = areaServiceImpl.selectProvinceByCommonUser(areaId);
+						result.setSuccess(true).setMessage("查询成功").setData(province);
+
+					}
+
+				}
+
+			} else {
+				result.setSuccess(false).setMessage("当前用户角色信息为空，请检查！");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+
+	@ApiOperation(value = "根据省查下属市的信息", notes = "根据省查下属市的信息")
+	@ResponseBody
+	@RequestMapping(value = "/getCitys{provinceId}", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public RestResponse<Area> doGetCitys(String provinceId) {
+		RestResponse result = new RestResponse();
+		if (provinceId != null) {
+			try {
+				List<Area> citys = areaServiceImpl.selectAllCity(provinceId);
+				if (citys == null || citys.size() == 0) {
+					result.setSuccess(false).setMessage("当前省未录入市信息，请检查！");
+
+				} else {
+					result.setSuccess(true).setMessage("查询成功").setData(citys);
+
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				result.setSuccess(false).setMessage("出现异常，请检查！");
+			}
+
+		} else {
+			result.setSuccess(false).setMessage("省份id为空，请检查！");
+
+		}
+
+		return result;
+	}
+
+	@ApiOperation(value = "根据市id查下属区县的信息", notes = "根据市id查下属区县的信息")
+	@ResponseBody
+	@RequestMapping(value = "/getAllZone", method = RequestMethod.POST)
+	public RestResponse<Area> doGetAllZone(String cityId) {
+		RestResponse result = new RestResponse();
+		if (cityId != null) {
+			try {
+				List<Area> zones = areaServiceImpl.selectAllZone(cityId);
+				if (zones == null || zones.size() == 0) {
+					result.setSuccess(false).setMessage("当前市未录入区县信息，请检查！");
+
+				} else {
+					result.setSuccess(true).setMessage("查询成功").setData(zones);
+
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				result.setSuccess(false).setMessage("出现异常，请检查！");
+			}
+
+		} else {
+			result.setSuccess(false).setMessage("市id为空，请检查！");
+
+		}
+
+		return result;
+	}
+
+	@ApiOperation(value = "根据区域id查上级省市名称、id", notes = "根据区域id查上级省市名称、id")
+	@ResponseBody
+	@RequestMapping(value = "/getParentAreaInfoById", method = RequestMethod.POST)
+	public RestResponse<Area> doGetParentAreaInfo(String id) {
+		RestResponse result = new RestResponse();
+
+		// 1.判空
+		String areaId = id;
+
+		if (areaId == null || areaId.equals("")) {
+			result.setSuccess(false).setMessage("区域id为空，请检查！");
+
+		} else {
+			Area area = areaServiceImpl.selectParentAreaInfoById(areaId);
+
+			if (area == null) {
+				result.setSuccess(false).setMessage("省不能修改上级区域！");
+
+			} else {
+				result.setSuccess(true).setMessage("查询成功").setData(area);
+
+			}
+
+		}
+
+		return result;
+	}
+	
+	/**
+	 *        根据区域名称搜索下属区域id
+	 * @param request
+	 * @param area
+	 * @return
+	 */
+	@ApiOperation(value = "根据区域名称搜索下属区域id", notes = "根据区域名称搜索下属区域id")
+	@ResponseBody
+	@RequestMapping(value = "/searchByName", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public RestResponse searchByName(HttpServletRequest request, String areaName) {
+		RestResponse result = new RestResponse();
+		List<String> ids = new ArrayList<>();
+		try {
+			User user = new User();
+			user.setName("刘德华");
+			//管理员，陕西
+			user.setType(0);
+			user.setUserArea("13");
+			
+			// 普通用户，陕西，西安，未央区
+			/*user.setType(0);
+			user.setUserArea("1");*/
+			
+			ids = areaServiceImpl.getSonAreasByAreaName(user, areaName);
+			if (ids.size() == 0) {
+				result.setSuccess(true).setMessage("未查到"+user.getName()+"---"+areaName+"下属相关区域id");
+			}else {
+				result.setSuccess(true).setMessage("操作成功").setData(ids);
+
+			}
+
+
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+		return result;
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+
+}

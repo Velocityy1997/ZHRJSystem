@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.monitor.baudInfo.dao.BaudInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.monitor.baudInfo.model.BaudInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="ic_status" property="icStatus" jdbcType="VARCHAR" />
+    <result column="hardward_status" property="hardwardStatus" jdbcType="VARCHAR" />
+    <result column="battery_status" property="batteryStatus" jdbcType="VARCHAR" />
+    <result column="instation_status" property="instationStatus" jdbcType="VARCHAR" />
+    <result column="bauds_info" property="baudsInfo" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+    <result column="bd_time" property="bdTime" jdbcType="VARCHAR" />
+    <result column="bd_time_status" property="bdTimeStatus" jdbcType="VARCHAR" />
+    <result column="service_status" property="serviceStatus" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	ic_status,
+     	hardward_status,
+     	battery_status,
+     	instation_status,
+     	bauds_info,
+     	update_time,
+     	bd_time,
+     	bd_time_status,
+     	service_status
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from baud_info 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <!--查询电量和信号getBaudList  -->
+  
+  <select id="getBaudList" resultMap="BaseResultMap" parameterType="java.util.List" >
+    select  *  from baud_info 
+   
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from baud_info 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from baud_info
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.monitor.baudInfo.model.BaudInfo">
+		insert into baud_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="icStatus != null">
+				ic_status,
+			</if>
+			<if test="hardwardStatus != null">
+				hardward_status,
+			</if>
+			<if test="batteryStatus != null">
+				battery_status,
+			</if>
+			<if test="instationStatus != null">
+				instation_status,
+			</if>
+			<if test="baudsInfo != null">
+				bauds_info,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="bdTime != null">
+				bd_time,
+			</if>
+			<if test="bdTimeStatus != null">
+				bd_time_status,
+			</if>
+			<if test="serviceStatus != null">
+				service_status,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="icStatus != null">
+				 #{ icStatus,jdbcType= VARCHAR },
+			</if>
+			<if test="hardwardStatus != null">
+				 #{ hardwardStatus,jdbcType= VARCHAR },
+			</if>
+			<if test="batteryStatus != null">
+				 #{ batteryStatus,jdbcType= VARCHAR },
+			</if>
+			<if test="instationStatus != null">
+				 #{ instationStatus,jdbcType= VARCHAR },
+			</if>
+			<if test="baudsInfo != null">
+				 #{ baudsInfo,jdbcType= VARCHAR },
+			</if>
+			<if test="updateTime != null">
+				 #{ updateTime,jdbcType= VARCHAR },
+			</if>
+			<if test="bdTime != null">
+				 #{ bdTime,jdbcType= VARCHAR },
+			</if>
+			<if test="bdTimeStatus != null">
+				 #{ bdTimeStatus,jdbcType= VARCHAR },
+			</if>
+			<if test="serviceStatus != null">
+				 #{ serviceStatus,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.monitor.baudInfo.model.BaudInfo">
+		select
+		<include refid="Base_Column_List" />
+		from baud_info
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="icStatus != null">
+			AND ic_status =  #{ icStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="hardwardStatus != null">
+			AND hardward_status =  #{ hardwardStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="batteryStatus != null">
+			AND battery_status =  #{ batteryStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="instationStatus != null">
+			AND instation_status =  #{ instationStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="baudsInfo != null">
+			AND bauds_info =  #{ baudsInfo,jdbcType= VARCHAR }
+		  </if>
+		  <if test="updateTime != null">
+			AND update_time =  #{ updateTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="bdTime != null">
+			AND bd_time =  #{ bdTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="bdTimeStatus != null">
+			AND bd_time_status =  #{ bdTimeStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="serviceStatus != null">
+			AND service_status =  #{ serviceStatus,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY update_time desc
+		<if test="start != null and max != null">
+			limit    #{  start},   #{  max }
+		 </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.monitor.baudInfo.model.BaudInfo">
+		select
+		count(1)
+		from baud_info
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="icStatus != null">
+			AND ic_status =  #{ icStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="hardwardStatus != null">
+			AND hardward_status =  #{ hardwardStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="batteryStatus != null">
+			AND battery_status =  #{ batteryStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="instationStatus != null">
+			AND instation_status =  #{ instationStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="baudsInfo != null">
+			AND bauds_info =  #{ baudsInfo,jdbcType= VARCHAR }
+		  </if>
+		  <if test="updateTime != null">
+			AND update_time =  #{ updateTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="bdTime != null">
+			AND bd_time =  #{ bdTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="bdTimeStatus != null">
+			AND bd_time_status =  #{ bdTimeStatus,jdbcType= VARCHAR }
+		  </if>
+		  <if test="serviceStatus != null">
+			AND service_status =  #{ serviceStatus,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.monitor.baudInfo.model.BaudInfo">
+		<if test="id !=null">
+			update baud_info
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 ic_status =  #{ icStatus,jdbcType= VARCHAR },
+     			 hardward_status =  #{ hardwardStatus,jdbcType= VARCHAR },
+     			 battery_status =  #{ batteryStatus,jdbcType= VARCHAR },
+     			 instation_status =  #{ instationStatus,jdbcType= VARCHAR },
+     			 bauds_info =  #{ baudsInfo,jdbcType= VARCHAR },
+     			 update_time =  #{ updateTime,jdbcType= VARCHAR },
+     			 bd_time =  #{ bdTime,jdbcType= VARCHAR },
+     			 bd_time_status =  #{ bdTimeStatus,jdbcType= VARCHAR },
+     			 service_status =  #{ serviceStatus,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

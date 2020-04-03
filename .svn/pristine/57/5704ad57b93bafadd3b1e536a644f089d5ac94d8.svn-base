@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.system.user.dao.mysql.mybatis.SystemUserRoleRaMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.system.user.model.SystemUserRoleRa" >
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="role_id" property="roleId" jdbcType="BIGINT" />
+  </resultMap>
+  
+  
+ <sql id="Base_Column_List" >
+     	user_id,
+        role_id
+  </sql>
+  
+  <!-- 添加 用户-角色关系表  -->
+	<insert id="insertSelectiveFromUserRole" parameterType="java.util.List">
+		insert into system_user_role_ra(user_id,role_id) values
+		<foreach collection="list" item="item" index="index" separator=",">
+				 (#{ item.userId,jdbcType= BIGINT },
+				 #{ item.roleId,jdbcType= BIGINT })
+		</foreach>
+	</insert>
+	
+	  <!-- 根据属性分页查询  -->
+   <select id="selectByPropertyByPageFromUserRole" resultMap="BaseResultMap"
+		parameterType="Map">
+		select
+		<include refid="Base_Column_List" />
+		from system_user_role_ra
+		where 1=1
+		  <if test="userId != null">
+			AND user_id =  #{ userId,jdbcType= BIGINT }
+		  </if>
+		  <if test="roleId != null">
+			AND role_id =  #{ roleId,jdbcType= BIGINT }
+		  </if>
+		ORDER BY user_id desc
+		<if test="startindex!=null and maxindex!=null">
+		 	limit #{startindex},#{maxindex} 
+		</if>
+	</select>
+	
+	<!-- 根据属查询记录条数 -->
+	 <select id="selectCountByPropertyFromUserRole"  resultType="java.lang.Integer"
+		parameterType="Map">
+		select
+		count(1)
+		from system_user_role_ra
+		where 1=1
+		  <if test="userId != null">
+			AND user_id =  #{ userId,jdbcType= BIGINT }
+		  </if>
+		  <if test="roleId != null">
+			AND role_id =  #{ roleId,jdbcType= BIGINT }
+		  </if>
+	</select>
+	
+  <!-- 根据userId查询用户-角色 -->
+  <select id="selectByPrimaryKeyFromUserRole" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+		<include refid="Base_Column_List" />
+    from system_user_role_ra 
+    where  user_id = #{ userId,jdbcType=BIGINT}
+  </select>
+  
+  <!-- 根据主键删除用户-角色（物理删除） -->
+  <delete id="deleteByPrimaryKeyByRole" parameterType="java.lang.Long" >
+    delete from system_user_role_ra 
+    where user_id =  #{ userId,jdbcType=BIGINT}
+  </delete>
+</mapper>

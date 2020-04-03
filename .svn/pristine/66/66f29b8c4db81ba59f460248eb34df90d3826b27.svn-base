@@ -1,0 +1,188 @@
+package com.web.business.generator.system.bdcard.model;
+
+import java.util.Date;
+
+import com.web.common.util.model.AutoModel;
+
+
+/**
+ * 北斗卡实体类
+ * @author cll
+ * @date 2019年8月8日
+ *
+ */
+public class BdCard extends AutoModel{
+    
+	private String cardId;
+
+    private String cardNum;//卡号
+
+    private String broadcastNum;//通播地址
+
+    private String userFeature;//用户特征
+
+    private String commFre;//通信频度
+
+    private String commGrade;//通信等级
+
+    private String subUserNum;//下属数量
+
+    private String investDate;//充值时间
+
+    private String createDate;//开卡时间
+
+    private String investTime;//充值时长
+
+    private String remainTime;//到期时间
+
+    private Integer isExceed; //是否超期   0标识无 、 1标识超期， 2未开卡
+    //新增卡时为2，续费后为0，过期后为1
+
+    private String exceedTime;//超期时间
+    
+    private Double balance;//余额
+    
+    private int status;//状态    0为正常   1为无效
+    
+    private String createTime;//创建时间
+    
+    private String cardRemark;
+
+  
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId == null ? null : cardId.trim();
+    }
+
+    public String getCardNum() {
+        return cardNum;
+    }
+
+    public void setCardNum(String cardNum) {
+        this.cardNum = cardNum == null ? null : cardNum.trim();
+    }
+
+    public String getBroadcastNum() {
+        return broadcastNum;
+    }
+
+    public void setBroadcastNum(String broadcastNum) {
+        this.broadcastNum = broadcastNum == null ? null : broadcastNum.trim();
+    }
+
+    public String getUserFeature() {
+        return userFeature;
+    }
+
+    public void setUserFeature(String userFeature) {
+        this.userFeature = userFeature == null ? null : userFeature.trim();
+    }
+
+    public String getCommFre() {
+        return commFre;
+    }
+
+    public void setCommFre(String commFre) {
+        this.commFre = commFre == null ? null : commFre.trim();
+    }
+
+    public String getCommGrade() {
+        return commGrade;
+    }
+
+    public void setCommGrade(String commGrade) {
+        this.commGrade = commGrade == null ? null : commGrade.trim();
+    }
+
+    public String getSubUserNum() {
+        return subUserNum;
+    }
+
+    public void setSubUserNum(String subUserNum) {
+        this.subUserNum = subUserNum == null ? null : subUserNum.trim();
+    }
+
+    public String getInvestDate() {
+        return investDate;
+    }
+
+    public void setInvestDate(String investDate) {
+        this.investDate = investDate == null ? null : investDate.trim();
+    }
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate == null ? null : createDate.trim();
+    }
+
+    public String getInvestTime() {
+        return investTime;
+    }
+
+    public void setInvestTime(String investTime) {
+        this.investTime = investTime == null ? null : investTime.trim();
+    }
+
+    public String getRemainTime() {
+        return remainTime;
+    }
+
+    public void setRemainTime(String remainTime) {
+        this.remainTime = remainTime == null ? null : remainTime.trim();
+    }
+
+    public Integer getIsExceed() {
+        return isExceed;
+    }
+
+    public void setIsExceed(Integer isExceed) {
+        this.isExceed = isExceed;
+    }
+
+    public String getExceedTime() {
+        return exceedTime;
+    }
+
+    public void setExceedTime(String exceedTime) {
+        this.exceedTime = exceedTime == null ? null : exceedTime.trim();
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+    }
+
+    public String getCardRemark() {
+        return cardRemark;
+    }
+
+    public void setCardRemark(String cardRemark) {
+        this.cardRemark = cardRemark == null ? null : cardRemark.trim();
+    }
+    
+    public String getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
+    
+}

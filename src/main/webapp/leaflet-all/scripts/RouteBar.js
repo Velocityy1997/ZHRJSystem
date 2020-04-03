@@ -1,0 +1,1010 @@
+L.Control.RouteBar = L.Control.extend({
+    options: {
+        position: 'topleft',
+        lng: 'en',
+        icoCheckedClass: 'text-primary',
+        icoUncheckedClass: 'text-default',
+    },
+    local: {
+        cn: {
+            headerTitle: '路线管理',
+            tip_edit: '工具',
+            tip_layer: '显示围栏',
+            tip_list: '列表',
+            tip_add: '添加路线',
+            tip_del: '删除路线',
+            err_noSelItem: '请先创建路线',
+            dlg_route_titleinput: '路线名：',
+            dlg_route_title: '添加路线',
+            dlg_dot_title: '添加点',
+            dlg_btn_cancel: '取消',
+            dlg_btn_ok: '确定',
+            dlg_point_lng: '经度：',
+            dlg_point_lat: '纬度：',
+            dlg_point_title: '名称：',
+            dlg_point_type: '类型：',
+            dlg_point_pos: '位置：',
+            terminal_name: '终端名称：',
+            gpstime: '定位时间：',
+            zhj_name: '指挥机名称：',
+            terminal_cardnum: '卡号：',
+            zhj_cardnum: '指挥机卡号：',
+            point_type_waypoint: '途径点',
+            point_type_awaypoint: '规避点',
+            point_type_purpose: '目的地',
+            pop_index: '序号：',
+            pop_title: '名称：',
+            pop_lng_lat: '经纬度：',
+            pop_type: '类型：',
+            newRouteTitle: '新建路线',
+            newPointTitle: '新建点',
+            pointNum: 2 //途经点和规避点最多有几个
+        },
+        deleteflag: 0,
+        en: {
+            headerTitle: 'route manage',
+            tip_edit: 'edit tool',
+            tip_layer: 'show fence',
+            tip_list: 'list',
+            tip_add: 'add route',
+            tip_del: 'delete route',
+            err_noSelItem: 'please create a route,first!',
+            dlg_route_titleinput: 'route name：',
+            dlg_route_title: 'add route',
+            dlg_btn_cancel: 'cancel',
+            dlg_btn_ok: 'ok',
+            dlg_point_lng: 'longitude：',
+            dlg_point_lat: 'latitude：',
+            dlg_point_title: 'name：',
+            dlg_point_type: 'type：',
+            dlg_point_pos: 'index：',
+            point_type_waypoint: 'way point',
+            point_type_awaypoint: 'away point',
+            pop_index: 'index：',
+            pop_title: 'name：',
+            pop_lng_lat: 'coordinate：',
+            pop_type: 'type：',
+            newRouteTitle: 'new route',
+            newPointTitle: 'new point',
+        }
+    },
+    initialize: function(options, thisMap) {
+        map = thisMap;
+        if (options) {
+            L.Util.setOptions(this, options);
+        }
+
+        g_RouteBar = this;
+        this.container = L.DomUtil.create('div', 'fencebar-container');
+        this.container.appendChild(this.createHeader());
+        this.itemContainer = L.DomUtil.create('ul', 'fencebar-container-ul list-group', this.container);
+        this.drawLayer = L.featureGroup();
+        this.lineLayer = L.layerGroup();
+        this.items = new W_Map();
+        this.editBar = this.createEditBar(this.drawLayer);
+        L.DomEvent.disableClickPropagation(this.container);
+        L.DomEvent.disableScrollPropagation(this.container);
+
+    },
+    createHeader: function() {
+        var content = L.DomUtil.create('div', 'list-group-item list-group-item-primary');
+        var ico = L.DomUtil.create("i", 'fa fa-road', content);
+        ico.setAttribute('aria-hidden', 'true');
+
+        var lb = L.DomUtil.create('lable', 'postionbar-li-item-lable', content);
+        lb.innerHTML = this.local[this.options.lng].headerTitle;
+
+        ico = L.DomUtil.create("i", 'fa fa-pencil postionbar-li-item-icon-p', content); //工具按钮
+        ico.setAttribute('aria-hidden', 'true');
+        ico.setAttribute('obj_sta', 'hide');
+        ico.classList.add("easyui-tooltip");
+        ico.setAttribute('title', this.local[this.options.lng].tip_edit);
+        this._isChecked(ico, false); //选中颜色变化
+        this._edit_btn_ico = ico;
+        L.DomEvent.on(ico, 'click', function(e) {
+            L.DomEvent.stop(e);
+            if (e.srcElement.getAttribute('obj_sta') == 'hide') {
+                this._isChecked(e.srcElement, true);
+                e.srcElement.setAttribute('obj_sta', 'view');
+                this.editBar.addTo(this._mymap); //添加画点编辑按钮
+                this.createMapEventHandler(this._mymap);
+            } else {
+                this._isChecked(e.srcElement, false);
+                e.srcElement.setAttribute('obj_sta', 'hide');
+                this.removeMapEventHandler(this._mymap);
+                this.editBar.remove(this._mymap);
+                this.drawLayer.remove();
+                this.lineLayer.remove();
+            }
+            //this._onLiBtn(e.srcElement.getAttribute('obj_fun'),e.srcElement);
+        }, this);
+
+        ico = L.DomUtil.create("i", 'fa fa-eye postionbar-li-item-icon-p text-primary', content);
+        ico.setAttribute('aria-hidden', 'true');
+        ico.setAttribute('obj_sta', 'view');
+        ico.classList.add("easyui-tooltip");
+        this._eye_btn_ico = ico;
+        ico.setAttribute('title', this.local[this.options.lng].tip_layer);
+        L.DomEvent.on(ico, 'click', function(e) { //显示围栏
+            L.DomEvent.stop(e);
+            if (e.srcElement.getAttribute('obj_sta') == 'view') {
+                e.srcElement.setAttribute('obj_sta', 'hide');
+                L.DomUtil.removeClass(e.srcElement, 'text-primary');
+                L.DomUtil.removeClass(e.srcElement, 'fa-eye');
+                L.DomUtil.addClass(e.srcElement, 'fa-eye-slash');
+                this.drawLayer.remove();
+                this.lineLayer.remove();
+            } else {
+                e.srcElement.setAttribute('obj_sta', 'view');
+                L.DomUtil.addClass(e.srcElement, 'text-primary');
+                L.DomUtil.removeClass(e.srcElement, 'fa-eye-slash');
+                L.DomUtil.addClass(e.srcElement, 'fa-eye');
+                this.drawLayer.addTo(this._mymap);
+                this.lineLayer.addTo(this._mymap);
+            }
+            //this._onLiBtn(e.srcElement.getAttribute('obj_fun'),e.srcElement);
+        }, this);
+
+        ico = L.DomUtil.create("i", 'fa fa-plus postionbar-li-item-icon-p text-primary', content);
+        ico.setAttribute('aria-hidden', 'true');
+        ico.setAttribute('obj_sta', 'view');
+        ico.setAttribute('title', this.local[this.options.lng].tip_add);
+        //this._isChecked(ico,false);
+        ico.classList.add("easyui-tooltip");
+        L.DomEvent.on(ico, 'click', function(e) { //添加路线
+            L.DomEvent.stop(e);
+            this.showCreateRouteDialog();
+            //this._onLiBtn(e.srcElement.getAttribute('obj_fun'),e.srcElement);
+        }, this);
+
+        ico = L.DomUtil.create("i", 'fa fa-bars postionbar-li-item-icon-p text-primary', content);
+        ico.setAttribute('aria-hidden', 'true');
+        ico.setAttribute('obj_sta', 'view');
+        ico.classList.add("easyui-tooltip");
+        ico.setAttribute('title', this.local[this.options.lng].tip_list);
+        L.DomEvent.on(ico, 'click', function(e) { //列表
+            L.DomEvent.stop(e);
+        }, this);
+
+        return content;
+
+    },
+    createRouteModel: function(obj) {
+        var item = {
+            title: obj.title,
+            id: this._getId(6),
+            wayPoints: [],
+            awayPoints: [],
+            purpose: [],
+            ui_item: null,
+        };
+        return item;
+    },
+    createPointModel: function(obj) {
+        var point = {
+            title: obj.title,
+            index: obj.pos,
+            lat: obj.lat,
+            lng: obj.lng,
+            type: obj.type,
+        };
+        return point;
+    },
+    saveRoute: function() {
+        if (this.hasOwnProperty('_eventHandler')) {
+            this._eventHandler.call(this._eventHandlerCtx, 'saveRoute');
+        }
+    },
+    deserializeRouteFromArray: function(items) {
+        for (var i in items) {
+            this.createRouteFromRouteModel(items[i]);
+        }
+    },
+    serializeRouteToArray: function() {
+        var arr = [];
+        var items = this.items.getArray();
+
+        for (var i = 0, len = items.length; i < len; i++) {
+            var item = {
+                title: items[i][1].title,
+                id: items[i][1].id,
+                awayPoints: [],
+                wayPoints: [],
+                purpose: []
+            };
+            for (var j in items[i][1].wayPoints) {
+                item.wayPoints.push({
+                    title: items[i][1].wayPoints[j].title,
+                    index: items[i][1].wayPoints[j].index,
+                    lat: items[i][1].wayPoints[j].lat,
+                    lng: items[i][1].wayPoints[j].lng,
+                    type: items[i][1].wayPoints[j].type,
+                });
+            }
+            for (var j in items[i][1].purpose) {
+                item.purpose.push({
+                    title: items[i][1].purpose[j].title,
+                    index: items[i][1].purpose[j].index,
+                    lat: items[i][1].purpose[j].lat,
+                    lng: items[i][1].purpose[j].lng,
+                    type: items[i][1].purpose[j].type,
+                });
+            }
+            for (var j in items[i][1].awayPoints) {
+                item.awayPoints.push({
+                    title: items[i][1].awayPoints[j].title,
+                    index: items[i][1].awayPoints[j].index,
+                    lat: items[i][1].awayPoints[j].lat,
+                    lng: items[i][1].awayPoints[j].lng,
+                    type: items[i][1].awayPoints[j].type,
+                });
+            }
+            arr.push(item);
+        }
+
+        return arr;
+    },
+    serializeRouteToArrayAddOrUpdate: function() { //新增或修改路线，只传最新的一条
+
+        var arr = [];
+        var itemId = {
+            title: this.selectedItem.title,
+            id: this.selectedItem.id,
+            flag: 0,
+        };
+        var itemPoint = {
+            awayPoints: [],
+            wayPoints: [],
+            purpose: []
+        };
+        if (this.deleteflag == 1) { //删除操作
+            itemId.flag = 1;
+            arr.push(itemId);
+            arr.push(itemPoint);
+            this.deleteflag = 0;
+            return arr;
+        }
+        for (var j in this.selectedItem.wayPoints) {
+            itemPoint.wayPoints.push({
+                title: this.selectedItem.wayPoints[j].title,
+                index: this.selectedItem.wayPoints[j].index,
+                lat: this.selectedItem.wayPoints[j].lat,
+                lng: this.selectedItem.wayPoints[j].lng,
+                type: this.selectedItem.wayPoints[j].type,
+            });
+        }
+
+        for (var j in this.selectedItem.awayPoints) {
+            itemPoint.awayPoints.push({
+                title: this.selectedItem.awayPoints[j].title,
+                index: this.selectedItem.awayPoints[j].index,
+                lat: this.selectedItem.awayPoints[j].lat,
+                lng: this.selectedItem.awayPoints[j].lng,
+                type: this.selectedItem.awayPoints[j].type,
+            });
+        }
+        for (var j in this.selectedItem.purpose) {
+            itemPoint.purpose.push({
+                title: this.selectedItem.purpose[j].title,
+                index: this.selectedItem.purpose[j].index,
+                lat: this.selectedItem.purpose[j].lat,
+                lng: this.selectedItem.purpose[j].lng,
+                type: this.selectedItem.purpose[j].type,
+            });
+        }
+        arr.push(itemId);
+        arr.push(itemPoint);
+        return arr;
+    },
+    setEventHanlder: function(fun, ctx) {
+        this._eventHandler = fun;
+        this._eventHandlerCtx = ctx;
+    },
+    showCreateRouteDialog: function() {
+        var content = L.DomUtil.create('div', 'easyui-dialog');
+        $(content).css('z-index', '10');
+        var div = L.DomUtil.create('div', '', content);
+        var span = L.DomUtil.create('label', 'label-top', div);
+        span.style = "margin:2px;";
+        span.innerHTML = this.local[this.options.lng].dlg_route_titleinput;
+        var input = L.DomUtil.create('input', 'easyui-validatebox tb', div);
+        $(input).attr({ 'type': 'text', 'id': 'create_route_dialog_title' });
+        $(input).val(this.getRouteTitle());
+        input.style = "margin:5px;width:200px";
+        var div1 = L.DomUtil.create('div', 'easyui-dialog', content);
+        div1.style = "float:right;margin:10px;";
+        var button1 = L.DomUtil.create("button", 'easyui-linkbutton', div1);
+        button1.style = "margin:10px;";
+        this.button_Route_span = L.DomUtil.create("span", '', button1);
+        this.button_Route_span.innerHTML = "确定";
+
+        L.DomEvent.on(button1, 'click', function(e) { //添加路线弹出框
+
+            var title = $('#create_route_dialog_title').val();
+            if (title == '') {
+                title = g_RouteBar.getRouteTitle();
+            }
+
+            var items = this.items.getArray();
+
+            for (var i = 0, len = items.length; i < len; i++) {
+                if (title == items[i][1].title) {
+                    showTipDialog('#tip_dlg', "提示", "路线已存在！", 2000);
+                    return;
+                }
+            }
+            /*if(this.selectedItem == undefined || this.selectedItem == null){
+            	showTipDialog('#tip_dlg',"提示", "请先创建路线！",2000);
+            	return;
+            }*/
+            $(content).dialog('destroy');
+            g_RouteBar.createRoute({ title: title }); //添加路线
+            g_RouteBar.saveRoute();
+        }, this);
+
+        var button2 = L.DomUtil.create("button", 'easyui-linkbutton', div1);
+        this.button_Route_span2 = L.DomUtil.create("span", '', button2);
+        this.button_Route_span2.innerHTML = "取消";
+        L.DomEvent.on(button2, 'click', function(e) {
+            $(content).dialog('destroy');
+        }, this);
+
+        $(content).dialog({
+            title: '添加路线',
+            closed: false,
+            cache: false,
+            modal: true
+        });
+    },
+    showCreatePointDialog: function(obj) {
+        var content = L.DomUtil.create('div', '');
+        $(content).css({ 'z-index': '10', 'width': '30%' });
+
+        var div = L.DomUtil.create('div', 'input-group', content);
+        var span = L.DomUtil.create('span', 'input-group-addon', div);
+        span.innerHTML = this.local[this.options.lng].dlg_point_lng;
+        var input = L.DomUtil.create('input', 'form-control', div);
+        $(input).attr({ 'value': L.Util.formatNum(obj.lng) + '°', 'readonly': 'true', 'id': 'create_point_dialog_lng' });
+
+        div = L.DomUtil.create('div', 'input-group', content);
+        span = L.DomUtil.create('span', 'input-group-addon', div);
+        span.innerHTML = this.local[this.options.lng].dlg_point_lat;
+        input = L.DomUtil.create('input', 'form-control', div);
+        $(input).attr({ 'value': L.Util.formatNum(obj.lat) + '°', 'readonly': 'true', 'id': 'create_point_dialog_lat' });
+
+        div = L.DomUtil.create('div', 'input-group', content);
+        span = L.DomUtil.create('span', 'input-group-addon', div);
+        span.innerHTML = this.local[this.options.lng].dlg_point_title;
+        input = L.DomUtil.create('input', 'form-control', div);
+        $(input).attr('id', 'create_point_dialog_title');
+        $(input).val(this.local[this.options.lng].newPointTitle);
+
+        div = L.DomUtil.create('div', 'input-group', content);
+        span = L.DomUtil.create('span', 'input-group-addon', div);
+        span.innerHTML = this.local[this.options.lng].dlg_point_type;
+        var select = L.DomUtil.create('select', 'form-control', div);
+        $(select).attr('id', 'create_point_dialog_type');
+
+        if (this.selectedItem.wayPoints.length == 0 && this.selectedItem.awayPoints.length == 0 && this.selectedItem.purpose.length == 0) {
+            L.DomUtil.create('option', '', select).innerHTML = this.local[this.options.lng].point_type_purpose; //目的地
+        } else {
+            L.DomUtil.create('option', '', select).innerHTML = this.local[this.options.lng].point_type_waypoint;
+            L.DomUtil.create('option', '', select).innerHTML = this.local[this.options.lng].point_type_awaypoint;
+        }
+        div = L.DomUtil.create('div', 'input-group', content);
+        span = L.DomUtil.create('span', 'input-group-addon', div);
+
+        var div1 = L.DomUtil.create('div', 'easyui-dialog', content);
+        div1.style = "float:right;margin:10px;";
+        var button1 = L.DomUtil.create("button", 'easyui-linkbutton', div1);
+        button1.style = "margin:10px;";
+        this.button_Route_span = L.DomUtil.create("span", '', button1);
+        this.button_Route_span.innerHTML = "确定";
+        L.DomEvent.on(button1, 'click', function(e) {
+
+            if (this.selectedItem.wayPoints.length + this.selectedItem.awayPoints.length +
+                this.selectedItem.purpose.length > g_RouteBar.local[g_RouteBar.options.lng].pointNum) {
+                showTipDialog('#tip_dlg', "提示", "途经点和规避点加起来最多有2个！", 2000);
+                return;
+            }
+
+            var lng = $('#create_point_dialog_lng').val().replace('°', '');
+            var flag = lng.substring(lng.indexOf("."));
+            if (flag.length > 6) {
+                lng = lng.substring(0, lng.indexOf(".") + 6);
+            }
+            var lat = $('#create_point_dialog_lat').val().replace('°', '');
+            var flag1 = lat.substring(lat.indexOf("."));
+            if (flag1.length > 6) {
+                lat = lat.substring(0, lng.indexOf(".") + 6);
+            }
+            var title = $('#create_point_dialog_title').val();
+            var type = $('#create_point_dialog_type').val();
+            if (type == g_RouteBar.local[g_RouteBar.options.lng].point_type_waypoint) {
+                type = 'waypoint';
+            } else if (type == g_RouteBar.local[g_RouteBar.options.lng].point_type_purpose) {
+                type = 'purpose';
+            } else {
+                type = 'awaypoint';
+            }
+
+            g_RouteBar.createPoint({ lng: lng, lat: lat, title: title, type: type });
+            if ((this.selectedItem.wayPoints.length + this.selectedItem.awayPoints.length) == 2 && this.selectedItem.purpose.length == 1) {
+                g_RouteBar.saveRoute();
+            }
+            $(content).dialog('destroy');
+        }, this);
+
+        var button2 = L.DomUtil.create("button", 'easyui-linkbutton', div1);
+        this.button_Route_span2 = L.DomUtil.create("span", '', button2);
+        this.button_Route_span2.innerHTML = "取消";
+        L.DomEvent.on(button2, 'click', function(e) {
+            $(content).dialog('destroy');
+        }, this);
+
+        $(content).dialog({
+            autoOpen: true,
+            title: this.local[this.options.lng].dlg_dot_title,
+            modal: true,
+            resizable: false
+        });
+    },
+    orderPoint: function(pointModel) { //点添加到数组
+        if (pointModel.type == 'awaypoint') {
+            var x = this.selectedItem.awayPoints.indexOf(pointModel);
+            if (x != -1) {
+                this.selectedItem.awayPoints.splice(x, 1);
+            }
+
+            for (var i = 0, len = this.selectedItem.awayPoints.length; i < len; i++) {
+                if (this.selectedItem.awayPoints[i].index >= pointModel.index) {
+                    this.selectedItem.awayPoints.splice(i, 0, pointModel);
+                    break;
+                }
+            }
+            if (this.selectedItem.awayPoints.indexOf(pointModel) == -1) {
+                this.selectedItem.awayPoints.push(pointModel);
+            }
+
+            for (var i = 0, len = this.selectedItem.awayPoints.length; i < len; i++) {
+                this.selectedItem.awayPoints[i].index = i + 1;
+            }
+        } else if (pointModel.type == 'purpose') {
+            var x = this.selectedItem.purpose.indexOf(pointModel);
+            if (x != -1) {
+                this.selectedItem.purpose.splice(x, 1);
+            }
+
+            for (var i = 0, len = this.selectedItem.purpose.length; i < len; i++) {
+                if (this.selectedItem.purpose[i].index >= pointModel.index) {
+                    this.selectedItem.purpose.splice(i, 0, pointModel);
+                    break;
+                }
+            }
+            if (this.selectedItem.purpose.indexOf(pointModel) == -1) {
+                this.selectedItem.purpose.push(pointModel);
+            }
+
+            for (var i = 0, len = this.selectedItem.purpose.length; i < len; i++) {
+                this.selectedItem.purpose[i].index = i + 1;
+            }
+        } else {
+            var x = this.selectedItem.wayPoints.indexOf(pointModel);
+            if (x != -1) {
+                this.selectedItem.wayPoints.splice(x, 1);
+            }
+
+            for (var i = 0, len = this.selectedItem.wayPoints.length; i < len; i++) {
+                if (this.selectedItem.wayPoints[i].index >= pointModel.index) {
+                    this.selectedItem.wayPoints.splice(i, 0, pointModel);
+                    break;
+                }
+            }
+            if (this.selectedItem.wayPoints.indexOf(pointModel) == -1) {
+                this.selectedItem.wayPoints.push(pointModel);
+            }
+            for (var i = 0, len = this.selectedItem.wayPoints.length; i < len; i++) {
+                this.selectedItem.wayPoints[i].index = i + 1;
+            }
+        }
+    },
+    createPoint: function(obj) {
+        var pointModel = this.createPointModel(obj);
+        this.orderPoint(pointModel); //console.log(this.selectedItem.wayPoints);
+        this.renderRoute();
+    },
+    createPoint2: function(obj) {
+        var pointModel = this.createPointModel(obj);
+        this.orderPoint(pointModel); //console.log(this.selectedItem.wayPoints);
+    },
+    renderRoute_DrawLine: function() {
+        var pts = [];
+
+
+        if (this.selectedItem.purpose.length > 0) {
+            if (this.selectedItem.polyline != undefined && this.selectedItem.polyline != null && this.lineLayer.hasLayer(this.selectedItem.polyline)) {
+                this.lineLayer.removeLayer(this.selectedItem.polyline);
+            }
+            for (var i in this.selectedItem.wayPoints) {
+                pts.push(L.latLng([this.selectedItem.wayPoints[i].lat, this.selectedItem.wayPoints[i].lng]));
+            }
+            if (this.selectedItem.purpose.length > 0) {
+                pts.push(L.latLng([this.selectedItem.purpose[0].lat, this.selectedItem.purpose[0].lng]));
+            }
+            var pl = L.polyline(pts, { color: 'red' }).addTo(this.lineLayer);
+            this.selectedItem.polyline = pl;
+        }
+    },
+    renderRoute: function(obj) { //选中路线后显示点
+        this.drawLayer.clearLayers();
+        this.lineLayer.clearLayers();
+        var pts = [];
+
+        if (this.selectedItem.purpose.length > 0) {
+
+            for (var i in this.selectedItem.wayPoints) {
+                pts.push(L.latLng([this.selectedItem.wayPoints[i].lat, this.selectedItem.wayPoints[i].lng]));
+            }
+            if (this.selectedItem.purpose.length > 0) {
+                pts.push(L.latLng([this.selectedItem.purpose[0].lat, this.selectedItem.purpose[0].lng]));
+            }
+            var pl = L.polyline(pts, { color: 'red' }).addTo(this.lineLayer);
+            this.selectedItem.polyline = pl;
+        }
+
+        for (var i in this.selectedItem.wayPoints) {
+            map.setView(L.latLng([this.selectedItem.wayPoints[0].lat, this.selectedItem.wayPoints[0].lng]), this.options.mapDefaultLevel);
+            var mk = L.marker(L.latLng([this.selectedItem.wayPoints[i].lat, this.selectedItem.wayPoints[i].lng]), { icon: this._createIcon('way') }).bindPopup(this._createDetai3(this.selectedItem.wayPoints[i]));
+            mk.dataModel = this.selectedItem.wayPoints[i];
+            mk.shape = 'marker';
+            mk.application = 'routebar';
+            mk.addTo(this.drawLayer);
+        }
+
+        for (var i in this.selectedItem.awayPoints) {
+            map.setView(L.latLng([this.selectedItem.awayPoints[0].lat, this.selectedItem.awayPoints[0].lng]), this.options.mapDefaultLevel);
+            var mk = L.marker(L.latLng([this.selectedItem.awayPoints[i].lat, this.selectedItem.awayPoints[i].lng]), { icon: this._createIcon('away') }).bindPopup(this._createDetai3(this.selectedItem.awayPoints[i]));
+            mk.dataModel = this.selectedItem.awayPoints[i];
+            mk.shape = 'marker';
+            mk.application = 'routebar';
+            mk.addTo(this.drawLayer);
+        }
+
+        for (var i in this.selectedItem.purpose) {
+            map.setView(L.latLng([this.selectedItem.purpose[0].lat, this.selectedItem.purpose[0].lng]), this.options.mapDefaultLevel);
+            var mk = L.marker(L.latLng([this.selectedItem.purpose[i].lat, this.selectedItem.purpose[i].lng]), { icon: this._createIcon('banner') }).bindPopup(this._createDetai3(this.selectedItem.purpose[i]));
+            mk.dataModel = this.selectedItem.purpose[i];
+            mk.shape = 'marker';
+            mk.application = 'routebar';
+            mk.addTo(this.drawLayer);
+        }
+    },
+    createRoute: function(obj) { //创建路线
+        var item = this.createRouteModel(obj);
+        this.items.set(item.id, item);
+        item.ui_item = this.createRouteItem(item); //新建路线样式
+        this.itemContainer.appendChild(item.ui_item);
+
+        this.selecteRoute(item.id);
+
+        this.renderRoute();
+        return item;
+    },
+    createRouteFromRouteModel: function(item) {
+        this.items.set(item.id, item);
+        item.ui_item = this.createRouteItem(item);
+        this.itemContainer.appendChild(item.ui_item);
+        return item;
+    },
+    selecteRoute: function(id) {
+        var item = this.items.get(id);
+        if (this.selectedItem != undefined && this.selectedItem != null) {
+            $(this.selectedItem.ui_item).removeClass('list-group-item-success');
+            $(this.selectedItem.ui_item).addClass('list-group-item-primary');
+        }
+        this.selectedItem = item;
+        $(this.selectedItem.ui_item).removeClass('list-group-item-primary');
+        $(this.selectedItem.ui_item).addClass('list-group-item-success');
+        return item;
+    },
+    createRouteItem: function(obj) {
+        var li = L.DomUtil.create('li', 'list-group-item list-group-item-success');
+        var content = L.DomUtil.create('div', '', li);
+        $(content).attr('obj_id', obj.id);
+        L.DomEvent.on(content, 'click', function(e) {
+            L.DomEvent.stop(e);
+            this.selecteRoute(e.srcElement.getAttribute('obj_id')); //选中路线的样式
+            this.renderRoute();
+            //this._onLiBtn(e.srcElement.getAttribute('obj_fun'),e.srcElement);
+        }, this);
+
+        var ico = L.DomUtil.create("i", 'fa fa-map-signs', content);
+        $(ico).attr('obj_id', obj.id);
+        ico.setAttribute('aria-hidden', 'true');
+
+        var lb = L.DomUtil.create('lable', 'postionbar-li-item-lable', content);
+        lb.innerHTML = obj.title;
+        $(lb).attr('obj_id', obj.id);
+
+        ico = L.DomUtil.create("i", 'fa fa-times postionbar-li-item-icon-p text-default', content);
+        ico.setAttribute('aria-hidden', 'true');
+        $(ico).attr('obj_id', obj.id);
+        this._setTooltip(ico, this.local[this.options.lng].tip_delete);
+        L.DomEvent.on(ico, 'click', function(e) {
+            L.DomEvent.stop(e);
+            var item = this.items.get($(ico).attr('obj_id'));
+            this.selectedItem = item;
+            this.items.remove(item.id);
+            this.drawLayer.clearLayers();
+            this.lineLayer.clearLayers();
+            this.deleteflag = 1; //删除标志位
+            this.saveRoute();
+            this.itemContainer.removeChild(item.ui_item);
+            this.selectedItem = null;
+            //this._onLiBtn(e.srcElement.getAttribute('obj_fun'),e.srcElement);
+        }, this);
+        return li;
+
+    },
+    pointCreateEventHandler: function(e) { //画点连线
+        var type = e.layerType;
+        var layer = e.layer;
+        if (type != 'marker') return;
+        if (this.selectedItem == undefined || this.selectedItem == null) {
+            showTipDialog('#tip_dlg', "提示", "请先创建路线！", 2000);
+            return;
+        }
+        if (this.selectedItem.wayPoints.length + this.selectedItem.awayPoints.length +
+            this.selectedItem.purpose.length > g_RouteBar.local[g_RouteBar.options.lng].pointNum) {
+            showTipDialog('#tip_dlg', "提示", "途经点和规避点加起来最多有2个！", 2000);
+            return;
+        }
+
+        //console.log(this.selectedItem);
+        var latlng = layer.getLatLng();
+
+        this.showCreatePointDialog({ lat: latlng.lat, lng: latlng.lng });
+    },
+    pointEditEventHandler: function(e) {;
+        var layers = e.layers.getLayers();
+        for (var i in layers) {
+            var layer = layers[i];
+            if (layer.application != 'routebar') return;
+            var latlng = layer.getLatLng();
+            layer.dataModel.lat = latlng.lat;
+            layer.dataModel.lng = latlng.lng;
+        }
+        this.renderRoute_DrawLine();
+        if (this.selectedItem.purpose.length == 0) {
+            showTipDialog('#tip_dlg', "提示", "必须有一个目的点！", 2000);
+            return;
+        }
+        if (this.selectedItem.purpose.length > 1) {
+            showTipDialog('#tip_dlg', "提示", "只能有一个目的点！", 2000);
+            return;
+        }
+        if ((this.selectedItem.wayPoints.length + this.selectedItem.awayPoints.length) > 2) {
+            showTipDialog('#tip_dlg', "提示", "途经点和规避点加起来最多有2个！", 2000);
+            return;
+        }
+        this.saveRoute();
+    },
+    pointDeleteEventHandler: function(e) {
+        var layers = e.layers.getLayers();
+        for (var i in layers) {
+            var layer = layers[i];
+            if (layer.application != 'routebar') return;
+            if (layer.dataModel.type == 'waypoint') {
+                var index = this.selectedItem.wayPoints.indexOf(layer.dataModel);
+                if (index != -1) {
+                    this.selectedItem.wayPoints.splice(index, 1);
+                }
+            } else if (layer.dataModel.type == 'purpose') {
+                var index = this.selectedItem.purpose.indexOf(layer.dataModel);
+                if (index != -1) {
+                    this.selectedItem.purpose.splice(index, 1);
+                }
+            } else {
+                var index = this.selectedItem.awayPoints.indexOf(layer.dataModel);
+                if (index != -1) {
+                    this.selectedItem.awayPoints.splice(index, 1);
+                }
+            }
+        }
+        this.renderRoute();
+        //this.saveRoute();
+    },
+    createMapEventHandler: function(map) {
+        map.on(L.Draw.Event.EDITED, this.pointEditEventHandler, this);
+
+        map.on(L.Draw.Event.DELETED, this.pointDeleteEventHandler, this);
+
+        map.on(L.Draw.Event.CREATED, this.pointCreateEventHandler, this);
+    },
+    removeMapEventHandler: function(map) {
+        map.off(L.Draw.Event.EDITED, this.pointEditEventHandler, this);
+
+        map.off(L.Draw.Event.DELETED, this.pointDeleteEventHandler, this);
+
+        map.off(L.Draw.Event.CREATED, this.pointCreateEventHandler, this);
+    },
+    createEditBar: function(drawLayer) {
+        var editBar = new L.Control.Draw({
+            position: 'topright',
+            draw: {
+                polyline: false,
+                polygon: false,
+                circle: false,
+                rectangle: false,
+                marker: {
+                    repeatMode: true,
+                },
+                circlemarker: false
+            },
+            edit: {
+                featureGroup: drawLayer,
+                remove: true,
+            },
+            lng: this.options.lng
+        });
+        return editBar;
+    },
+    onAdd: function(map) {
+        this._mymap = map;
+        this.drawLayer.addTo(map);
+        this.lineLayer.addTo(map);
+
+        /////////////////////////////////
+        var htmlElement = this._eye_btn_ico;
+        if (htmlElement.getAttribute('obj_sta') != 'view') {
+            htmlElement.setAttribute('obj_sta', 'view');
+            L.DomUtil.addClass(htmlElement, 'text-primary');
+            L.DomUtil.removeClass(htmlElement, 'fa-eye-slash');
+            L.DomUtil.addClass(htmlElement, 'fa-eye');
+            this.drawLayer.addTo(this._mymap);
+            this.lineLayer.addTo(this._mymap);
+
+        }
+        return this.container;
+    },
+    onRemove: function(map) {
+        var htmlElement = this._edit_btn_ico;
+        var sta = htmlElement.getAttribute('obj_sta');
+        if (sta == 'view') {
+            htmlElement.setAttribute('obj_sta', 'hide');
+            this._isChecked(htmlElement, false);
+            this.editBar.remove();
+            this.removeMapEventHandler(map);
+        }
+        /////////////////////////////////
+        var htmlElement = this._eye_btn_ico;
+        if (htmlElement.getAttribute('obj_sta') == 'view') {
+            htmlElement.setAttribute('obj_sta', 'hide');
+            L.DomUtil.removeClass(htmlElement, 'text-primary');
+            L.DomUtil.removeClass(htmlElement, 'fa-eye');
+            L.DomUtil.addClass(htmlElement, 'fa-eye-slash');
+            this.drawLayer.remove();
+            this.lineLayer.remove();
+
+        }
+    },
+    enable: function() {
+        return this;
+    },
+    disable: function() {
+        return this;
+    },
+    _createIcon: function(name) {
+        var icon = null;
+        switch (name) {
+            case "devIco":
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/marker-green.png',
+                    iconSize: [21, 25],
+                    iconAnchor: [9, 25],
+                    popupAnchor: [0, -25],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [14, 41]
+                });
+                break;
+            case "centerIco":
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/wujiaoxing.jpg',
+                    iconSize: [48, 48],
+                    iconAnchor: [12, 43],
+                    popupAnchor: [0, -52],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [0, 51]
+                });
+                break;
+            case "banner":
+
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/banner.png',
+                    iconSize: [48, 48],
+                    iconAnchor: [12, 43],
+                    popupAnchor: [0, -52],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [0, 51]
+                });
+                break;
+            case "away":
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/marker-red.png',
+                    iconSize: [21, 25],
+                    iconAnchor: [9, 25],
+                    popupAnchor: [0, -25],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [14, 41]
+                });
+                break;
+            case "way":
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/marker-gold.png',
+                    iconSize: [21, 25],
+                    iconAnchor: [9, 25],
+                    popupAnchor: [0, -25],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [14, 41]
+                });
+                break;
+            case "qidian":
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/qidian.png',
+                    iconSize: [21, 25],
+                    iconAnchor: [9, 25],
+                    popupAnchor: [0, -25],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [14, 41]
+                });
+                break;
+            case "tujing":
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/tujing.png',
+                    iconSize: [21, 25],
+                    iconAnchor: [9, 25],
+                    popupAnchor: [0, -25],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [14, 41]
+                });
+                break;
+            case "zhongdian":
+                icon = L.icon({
+                    iconUrl: '../ZHRJSystem/img/zhongdian.png',
+                    iconSize: [21, 25],
+                    iconAnchor: [9, 25],
+                    popupAnchor: [0, -25],
+                    shadowUrl: '../ZHRJSystem/img/marker-shadow.png',
+                    shadowSize: [41, 41],
+                    shadowAnchor: [14, 41]
+                });
+                break;
+        }
+        return icon;
+    },
+    _getId: function(len) {
+        return Math.random().toString(36).substr(3, len) + Date.now();
+    },
+    _createDetail: function(obj) {
+        var div = L.DomUtil.create('div', '', '');
+        var p = L.DomUtil.create('p', 'text-left font-weight-bold', div);
+        var content = "";
+        if (obj.hasOwnProperty('title')) content += this.local[this.options.lng].pop_title + obj.title + "<br/>";
+        if (obj.hasOwnProperty('index')) content += this.local[this.options.lng].pop_index + obj.index + "<br/>";
+        if (obj.hasOwnProperty('type')) content += this.local[this.options.lng].pop_type + ((obj.type == 'waypoint') ? this.local[this.options.lng].point_type_waypoint : this.local[this.options.lng].point_type_awaypoint) + "<br/>";
+        if (obj.hasOwnProperty('lat')) content += this.local[this.options.lng].pop_lng_lat + obj.lng + '° , ' + obj.lat + '°' + "<br/>";
+        if (obj.hasOwnProperty('name')) content += this.local[this.options.lng].terminal_name + obj.name + "<br/>";
+        if (obj.hasOwnProperty('cardNum')) content += this.local[this.options.lng].terminal_cardnum + obj.cardNum + "<br/>";
+        if (obj.hasOwnProperty('longitude')) content += this.local[this.options.lng].pop_lng_lat + obj.longitude + '° , ' + obj.latitude + '°' + "<br/>";
+
+        p.innerHTML = content;
+        return div;
+    },
+    _createDetai3: function(obj) {
+        var div = L.DomUtil.create('div', '', '');
+        var p = L.DomUtil.create('p', 'text-left font-weight-bold', div);
+        var content = "";
+        if (obj.hasOwnProperty('index')) content += this.local[this.options.lng].pop_index + obj.index + "<br/>";
+        if ((obj.type == 'waypoint')) {
+            content += this.local[this.options.lng].pop_type + this.local[this.options.lng].point_type_waypoint + "<br/>";
+        } else if ((obj.type == 'awaypoint')) {
+            content += this.local[this.options.lng].pop_type + this.local[this.options.lng].point_type_awaypoint + "<br/>";
+        } else {
+            content += this.local[this.options.lng].pop_type + this.local[this.options.lng].point_type_purpose + "<br/>";
+        }
+        if (obj.hasOwnProperty('lat')) content += this.local[this.options.lng].pop_lng_lat + obj.lng + '° , ' + obj.lat + '°' + "<br/>";
+
+        p.innerHTML = content;
+
+        /*var ico = L.DomUtil.create('span','fa fa-pencil');
+        $(ico).attr({'obj_id':this.selectedItem.id,'obj_index':obj.index,'obj_type':obj.type});
+        L.DomEvent.on(ico,'click',function(e){
+        	if($(e.srcElement).attr('obj_type') == 'waypoint'){
+        		
+        	}else{
+        	
+        	}
+        },this);
+        div.appendChild(ico);*/
+        return div;
+    },
+    _createDetail2: function(obj) {
+        var div = L.DomUtil.create('div', '', '');
+        var p = L.DomUtil.create('p', 'text-left font-weight-bold', div);
+        var content = "";
+
+        if (obj.hasOwnProperty('lat')) content += this.local[this.options.lng].pop_lng_lat + obj.lng + '° , ' + obj.lat + '°' + "<br/>";
+        if (obj.hasOwnProperty('name')) content += this.local[this.options.lng].zhj_name + obj.name + "<br/>";
+        if (obj.hasOwnProperty('cardNum')) content += this.local[this.options.lng].zhj_cardnum + obj.cardNum + "<br/>";
+        if (obj.hasOwnProperty('longitude')) content += this.local[this.options.lng].pop_lng_lat + obj.longitude + '° , ' + obj.latitude + '°' + "<br/>";
+
+        p.innerHTML = content;
+        return div;
+    },
+    _createDetail1: function(obj) {
+        var div = L.DomUtil.create('div', '', '');
+        var p = L.DomUtil.create('p', 'text-left font-weight-bold', div);
+        var content = "";
+
+        if (obj.hasOwnProperty('name')) content += this.local[this.options.lng].terminal_name + obj.name + "<br/>";
+        if (obj.hasOwnProperty('cardNum')) content += this.local[this.options.lng].terminal_cardnum + obj.cardNum + "<br/>";
+        if (obj.hasOwnProperty('longitude')) content += this.local[this.options.lng].pop_lng_lat + obj.longitude + '° , ' + obj.latitude + '°' + "<br/>";
+        if (obj.hasOwnProperty('gpstime')) content += this.local[this.options.lng].gpstime + obj.gpstime + "<br/>";
+        p.innerHTML = content;
+        return div;
+    },
+    _toopTip: function(htmlElement, showText) { //鼠标放置显示文字
+        $(htmlElement).tooltip({
+            position: 'bottom',
+            content: '<span style="color:#6A6A6A">' + showText + '</span>',
+            onShow: function() {
+                $(this).tooltip('tip').css({
+                    backgroundColor: '#ffffff',
+                    borderColor: '#ff8c40'
+                });
+            }
+        });
+    },
+    _setTooltip: function(htmlElement, title) {
+        $(htmlElement).tooltip({
+            html: false,
+            placement: 'top',
+            title: title,
+            container: 'body'
+        });
+    },
+    _isChecked: function(htmlElement, isChecked) {
+        if (isChecked) {
+            $(htmlElement).addClass(this.options.icoCheckedClass);
+            $(htmlElement).removeClass(this.options.icoUncheckedClass);
+        } else {
+            $(htmlElement).removeClass(this.options.icoCheckedClass);
+            $(htmlElement).addClass(this.options.icoUncheckedClass);
+        }
+    },
+    checkRouteTitle: function(title) {
+        for (var i in this.items.getArray()) {
+            if (this.items.getArray()[i][1].title == title) return false;
+        }
+        return true;
+    },
+    getRouteTitle: function() {
+        var num = 0;
+        while (num++ < 200) {
+            var t = this.local[this.options.lng].newRouteTitle + num.toString();
+            var c = 0;
+            for (var i in this.items.getArray()) {
+                if (this.items.getArray()[i][1].title == t) c = 1;
+            }
+            if (c == 0) return t;
+        }
+        return this.local[this.options.lng].newRouteTitle;
+    },
+});

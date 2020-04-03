@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang=en>
+
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge">
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <link rel=icon href=favicon.ico>
+    <title>中国位置服务平台</title>
+    <link rel=stylesheet href=./leaflet-all/css/bootstrap3.min.css>
+    <link rel=stylesheet href=./leaflet-all/css/jquery-ui.css>
+    <link rel=stylesheet href=./leaflet-all/css/easyui.css>
+    <link rel=stylesheet href=./font-awesome/css/font-awesome.min.css>
+    <link rel=stylesheet href=./leaflet-all/css/leaflet.css>
+    <link rel=stylesheet href=./leaflet-all/css/SearchBar.css>
+    <link rel=stylesheet href=./leaflet-all/css/PostionBar.css>
+    <link rel=stylesheet href=./leaflet-all/css/NavBar.css>
+    <link rel=stylesheet href=./leaflet-all/css/leaflet-measure.css>
+    <link rel=stylesheet href=./leaflet-all/css/leaflet-ruler.css>
+    <link rel=stylesheet href=./leaflet-all/css/L.Control.MousePosition.css>
+    <link rel=stylesheet href=./leaflet-all/css/Control.MiniMap.min.css>
+    <link rel=stylesheet href=./leaflet-all/css/MarkerCluster.css>
+    <link rel=stylesheet href=./leaflet-all/css/MarkerCluster.Default.css>
+    <link rel=stylesheet href=./leaflet-all/css/leaflet-routing-machine.css>
+    <link rel=stylesheet href=./leaflet-all/css/leaflet.draw-src.css>
+    <link rel=stylesheet href=./leaflet-all/css/easy-button.css>
+    <link rel=stylesheet href=./leaflet-all/css/LevelControl.css>
+    <link rel=stylesheet href=./leaflet-all/css/Fence.css>
+    <link rel=stylesheet href=./leaflet-all/css/bootstrap-tagsinput.css>
+    <link rel=stylesheet href=./leaflet-all/css/RouteBar.css>
+    <link href=public/css/chunk-058ee802.1233c6d4.css rel=prefetch>
+    <link href=public/css/chunk-12367352.af591a03.css rel=prefetch>
+    <link href=public/css/chunk-1c73b952.c78a3b5a.css rel=prefetch>
+    <link href=public/css/chunk-2b132551.4b30748a.css rel=prefetch>
+    <link href=public/css/chunk-2baa60f5.ec3cc676.css rel=prefetch>
+    <link href=public/css/chunk-31c36e34.236e4127.css rel=prefetch>
+    <link href=public/css/chunk-3b35418b.8c17b27a.css rel=prefetch>
+    <link href=public/css/chunk-4069c610.bb87d10a.css rel=prefetch>
+    <link href=public/css/chunk-41a5a053.31780f88.css rel=prefetch>
+    <link href=public/css/chunk-58acfb60.bc43e672.css rel=prefetch>
+    <link href=public/css/chunk-6354f6dd.21ed437e.css rel=prefetch>
+    <link href=public/css/chunk-7610f4d8.20accebb.css rel=prefetch>
+    <link href=public/css/chunk-7d0c3d48.1c0c4813.css rel=prefetch>
+    <link href=public/css/chunk-b9343dc8.7b576290.css rel=prefetch>
+    <link href=public/css/chunk-c23ef2e6.acd36763.css rel=prefetch>
+    <link href=public/css/chunk-d28b65a2.0832ad72.css rel=prefetch>
+    <link href=public/css/chunk-da3fa714.35c8b06d.css rel=prefetch>
+    <link href=public/js/chunk-058ee802.47a44890.js rel=prefetch>
+    <link href=public/js/chunk-12367352.5bbf970f.js rel=prefetch>
+    <link href=public/js/chunk-1c73b952.730252cf.js rel=prefetch>
+    <link href=public/js/chunk-2b132551.55b5535a.js rel=prefetch>
+    <link href=public/js/chunk-2baa60f5.f684a2ac.js rel=prefetch>
+    <link href=public/js/chunk-31c36e34.674cb605.js rel=prefetch>
+    <link href=public/js/chunk-3b35418b.3daa0aad.js rel=prefetch>
+    <link href=public/js/chunk-4069c610.c39a5e5f.js rel=prefetch>
+    <link href=public/js/chunk-41a5a053.1deb2eca.js rel=prefetch>
+    <link href=public/js/chunk-4396c825.77279993.js rel=prefetch>
+    <link href=public/js/chunk-58acfb60.33abeaaa.js rel=prefetch>
+    <link href=public/js/chunk-6354f6dd.329ed5c1.js rel=prefetch>
+    <link href=public/js/chunk-7610f4d8.7fa6f76a.js rel=prefetch>
+    <link href=public/js/chunk-7d0c3d48.018f7177.js rel=prefetch>
+    <link href=public/js/chunk-b9343dc8.8f86a75c.js rel=prefetch>
+    <link href=public/js/chunk-c23ef2e6.f6741956.js rel=prefetch>
+    <link href=public/js/chunk-d28b65a2.fc7c5f27.js rel=prefetch>
+    <link href=public/js/chunk-da3fa714.380bff65.js rel=prefetch>
+    <link href=public/css/app.baf54c29.css rel=preload as=style>
+    <link href=public/css/chunk-vendors.1c694d0b.css rel=preload as=style>
+    <link href=public/js/app.bb46470f.js rel=preload as=script>
+    <link href=public/js/chunk-vendors.33befec6.js rel=preload as=script>
+    <link href=public/css/chunk-vendors.1c694d0b.css rel=stylesheet>
+    <link href=public/css/app.baf54c29.css rel=stylesheet>
+</head>
+
+<body><noscript><strong>We're sorry but my-project doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript>
+    <div id=app></div>
+    <script src=./leaflet-all/scripts/jquery-1.9.1.min.js></script>
+    <script src=./leaflet-all/scripts/jquery-ui.min.js></script>
+    <script language=javascript src=./leaflet-all/scripts/W.Map.js></script>
+    <script language=javascript src=./leaflet-all/scripts/popper.min.js></script>
+    <script language=javascript src=./leaflet-all/scripts/bootstrap3.min.js></script>
+    <script language=javascript src=./leaflet-all/scripts/leaflet.js></script>
+    <script language=javascript src=./leaflet-all/scripts/SearchBar.js></script>
+    <script language=javascript src=./leaflet-all/scripts/PostionBar.js></script>
+    <script language=javascript src=./leaflet-all/scripts/NavBar.js></script>
+    <script language=javascript src=./leaflet-all/scripts/leaflet-measure.js></script>
+    <script language=javascript src=./leaflet-all/scripts/leaflet-ruler.js></script>
+    <script language=javascript src=./leaflet-all/scripts/L.Control.MousePosition.js></script>
+    <script language=javascript src=./leaflet-all/scripts/Control.MiniMap.min.js></script>
+    <script language=javascript src=./leaflet-all/scripts/leaflet.markercluster.js></script>
+    <script language=javascript src=./leaflet-all/scripts/leaflet-routing-machine.js></script>
+    <script language=javascript src=./leaflet-all/scripts/leaflet.draw-src.js></script>
+    <script language=javascript src=./leaflet-all/scripts/easy-button.js></script>
+    <script language=javascript src=./leaflet-all/scripts/LevelControl.js></script>
+    <script language=javascript src=./leaflet-all/scripts/Fence.js></script>
+    <script language=javascript src=./leaflet-all/scripts/bootstrap-notify.min.js></script>
+    <script language=javascript src=./leaflet-all/scripts/bootstrap-tagsinput.js></script>
+    <script src=./leaflet-all/scripts/jquery.easyui.min.js></script>
+    <script src=./leaflet-all/scripts/easyui-lang-zh_CN.js></script>
+    <script src=./leaflet-all/scripts/jquery.tooltip.js></script>
+    <script language=javascript src=./leaflet-all/scripts/RouteBar.js></script>
+    <script src=./leaflet-all/scripts/base.js></script>
+    <script src=public/js/chunk-vendors.33befec6.js></script>
+    <script src=public/js/app.bb46470f.js></script>
+</body>
+
+</html>

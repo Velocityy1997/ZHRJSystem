@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.0.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	
+	<groupId>com.hg</groupId>
+	<artifactId>ZHRJSystem</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>ZHRJSystem</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+
+		<pagehelper.version>1.2.5</pagehelper.version>
+		<springfox.version>2.7.0</springfox.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+        <!-- aop 用于记录日志 -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.restdocs</groupId>
+			<artifactId>spring-restdocs-mockmvc</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.mina</groupId>
+			<artifactId>mina-core</artifactId>
+			<version>2.0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+		</dependency>
+        <!-- 解析json -->
+	    <dependency>  
+	        <groupId>net.sf.json-lib</groupId>  
+	        <artifactId>json-lib</artifactId>  
+	        <version>2.4</version>  
+	        <classifier>jdk15</classifier>  
+	    </dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<!-- Spring Boot 热部署 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		<!-- tomcat的支持. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<!--<scope>provided</scope>-->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+		<!-- 访问JSP页面必须配置 -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<!--<scope>provided</scope>-->
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.8.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.41</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.16</version>
+		</dependency>
+		<!-- Jackson 的JSR310标准支持 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.9.2</version>
+		</dependency>
+		<!-- page helper -->
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+			<version>${pagehelper.version}</version>
+		</dependency>
+		<!-- springfox swagger2 -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${springfox.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${springfox.version}</version>
+		</dependency>
+		<!-- 自定义jar -->
+		<dependency>
+			<groupId>private</groupId>
+			<artifactId>common</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>private</groupId>
+			<artifactId>redis</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>private</groupId>
+			<artifactId>freemark</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		<!--  mybatis.generator插件-->
+		<dependency>
+			<groupId>org.mybatis.generator</groupId>
+			<artifactId>mybatis-generator-core</artifactId>
+			<version>1.3.7</version>
+		</dependency>
+		
+		
+		<!--MD5码  -->
+		<dependency>
+	   		<groupId>commons-codec</groupId>
+	    	<artifactId>commons-codec</artifactId>
+	    	<version>1.10</version>
+		</dependency>
+			
+			<!--解析Excel  -->
+		 <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.13</version>
+        </dependency>
+         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+    		<groupId>commons-fileupload</groupId>
+    		<artifactId>commons-fileupload</artifactId>
+    		<version>1.3.3</version>
+		</dependency>
+		<dependency>
+    		<groupId>commons-io</groupId>
+    		<artifactId>commons-io</artifactId>
+    		<version>2.4</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<finalName>timeserver</finalName>
+		<plugins>
+		<!-- 	<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin> -->
+			<!--lq mybatis  generator相关配置 -->
+			<plugin>
+				<groupId>org.mybatis.generator</groupId>
+				<artifactId>mybatis-generator-maven-plugin</artifactId>
+				<version>1.3.5</version>
+				<executions>
+	       			<execution>
+	            		<id>Generate MyBatis Artifacts</id>
+	            		<phase>package</phase>
+	            		<goals>
+	                		<goal>generate</goal>
+	           			</goals>
+	        		</execution>
+    			</executions>
+				<configuration>
+					<!-- generator 工具配置文件的位置 -->
+					<configurationFile>src/main/resources/generatorConfig.xml</configurationFile>
+					<!--允许移动生成的文件 -->
+					<verbose>true</verbose>
+					<!-- 是否覆盖 -->
+					<overwrite>true</overwrite>
+				</configuration>
+			</plugin>
+		
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<fork>true</fork> <!-- fork=true,用于明确表示编译版本配置的可用 -->
+				</configuration>
+			</plugin>
+			
+			
+		</plugins>
+	</build>
+
+
+</project>

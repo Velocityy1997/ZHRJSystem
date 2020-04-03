@@ -1,0 +1,391 @@
+function showSendBroadcastDialog() {
+	$("#sendBroadcastDialog").dialog({ 
+		autoOpen:true,
+		height: 440, 
+		width: 400,  		
+		resizable: false, 
+		modal: true
+	});
+	getpreMessage();	
+}
+function sendBroadcast(){
+	 url = "/ZHRJSystem/zhjTask/broadcast"; //修改的url
+	 $("#sendBroadcastForm").attr("action",url);
+	 var options={  
+		        type:"post",  //提交方式    
+		        url:url,
+		        success:showUpdateResponse,//提交成功的回调函数  
+		        }  
+	 $("#sendBroadcastForm").ajaxForm(options); 
+	 $('#sendBroadcastDialog').dialog('close')
+		
+   }
+
+function getpreMessage(){
+	$("#preMessage").empty();
+	var options = '<option selected="selected" value="">请选择</option>';
+	$.ajax({
+		type : "GET",
+		async : false,
+		url : "/ZHRJSystem/preMessage/getAll",
+		dataType : "json",
+		success : function(result) {      				
+			var optionName;
+	    	for(var i=0;i<result.data.length;i++){
+	    		optionName = result.data[i].content;
+	    		options +='<option value="'+result.data[i].content +'">'+optionName+'</option>';
+	    	}
+	    	$("#preMessage").append(options);
+	    	$("#preMessageM").append(options);
+		},
+		error : function(result) {
+
+		}
+	});
+	
+}
+function changepreMessage(){
+	
+	var pre = $('#preMessage option:selected').text();
+	if(pre != "请选择") {
+		$('#contents').append(pre);
+	}	
+}
+function changepreMessageM(){
+	
+	var pre = $('#preMessageM option:selected').text();
+	if(pre != "请选择") {
+		$('#contentM').append(pre);
+	}	
+}
+
+function showzhiSysinfoDialog() {
+	$("#zhiSysinfoDialog").dialog({ 
+		autoOpen:true,
+		height: 400, 
+		width: 300,  		
+		resizable: false, 
+		modal: true
+	});	
+	$.ajax({
+		type : "GET",
+		async : false,
+		url : "/ZHRJSystem/zhjTask/getZhjInfo",
+		dataType : "json",
+		success : function(result) {      				
+			$("#zhjCardNo").html(result.data.cardNum);
+			$("#zhjName").html(result.data.name);
+			$("#zhjState").html(result.data.status);
+			$("#zhjLongitude").html(result.data.longitude);
+			$("#zhjLatitude").html(result.data.latitude);
+			$("#zhjLevel").html(result.data.type);
+			$("#brocastAddr").html(result.data.brocastAdd);
+			$("#txLevel").html(result.data.txlevel);
+			$("#zhjFrequency").html(result.data.frequency+"秒");
+			$("#zhjLength").html(result.data.txlength);
+			$("#locateTime").html(result.data.locateTime);
+		},
+		error : function(result) {
+
+		}
+	});
+	
+}
+
+function getzhiPositionf(){
+
+	$.ajax({
+		type : "GET",
+		async : false,
+		url : "/ZHRJSystem/zhjTask/getLoaction",
+		dataType : "json",
+		success : function(result) {      				
+			mizhu.toast(result.message);
+		},
+		error : function(result) {
+
+		}
+	});
+	
+}
+
+function sendYlwzf(nodes){
+	if(nodes.length < 1) {
+    	mizhu.toast("请选择终端");
+    }
+    else {
+    	terminalId="";
+        for(var i=0;i<nodes.length;i++){
+        	if(nodes[i].type != "root" && nodes[i].type != null) {
+        		terminalId+=nodes[i].terminalId + ",";
+        	}       	
+        }
+        if(terminalId == "") {
+        	mizhu.toast("请选择终端");
+        }
+        else {
+        	$.ajax({
+        		type : "POST",
+        		url : "/ZHRJSystem/zhjTask/sharePosition",
+        		data : "terminalId=" + terminalId,
+        		dataType : "json",
+        		success : function(result) {      				
+        	    		mizhu.toast(result.message);
+        				
+        		},
+        		error : function(result) {
+
+        			mizhu.toast("删除失败");
+        		}
+        	});
+        }              
+    }		
+}
+
+function resetTaskf(){
+
+	$.ajax({
+		type : "GET",
+		async : false,
+		url : "/ZHRJSystem/zhjTask/resetTask",
+		dataType : "json",
+		success : function(result) {      				
+			mizhu.toast(result.message);
+		},
+		error : function(result) {
+
+		}
+	});
+	
+}
+
+function sendMessageDialogf(nodes) {
+	if(nodes.length < 1) {
+    	mizhu.toast("请选择终端");
+    }
+	else {
+    	terminalCard="";
+    	name="";
+        for(var i=0;i<nodes.length;i++){
+        	if(nodes[i].type != "root" && nodes[i].type != null) {
+        		terminalCard+=nodes[i].card + ",";
+        		name+=nodes[i].name + ",";
+        	}       	
+        }
+        if(terminalCard == "") {
+        	mizhu.toast("请选择终端");
+        }
+        else {
+        	$("#sendMessageDialog").dialog({ 
+        		autoOpen:true,
+        		height: 540, 
+        		width: 400,  		
+        		resizable: false, 
+        		modal: true
+        	});
+        	document.getElementById('cardNums').innerText=name;
+        	document.getElementById('cardNums1').innerText=terminalCard;
+        	getpreMessage();
+        }              
+    }	
+}
+
+function sendMessagef(){
+	
+	 url = "/ZHRJSystem/zhjTask/sendMsg"; //修改的url
+	 $("#sendMessageForm").attr("action",url);
+	 var options={  
+		        type:"post",  //提交方式    
+		        url:url,
+		        success:showUpdateResponse,//提交成功的回调函数  
+		        }  
+	 $("#sendMessageForm").ajaxForm(options); 
+	 $('#sendMessageDialog').dialog('close')
+    	          	
+}
+
+function sendZldhDialogf(nodes) {
+	if(nodes.length < 1) {
+    	mizhu.toast("请选择终端");
+    }
+	else {
+    	terminalCard="";
+    	name="";
+        for(var i=0;i<nodes.length;i++){
+        	if(nodes[i].type != "root" && nodes[i].type != null) {
+        		terminalCard+=nodes[i].card + ",";
+        		name+=nodes[i].name + ",";
+        	}       	
+        }
+        if(terminalCard == "") {
+        	mizhu.toast("请选择终端");
+        }
+        else {
+        	$("#sendZldhDialog").dialog({ 
+        		autoOpen:true,
+        		height: 540, 
+        		width: 400,  		
+        		resizable: false, 
+        		modal: true
+        	});
+        	document.getElementById('cardNumsz').innerText=name;
+        	document.getElementById('cardNumsz1').innerText=terminalCard;
+        	getRotes();
+        }              
+    }	
+}
+
+function getRotes(){
+	$("#selectRote").empty();
+	$.ajax({
+		type : "GET",
+		async : false,
+		url : "/ZHRJSystem/route/getAll",
+		dataType : "json",
+		success : function(result) {      				
+			var optionName;
+			var options = "";
+	    	for(var i=0;i<result.data.length;i++){
+	    		optionName = result.data[i].routeName;
+	    		options +='<option value="'+result.data[i].routeName +'">'+optionName+'</option>';
+	    	}
+	    	$("#selectRote").append(options);
+		},
+		error : function(result) {
+
+		}
+	});
+}
+
+function sendZldhf(){
+	
+	 url = "/ZHRJSystem/terminalTask/orderNav"; //修改的url
+	 $("#sendZldhForm").attr("action",url);
+	 var options={  
+		        type:"post",  //提交方式    
+		        url:url,
+		        success:showUpdateResponse,//提交成功的回调函数  
+		        }  
+	 $("#sendZldhForm").ajaxForm(options); 
+	 $('#sendZldhDialog').dialog('close')  	          	
+}
+
+
+function getTerminalPositionf(nodes) {
+	
+	if(nodes.length < 1) {
+    	mizhu.toast("请选择终端");
+    }
+	else {
+		var ll=[];	
+	    for(var i=0;i<nodes.length;i++){
+	    	if(nodes[i].type != "root" && nodes[i].type != null) {
+	    		ll.push(nodes[i].card);   		
+	    	}       	
+	    }
+	    if(ll.length != 1) {
+	    	mizhu.toast("只能选择一个终端");
+	    }
+	    else {
+	    	document.getElementById('ri').contentWindow.document.getElementById('topFrame').
+	    	contentWindow.document.getElementById('frame_content').contentWindow.
+	    	getTerminalLocation(ll[0]);	    	
+	    }	    
+	}	
+}
+
+function historyTraceWindowf(nodes) {
+	
+	if(nodes.length < 1) {
+    	mizhu.toast("请选择终端");
+    }
+	else {
+		var ll=[];	
+	    for(var i=0;i<nodes.length;i++){
+	    	if(nodes[i].type != "root" && nodes[i].type != null) {
+	    		ll.push(nodes[i].card);   		
+	    	}       	
+	    }
+	    if(ll.length != 1) {
+	    	mizhu.toast("只能选择一个终端");
+	    }
+	    else {
+	    	 
+	    	$("#historyTrack").dialog({ 
+	    		autoOpen:true,
+	    		height: 240, 
+	    		width: 400,  		
+	    		resizable: false, 
+	    		modal: true
+	    	});   
+	    	$('#dateTime').blur();
+	    	$('#dateTime1').blur();
+	    	$('#dateTime').datetimepicker({
+			    format: 'yyyy-mm-dd hh:ii',
+			    autoclose: true,
+			    /* minView: "month",  *///选择日期后，不会再跳转去选择时分秒 
+			    language: 'zh-CN',
+			    dateFormat: 'yyyy-mm-dd',//日期显示格式
+			    timeFormat: 'HH:mm',//时间显示格式
+			    todayBtn: 1,
+			    autoclose: 1,
+			    minView: 0,  //0表示可以选择小时、分钟   1只可以选择小时
+			    minuteStep: 1,//分钟间隔1分钟
+			});
+	    	$('#dateTime1').datetimepicker({
+			    format: 'yyyy-mm-dd hh:ii',
+			    autoclose: true,
+			    /* minView: "month",  *///选择日期后，不会再跳转去选择时分秒 
+			    language: 'zh-CN',
+			    dateFormat: 'yyyy-mm-dd',//日期显示格式
+			    timeFormat: 'HH:mm',//时间显示格式
+			    todayBtn: 1,
+			    autoclose: 1,
+			    minView: 0,  //0表示可以选择小时、分钟   1只可以选择小时
+			    minuteStep: 1,//分钟间隔1分钟
+			});	    		    	
+	    }	    
+	}				
+}
+
+function getHistoryTraceT() {
+	var sd=document.getElementById('dateTime').value;
+	var ed=document.getElementById('dateTime1').value;
+	
+	if (sd != '' && ed != '') { 
+	    if (sd > ed) {
+	    	mizhu.toast("开始时间不能大于结束时间");
+	    }
+	    else {
+	    	var totalMS = new Date(ed).getTime() - new Date(sd).getTime();
+		    var hour = Math.ceil(totalMS / 1000  / 60 / 60);
+		    if(hour > 24) {
+		    	mizhu.toast("时间相差不能超过24小时");
+		    }
+		    else {
+		    	$('#historyTrack').dialog('close');		    	
+		    	var treeObj=document.getElementById('li').contentWindow.$.fn.zTree.getZTreeObj("terminal_tree");
+		    	nodes=treeObj.getCheckedNodes(true);
+		    	var ll = [];
+		    	for(var i=0;i<nodes.length;i++){
+			    	if(nodes[i].type != "root" && nodes[i].type != null) {
+			    		ll.push(nodes[i].card);   		
+			    	}       	
+			    }		    	
+		    		window.open('terminalHistoryTrack.html?id='+ll[0]+ "&" +"startTime=" + sd + "&" + "endTime=" + ed);			    					
+		    }
+	    }	    	    
+	}		
+}
+
+function showUpdateResponse(responseText, statusText){  
+	if(responseText.success){
+		
+		mizhu.toast(responseText.message);
+		 
+		window.parent.leftFrame.location.reload();
+     }else{
+    	 mizhu.toast(responseText.message); 	            	 
+     }
+   
+}

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.role.dao.RoleMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.role.model.Role" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	name,
+     	level,
+     	description
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from role 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from role 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from role
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.role.model.Role">
+		insert into role
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="level != null">
+				level,
+			</if>
+			<if test="description != null">
+				description,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="name != null">
+				 #{ name,jdbcType= VARCHAR },
+			</if>
+			<if test="level != null">
+				 #{ level,jdbcType= VARCHAR },
+			</if>
+			<if test="description != null">
+				 #{ description,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.role.model.Role">
+		select
+		<include refid="Base_Column_List" />
+		from role
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null">
+			AND name =  #{ name,jdbcType= VARCHAR }
+		  </if>
+		  <if test="level != null">
+			AND level =  #{ level,jdbcType= VARCHAR }
+		  </if>
+		  <if test="description != null">
+			AND description =  #{ description,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY update_time desc
+		<if test="start != null and max != null">
+			limit    #{  start},   #{  max }
+		 </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.role.model.Role">
+		select
+		count(1)
+		from role
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null">
+			AND name =  #{ name,jdbcType= VARCHAR }
+		  </if>
+		  <if test="level != null">
+			AND level =  #{ level,jdbcType= VARCHAR }
+		  </if>
+		  <if test="description != null">
+			AND description =  #{ description,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.role.model.Role">
+		<if test="id !=null">
+			update role
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 name =  #{ name,jdbcType= VARCHAR },
+     			 level =  #{ level,jdbcType= VARCHAR },
+     			 description =  #{ description,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

@@ -1,0 +1,152 @@
+$(function(){
+				var obj = function(option){
+					
+					this.val = option.bdtimeFrequence;
+					this.portv  = option.port;
+					this.baudRate = option.baudRate;
+					
+					this.select1 = 'COM1';
+					this.select2 = 1;
+					this.option = option;
+					this.init();
+				};
+				
+				obj.prototype.init = function(){
+					$('#input').val(this.val);
+					$('#dk').val(this.portv).text(this.portv);
+					$('#btl').val(this.baudRate).text(this.baudRate);
+					this.select1 = this.portv;
+					this.select2 = this.baudRate;
+					this.allEvents();		// 所有点击事件
+					this.drawOption();		// 渲染option
+					this.drawOption2();		// 波特率
+					//
+				}
+				
+				obj.prototype.allEvents = function(){
+					this.clickArrowUp('#spinner-button-top', '#input');		// 点击上
+					this.clickArrowBottom('#spinner-button-bottom', '#input');	// 点击下
+					this.listenChange();		// 监测切换
+					this.clcikSet1();		// 设置1
+					this.clcikSet2();		// 设置2
+				}
+				
+				obj.prototype.clickArrowUp = function(dom, child){
+					var _this = this;
+					
+					$(dom).on('click', function(){
+						var val = Number(_this.val);
+						if(val >= 100){
+							val = 100;
+						}else{
+							val += 5;
+						}
+					
+						_this.val = val;
+					
+						$(child).val(_this.val);
+					});
+				}
+				
+				obj.prototype.clickArrowBottom = function(dom, child){
+					var _this = this;
+					
+					$(dom).on('click', function(){
+						var val = Number(_this.val);
+						if(_this.val <= 20){
+							val = 20;
+						
+						}else{
+							val -= 5;
+						}
+			
+						_this.val = val;
+						$(child).val(_this.val);
+					});
+				}
+				
+				obj.prototype.drawOption = function(){
+					var $select = $('#select1');
+					
+					for(i = 1; i<101; i++){	
+						var $option = $('<option value="COM'+ i +'">COM'+ i +'</option>').appendTo($select);
+					}
+				}
+				
+				obj.prototype.drawOption2 = function(){
+					var $select = $('#select2');
+					var arr = ['1', '2'];
+					for(i = 0; i<arr.length; i++){	
+						var $option = $('<option value="'+ arr[i] +'">'+ arr[i] +'</option>').appendTo($select);
+					}
+				}
+				obj.prototype.listenChange = function(item){
+					var _this = this;
+					$('#select1').on('change', function(){
+						_this.select1 = $(this).val(); 
+					});
+					$('#select2').on('change', function(){
+						_this.select2 = $(this).val(); 
+					});
+				}
+				
+				/* 掉接口 */
+				obj.prototype.clcikSet1 = function(){
+					var _this = this;
+					$('#set1').on('click', function(){
+						
+						var val1 = $('#input').val();
+						var val2 = _this.select1;
+						var val3 = _this.select2;
+						$.ajax({
+				             type: "post",
+				             url: "/ZHRJSystem/sysInfo/update",
+				             data: "commFre="+ val1 + "&port="+ val2 +"&baudRate=" +  val3,
+				             dataType: "json",
+				             success: function(data){
+				            	 window.location.reload();
+				                      
+				             }
+				         });
+					});	
+				}
+				
+				obj.prototype.clcikSet2 = function(){
+					var _this = this;
+					$('#set2').on('click', function(){
+						var val1 = $('#input').val();
+						var val2 = _this.select1;
+						var val3 = _this.select2;
+					
+						$.ajax({
+				             type: "post",
+				             url: "/ZHRJSystem/sysInfo/update",
+				             data: "commFre="+ val1 + "&port=" + val2  +"&baudRate=" +  val3,
+				             dataType: "json",
+				             success: function(data){
+				            	 window.location.reload();
+				             }
+				         });
+					});
+				}
+				
+				
+				/* ---------- */
+				
+				
+		
+					$.ajax({
+			             type: "post",
+			             url: "/ZHRJSystem/sysInfo/info",
+			             dataType: "json",
+			             success: function(data){
+			                      
+			                        new obj({
+			                        	baudRate: data.baudRate,
+			                        	bdtimeFrequence: data.bdtimeFrequence,
+			                        	port: data.port
+			                        });
+			             }
+			         });
+			
+			})

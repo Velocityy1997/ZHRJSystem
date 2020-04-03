@@ -1,0 +1,40 @@
+package com.web.business.generator.util.listener;
+
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+
+import com.web.business.generator.util.AnalysisService;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletContextEvent;
+
+@WebListener
+public class ServiceStartListener  implements ServletContextListener{
+	
+	
+	
+	@Resource
+	private AnalysisService analysisService;
+	
+	@Override
+	public void contextDestroyed(ServletContextEvent arg0) {
+	        // TODO Auto-generated method stub
+		/*
+		 * if (null != analysisService) { System.out.println("后台服务销毁++++++++++++");
+		 * analysisService.stopAnalysisService(); }
+		 */
+	       
+	    }
+
+	@Override
+	public void contextInitialized(ServletContextEvent arg0) {
+	        // TODO Auto-generated method stub
+		//AnalysisService	analysisService = (AnalysisService) ApplicationContextHolder.getBean("analysisSerivce");
+		
+		
+		  if(analysisService != null) { System.out.println("监听启动++++++++++++++++++++");
+		  analysisService.startAnalysisService(); }
+		 
+	      
+	    }
+}

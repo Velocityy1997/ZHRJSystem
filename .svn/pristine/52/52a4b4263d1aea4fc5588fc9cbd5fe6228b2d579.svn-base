@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html style="overflow-x: hidden;">
+	<head>
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+	    <meta name=\"renderer\" content=\"webkit|ie-comp|ie-stand\">
+	 	<meta name="renderer" content="webkit">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0,user-scalable=no">	 	
+	    <meta name="renderer" content="webkit">
+	   
+	    <link rel="stylesheet" href="plugins/easyui/themes/default/easyui.css"
+	    type="text/css"></link>
+	    <link rel="stylesheet" href="plugins/easyui/themes/icon.css" type="text/css"></link>
+	    <link rel="stylesheet" href="plugins/assets/css/ace.min.css" />
+	   <script src="plugins/assets/js/jquery-1.10.2.min.js"></script>
+		<script type="text/javascript" src="plugins/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="plugins/assets/js/ace-elements.min.js"></script>
+		<script src="plugins/assets/js/ace.min.js"></script>
+		<script src="plugins/assets/js/ace-extra.min.js"></script>	
+		<script src="plugins/assets/js/bootstrap.min.js"></script>
+		<script src="plugins/assets/js/jquery.form.js"></script>
+		<script src="plugins/assets/js/ui.js"></script>
+	    <!-- ztree的js和css -->
+	    <link rel="stylesheet" type="text/css" href="plugins/ztree/css/zTreeStyle/zTreeStyle.css">
+	    <script type="text/javascript" src="plugins/ztree/js/jquery.ztree.core.js"></script>
+	    <script type="text/javascript" src="plugins/ztree/js/jquery.ztree.excheck.js"></script>
+	    <script type="text/javascript" src="plugins/ztree/js/jquery.ztree.exedit.js"></script>
+	   
+	    <script src="plugins/js/tree.js"></script>
+	    
+		<style type="text/css">
+		    div#rMenu {position:absolute; visibility:hidden; top:0;background-color:#5ca3c8; text-align: left;padding:4px;z-index: 1000}
+		    div#rMenuT {position:absolute; visibility:hidden; top:0;background-color:#5ca3c8; text-align: left;padding:4px;z-index: 1000}
+		    
+		    a{
+	        padding: 3px 11px 3px 4px;
+	        background-color:#5ca3c8;
+	        vertical-align:middle;
+	        text-decoration: none;
+            color: #FFFF;
+            }
+            ul{
+            margin: 0px 0 5px 10px;
+            }
+            
+       </style>
+	    <script type="text/javascript">
+	    	    	   
+	    /**************************ztree************************************/
+        //设置ztree标题的颜色
+        function setFontCss(treeId, treeNode) { 
+               return treeNode.level == 1 ? {color:"red"} : {}; 
+        }; 
+         
+        var setting = { 
+                //  check: { 
+                //     enable: true//启动多选框记得导入jquery.ztree.excheck-3.4.js  
+                // }, 
+                     
+                  data: { 
+                      simpleData: { 
+                          enable: true,//如果设置为 true，请务必设置 setting.data.simpleData 内的其他参数: idKey / pIdKey / rootPId，并且让数据满足父子关系。 
+                          idKey: "id", 
+                          pIdKey: "pId", 
+                          rootPId: "0" ,
+                          name: "name"
+                      },
+                      key: {
+                       name: "name",
+                       url:""
+                   }
+
+                  }, 
+                  check: {
+              		enable: true,     //这里设置是否显示复选框
+              		chkboxType: { "Y":"ps", "N":"ps" }      //设置复选框是否与 父/子 级相关联
+              	},               
+                     
+                  view: { 
+                      showLine: false,//显示连接线 
+                      showIcon: true,//显示节点图片 
+                      //fontCss: {color:"red"} 
+                      fontCss: setFontCss//节点颜色 
+                  }, 
+                     
+                  async: {    //ztree异步请求数据 
+                      enable: true, 
+                      url: "terminal/getTerminalTreeByUser",//getTerminalTree请求action方法   
+                      autoparam:["id"] 
+                  },
+                  callback:{
+                	  beforeRightClick: zTreeBeforeRightClick,
+                	  onRightClick : zTreeOnRightClick,   //右键事件
+                      onAsyncSuccess: zTreeOnAsyncSuccess                      
+                  }
+              }; 
+         
+           //启动树节点     
+           $(function($){ 
+               $.fn.zTree.init($("#terminal_tree"), setting); 
+               $("body").bind(//鼠标点击事件不在节点上时隐藏右键菜单  
+                       "mousedown",  
+                       function(event) {  
+                           if (!(event.target.id == "rMenu" || event.target.id == "rMenuT" || $(event.target)  
+                                   .parents("#rMenu").length > 0 || $(event.target)  
+                                   .parents("#rMenuT").length > 0)) {  
+                               $("#rMenu").hide();  
+                               $("#rMenuT").hide();  
+                           }  
+                       });  
+           });
+            
+           function zTreeOnAsyncSuccess(){
+               //alert('加载树成功');
+               var treeObj = $.fn.zTree.getZTreeObj("terminal_tree");
+               treeObj.expandAll(true);
+           }
+
+           function showPanel(stitle,urlpath){ 
+               //alert(urlpath); 子节点请求路径      
+               if($('#ttab').tabs('exists',stitle)){
+                   $('#ttab').tabs('select',stitle);
+               }else{
+                   $('#ttab').tabs('add',{   
+                       title:stitle,   
+                       content:'<iframe src='+urlpath+' scrolling=no frameborder=0 height=100% width=100% marginheight=0 marginwidth=0/>',   
+                       closable:true
+                   });
+               }
+
+           }
+            
+           
+           //鼠标右键事件-创建右键菜单  
+           function zTreeOnRightClick(event, treeId, treeNode) { 
+        	   
+        	   var st = $(document).scrollTop();
+               if (!treeNode) {  
+            	   var treeObj = $.fn.zTree.getZTreeObj("terminal_tree");
+                   treeObj.cancelSelectedNode(); 
+                   showRMenu(treeNode.type, event.clientX, event.clientY + st);  
+               } else if (treeNode && !treeNode.noR) { //noR属性为true表示禁止右键菜单  
+                   if (treeNode.newrole && event.target.tagName != "a" && $(event.target).parents("a").length == 0) {  
+                	   var treeObj = $.fn.zTree.getZTreeObj("terminal_tree");
+                       treeObj.cancelSelectedNode();
+                       showRMenu(treeNode.type, 140, event.clientY + st);  
+                   } else {  
+                	   var treeObj = $.fn.zTree.getZTreeObj("terminal_tree");
+                       //treeObj.selectNode(treeNode);  
+                       showRMenu(treeNode.type, 140, event.clientY + st);  
+                   }  
+               }  
+           }  
+           
+           function showRMenu(type, x, y) { 
+        	  
+        	   if(type == "root") {
+        		   $("#rMenu").show();
+            	   $("#rMenu").css({"top":y+"px", "left":x+"px", "visibility":"visible"}); //设置右键菜单的位置、可见
+        	   }
+        	   else {
+        		   $("#rMenuT").show();
+        		   $("#rMenuT").css({"top":y+"px", "left":x+"px", "visibility":"visible"}); //设置右键菜单的位置、可见
+        	   }
+        	  
+           }  
+           //隐藏右键菜单  
+           function hideRMenu() {  
+        	   if (rMenu) $("#rMenu").css({"visibility": "hidden"}); //设置右键菜单不可见
+           } 
+           function hideRMenuT() {  
+        	   if (rMenu) $("#rMenuT").css({"visibility": "hidden"}); //设置右键菜单不可见
+           } 
+           function zTreeBeforeRightClick(treeId, treeNode) {
+               return treeNode;  //这里只需要设置不需要显示右键菜单的子节点的edit属性为false就行（如果是异步加载的数据，则需要在tree的实体中加上edit字段(默认为true)，然后在遍历的时候注意不需要显示右键菜单的数据，将edit属性设为false就行。）
+       }
+       /*******************************************************************/
+	
+	    </script>
+	    
+	 	<title>指挥机软件系统</title>
+	</head>
+	<body>
+	
+   
+		<!--  <div class="easyui-accordion" data-options="fit:true,border:false">
+            <div title="系统设置1" data-options="selected:true"> -->
+		<div class="breadcrumbs" id="breadcrumbs" style="height: 40px;margin: -17px; background-color: #83BFEA;">
+		  
+		</div>
+		
+		<div style="margin: 20px 0px 0px -16px;">
+			<ul id="terminal_tree" class="ztree" style="overflow:auto;"></ul>
+			<div id="rMenu">
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="getSendBroadcastDialog()">短信通播</a></ul>
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="getzhiSysinfoDialog()">本机信息</a></ul>
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="getzhiPosition()">本机定位</a></ul>
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="sendYlwz()">友邻位置</a></ul>
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="resetTask()">任务重置</a></ul>
+		</div>
+		<div id="rMenuT">
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="sendMessageDialog()">发送短信</a></ul>
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="sendZldhDialog()">指令导航</a></ul>
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="getTerminalPosition()">位置查询</a></ul>
+		    <ul><a href="javascript:void(0)" class="list-group-item" onclick="historyTraceWindow()">显示轨迹</a></ul>		    
+		</div>
+		</div>
+	
+	<script type="text/javascript">
+	    var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+		var isOpera = userAgent.indexOf("Opera") > -1;
+		var div1 = document.getElementById("breadcrumbs");  
+		if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera) {
+		    			  			
+	    } //判断是否IE浏览器
+	    else {
+	    	div1.style.background="-webkit-linear-gradient(left, #415F87 , #67C0E3)";
+	    }	
+	    </script>
+</body></html>

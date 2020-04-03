@@ -1,0 +1,715 @@
+li {
+	list-style: none;
+}
+ul, li {
+	margin: 0px;
+	padding: 0px;
+}
+label{
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0px auto;
+}
+.inlineBlock input,.inlineBlock label{
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0px auto;
+}
+.systemInfo li {
+	margin: 0px;
+	margin-left: 20px;
+	font-weight: bold;
+	color: #0E2D5F;
+	font-size: 16px;
+	font-family: "Hiragino Sans GB", "Microsoft YaHei", \9ED1\4F53,
+		\5b8b\4f53, sans-serif;
+}
+/* li span{color:#0E2D5F;} */
+/* gps ztree tab searchBox */
+.gpsLeft {
+	height: 92%;
+	position: absolute;
+	top: 20px;
+	left: 40px;
+	z-index: 300;
+	display: inline-block;
+	width: 380px;
+}
+.inquiryBox {
+	border-radius: 2px;
+	display: inline-block;
+	position: relative;
+	background-color: rgba(255, 255, 255, 0.8);
+	z-index: 5;
+	border: 2px #367fa9 solid
+}
+
+.inquiryBox:after {
+	display: block;
+	clear: both;
+	content: "";
+	line-height: 0;
+	visibility: hidden;
+}
+
+.queryTitle {
+	color: #fff;
+	position: absolute;
+	background-color: #444;
+	display: inline-block;
+	padding: 5px;
+	bottom: -30px;
+	left: -12px;
+	border-radius: 3px;
+	display: none;
+}
+
+.arrow {
+	width: 0;
+	height: 0;
+	border: solid 8px;
+	border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #444;
+	position: absolute;
+	top: -16px;
+	left: 20px;
+}
+
+.advancedQuery:hover .queryTitle {
+	display: block;
+}
+
+.inquiryBox div, .inquiryBox input, .inquiryBox button {
+	display: inline-block;
+	vertical-align: middle;
+	/* border: none; */
+	/* height: 38px; */
+	border-radius: 0px;
+	background-color: none;
+}
+
+.inquiryBox button#advancedQuery {
+	height: 32px;
+	border: none;
+	margin-top: 1px;
+	box-shadow: none;
+	border-left: 1px #eee solid;
+}
+
+.inquiryBox button#advancedQuery {
+	border: none;
+	border-left: 1px #eee solid;
+}
+/*
+#treeSearch{
+	float: left;
+  	width: 318px;
+	box-sizing: border-box;
+	border: 0;
+	padding: 9px 0;
+	border-left: 10px solid transparent;
+	border-right: 27px solid transparent;
+	line-height: 20px;
+	font-size: 16px;
+	height: 34px;
+	color: #333;
+	position: relative;
+	border-radius: 2px 0 0 2px;
+}
+*/
+.ztree-sidebar {
+	width: 292px;
+	position: relative;
+	/* left: 40px; */
+	border: 1px #000 solid;
+}
+
+.expertCon {
+	min-height: 500px;
+	overflow: scroll;
+}
+
+.expertCon li {
+	padding: 3px 10px;
+}
+
+/* ztreeTip style */
+.popTable {
+	margin: 10px 15px;
+}
+
+.popMonitorIcon {
+	border-top: 1px #D2D2D2 solid;
+}
+
+.popMonitorIcon li {
+	width: 80px;
+	margin: 12px auto 8px;
+	text-align: center;
+	cursor: pointer;
+	float: left;
+}
+
+.popMonitorIcon>li div {
+	width: 30px;
+	height: 30px;
+	opacity: 0.9;
+	margin: auto;
+	cursor: pointer;
+}
+
+.monitorMap {
+	width: 100%;
+	height: 210px;
+	border-bottom: 1px #d2d2d2 solid;
+}
+/* iframe tableFont tableBorderTop */
+table {
+	font-size: 75%;
+}
+
+.ui-jqgrid {
+	boder-top: none !important;
+}
+
+.monitoringMap {
+	height: 500px;
+}
+
+.BMap_Marker label {
+	/* form.less 会与污染页面上的label,从而导致地图marker上的label显示有问题 */
+	max-width: inherit !important;
+}
+
+.textLeft {
+	text-align: left;
+}
+.textCenter {
+	text-align: center;
+}
+.inlineBlock {
+	display: inline-block;
+	white-space: nowrap;
+	margin-right: 4px
+}
+
+.gpsLeft .input-group {
+	margin-top: 6px;
+}
+
+#gpsLeftBody {
+	height: 100%;
+	overflow-y: auto;
+}
+
+#monitoringMap {
+	height: 500px;
+}
+
+#reappearMap {
+	height: 500px;
+}
+
+#reappearPlayer {
+	padding: 16px;
+}
+#reappearPlayer #startButton {
+	width: 48px !important;
+	height: 48px !important;
+	border-radius: 24px !important;
+	font-size: 24px !important;
+	text-align: center !important;
+	line-height: 24px !important;
+	padding: 0 !important;
+}
+#reappearPlayer .media-button {
+	width: 30px !important;
+	height: 30px !important;
+	border-radius: 15px !important;
+	font-size: 15px !important;
+	text-align: center !important;
+	line-height: 15px !important;
+	padding: 0 !important;
+}
+#reappearSearchRegion {
+	margin: 6px;
+	padding: 12px;
+	-webkit-box-shadow: 0 4px 6px -6px #222;
+	-moz-box-shadow: 0 4px 6px -6px #222;
+	box-shadow: 0 4px 6px -6px #222;
+}
+
+/* remoteVehicleStatusDiagnosis start   */
+div.overflowYScr{
+	overflow-x: auto;
+	overflow-y: none;
+	margin: 5px;
+	}
+div.overflowYScr table{
+	min-width: 100%!important;
+	white-space:nowrap;
+  	width: 100%;
+	background-color: #f1f1f1;
+	border-spacing: 1px;
+  	border-collapse:separate;
+	}
+div.overflowYScr table th{
+	padding: 3px 5px;
+	text-align:left;
+	white-space: nowrap;
+	font-weight: 0;
+	background-color: #ffffff;
+	}
+div.overflowYScr table td{
+	min-width:100px;
+	text-align:center;
+	padding: 3px 5px;
+	background-color: #ffffff;
+	}
+div.remoteDiagnosisWrap{
+	background:#FFFFFF;
+}
+.remoteDiagnosisNav{
+	text-indent: 20px;
+	margin:18px auto 21px;
+}
+div.dfborder{
+	margin: 26px 20px 0px;
+	border:1px #d2d2d2 solid;
+}
+.vehChoice{
+	padding: 18px 0px;
+}
+input[type="text"].daterangeDefTime{
+	width: 100px;
+	height: 26ox;
+}
+.dfborderCaptions{
+	padding: 11px 0px;
+	background-color: #f9f9f9;
+	border-bottom: 1px #d2d2d2 solid;
+}
+.remoteDiagInfo td{
+	padding: 5px 0px;
+}
+.vehThreeState{
+	width: 398px;
+	height: 156px;
+	margin:auto;
+	position:relative;
+	background: url(../images/report/remoteEmpty.png) no-repeat center center;
+}
+.vehThreeStateCon{
+	width: 280px;
+	height: 92px;
+	position:absolute;
+	line-height: 92px;
+	/*color:#999;*/
+	color: #ffffff;
+	font-size: 30px;
+	font-weight:bold;
+	top:7px; right:17px;
+}
+/* 空载 */
+.empFullHarf-emp{
+	width: 280px;
+	color: #cf000f;
+	display: block;
+}
+/* 半载 */
+.empFullHarf-harf{
+	width: 280px;
+	color: #ffffff;
+	height: 46px;
+	position:absolute;
+	bottom: 0px;
+	display: block;
+	line-height: 46px;
+	background-color:#cf000f;
+}
+/* 满载 */
+.empFullHarf-full{
+	width: 280px;
+	color: #ffffff;
+	display: block;
+	background-color:#cf000f;
+}
+.vehConditions{
+	margin: 20px 10px;
+}
+.anomalyTable{
+	width:100%;
+	white-space: nowrap;
+	text-indent: 0px;
+	color: #999;
+}
+table.anomalyTable td{
+	text-align:center;
+}
+table.anomalyTable td>span{
+	min-width: 80px;
+	text-align:center;
+	display:inline-block;
+	padding: 10px 3px;
+	border:1px #D2D2D2 solid;
+}
+table.anomalyTable td>span.includeImg img{
+	vertical-align: middle;
+	margin: auto 3px;
+}
+.normalrWaps{
+	width: 100px;
+	vertical-align: top;
+	text-align:left;
+	white-space: pre-wrap;
+	text-indent: 0px;
+}
+.normalrWaps > span{
+	margin: 12px auto;
+	min-width: 70px;
+	text-align:center;
+	display:inline-block;
+	padding: 10px 3px;
+	float:left;
+	border:1px #D2D2D2 solid;
+}
+.normalrWaps > strong{
+	margin: 12px auto;
+	min-width: 70px;
+	text-align:center;
+	display:inline-block;
+	padding: 10px 3px;
+	float:left;
+}
+.tableRightTD{
+	width:100px;
+}
+.tableRightInfoes{
+	min-width:110px;
+	man-width:150px;
+	padding: 10px 3px;
+	text-align:left;
+	line-height:22px;
+	border:1px #D2D2D2 solid;
+	margin-right: 3px;
+}
+.remoteVehDir{
+	width: 70px;
+	display: block;
+	font-size: 16px;
+	line-height: 22px;
+	text-align: center;
+}
+.gears{
+	display: inline-block;
+	margin: auto;
+}
+.gears:after{
+	display: block;
+	content: "";
+	line-height: 0;
+	clear: both;
+	visibility: hidden;
+}
+.gearsStop,.gearsRetreat{
+	float: left;
+	line-height:40px;
+}
+.gearsNumber{
+	float: left;
+	margin-top:8px;
+	line-height:24px;
+}
+.gearsStop,.gearsRetreat{
+	width: 40px;
+	height:40px;
+	font-size: 24px;
+	text-align:center;
+	background: url(../images/report/vehStatesBg.png) no-repeat center center;
+}
+.gearsNumber li{
+	width: 24px;
+	height: 24px;
+	margin: auto 5px;
+	float:left;
+}
+.textLeft p{
+	text-align: left;
+}
+.sliderModuleBox{
+	margin: 23px 30px 5px;
+}
+.vehConditionOperate{
+	text-align: center;
+}
+.vehConditionOperate>div{
+	display: inline-block;
+	text-indent: 0px;
+	white-space: nowrap;
+}
+.vehConditionOperate>.curRemote{
+	display:inline-block;
+	padding: 1px 3px;
+	text-indent: 0px;
+	margin: auto 30px;
+	float: right;
+	cursor:pointer;
+}
+.instrumentBOx{
+	margin: 30px auto 15px;
+}
+.dashBoard{
+	width:100%;
+	white-space: nowrap;
+	text-indent: 0px;
+	text-align: center;
+}
+.dashBoard th{
+	font-size:16px;
+	text-align: center;
+	color: #999999;
+}
+.oilMeter_top{
+	width: 124px;
+	height:79px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+	border:1px red solid;
+}
+.oilMeter{
+	width: 124px;
+	height:79px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+	background: url(../images/report/oilMeterBg.png) no-repeat center center;
+}
+.oilMeterVal{
+	margin: auto;
+	display: inline-block;
+	text-align:center;
+	text-indent: 0px;
+	position: absolute;
+	bottom:0px;
+	font-size: 12px;
+	left: -40px;
+	width: 200px;
+	top:79px;
+}
+.speedMileage_top {
+	width: 187px;
+	height:174px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+}
+.speedMileage{
+	width: 187px;
+	height:174px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+	background: url(../images/report/speedMileageMeter.png) no-repeat center center;
+}
+.speedMileageVal{
+	margin: auto;
+	display: inline-block;
+	text-align:center;
+	text-indent: 0px;
+	position: absolute;
+	bottom:0px;
+	font-size: 12px;
+	left: 8px;
+	top: 138px;
+	width: 100px;
+	text-align: center;
+}
+
+.rotateSpeed_top{
+	width: 189px;
+	height:152px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+}
+.rotateSpeed{
+	width: 189px;
+	height:152px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+	background: url(../images/report/rotateSpeedBg.png) no-repeat center center;
+}
+.rotateSpeedVal{
+	margin: auto;
+	display: inline-block;
+	text-align:center;
+	text-indent: 0px;
+	position: absolute;
+	bottom:0px;
+	font-size: 12px;
+	left: -5px;
+	top: 134px;
+	width: 200px;
+	text-align: center;
+}
+.temperatureMeter_top{
+	width: 126px;
+	height:72px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+}
+.temperatureMeter{
+	width: 126px;
+	height:72px;
+	margin: 24px auto;
+	font-size: 24px;
+	text-align:center;
+	position: relative;
+	background: url(../images/report/temperatureMeterBg.png) no-repeat center center;
+}
+.temperatureMeterVal{
+	margin: auto;
+	display: inline-block;
+	text-align:center;
+	text-indent: 0px;
+	position: absolute;
+	bottom:0px;
+	font-size: 12px;
+	left: -35px;
+	width: 200px;
+	top:79px;
+}
+.remoteTroubleCode{
+	position:relative;
+	margin: 26px auto 12px;
+}
+span.TroubleCodeCap{
+	display:inline-block;
+	line-height: 36px;
+	text-indent: 0px;
+}
+.leftPatch{
+	position: absolute;
+	left:-25px; top:-20px;
+}
+.rightPatch{
+	position: absolute;
+	right:-25px; top:-20px;
+}
+.TroubleCodeUl{
+	/* color:#f2bbbf; */
+	background-color: #fdfbe9;
+	border:1px #ece9d9 solid;
+}
+.TroubleCodeUl:after{
+	display: block;
+	clear: both;
+	content: "";
+	line-height: 0;
+	visibility: hidden;
+}
+.TroubleCodeUl li{
+	width: 100%;
+	display:block;
+	min-height:20px;
+	text-indent: 20px;
+	border:1px #f4f1e0 solid;
+	float: left;
+}
+.curRedSpan{
+	color: #cf000f;
+	text-indent:0px;
+	border:1px #cf000f solid;
+}
+.oilmassUnusualTishi{
+	color: #999;
+	margin: auto 20px;
+}
+.browserJudge{
+	line-height: 20px
+}
+.carHalf {
+	width: 280px;
+	height: 46px;
+	position:absolute;
+	line-height: 46px;
+	/*color:#000;
+	background-color:red;*/
+	color: #ffffff;
+	background-color: #cf000f;
+	font-size: 30px;
+	font-weight:bold;
+	top:55px; right:17px;
+}
+.infoDiv{
+	display:none;
+	position: absolute;
+	width: 150px;
+	height:23px;
+	border:1px solid  #f0f0f5;
+	line-height:23px;
+	text-align:center;
+	text-indent: 0;
+}
+
+.infoDiv_left {
+	position: absolute;
+	width: 150px;
+	height:23px;
+	border:1px solid  #f0f0f5;
+	line-height:23px;
+	text-align:center;
+	text-indent: 0;
+	left:25px;
+}
+.infoDiv_right {
+	position: absolute;
+	width: 150px;
+	height:23px;
+	border:1px solid  #f0f0f5;
+	line-height:23px;
+	text-align:center;
+	text-indent: 0;
+	right:25px;
+}
+/* remoteVehicleStatusDiagnosis end   */
+/* jqGrid */
+.ui-jqgrid-hdiv table.ui-jqgrid-htable,.ui-jqgrid-bdiv #dtable{
+	min-width: 100%!important;
+	white-space:nowrap;
+  	width: 100%;
+}
+.customLayTitle{
+	padding: 0 80px 0 20px;
+	height: 42px;
+	line-height: 42px;
+	border-bottom: 1px solid #eee;
+	font-size: 14px;
+	color: #333;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	background-color: #F8F8F8;
+}
+/* risk */
+.gpsLeftHover {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	z-index: 300;
+	display: inline-block;
+	width: 380px;
+}
+.risk-content{
+	margin-left: 382px;
+}

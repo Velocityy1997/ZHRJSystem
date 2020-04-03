@@ -1,0 +1,146 @@
+﻿@charset "utf-8";
+
+/* CSS Document */
+html{ height: 100%; width: 100%;}
+* {
+	margin: 0;
+	padding: 0;
+}
+/* 实时报警的页面btn的样式 */
+#refBtn{background: #1A6DAE;
+    border: 1px solid #1A6DAE;
+    border-radius: 4px;
+    padding: 4px 16px;
+    overflow: hidden;
+    color: #fff;
+    margin-left: 10px;}
+
+/* 选择文件所有btn的样式 */
+.phone_fs li button {
+    background: #1A6DAE;
+    border: 1px solid #1A6DAE;
+    border-radius: 4px;
+    color: #fff;
+    padding: 0px 18px;
+}
+
+.ToUpload {
+	float:left;
+    position: relative;
+    display: inline-block;
+    background: #1A6DAE;
+    border: 1px solid #1A6DAE;
+    border-radius: 4px;
+    padding: 4px 12px;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 20px;    float: left;
+    margin-left: 36px;
+}
+.ToUpload input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+.ToUpload:hover {
+    background: #00569A;
+    border-color: #00569A;
+    color: #fff;
+    text-decoration: none;
+}
+.upload_input{
+	padding: 7px 26px;
+    border: 1px solid #1A6DAE!important;
+    color: #fff;
+    margin-left: 35px;
+    margin-top: 1%;
+    border-radius: 5px;
+    background: #1A6DAE;
+}		
+.end_upload{           
+    width: 40%;
+    /* height: 100px; */
+    border: 1px solid #ccc;
+    display: block;
+    margin-left: 35px;padding-bottom: 77px;}
+
+.form-sc-file-left1{left: 42px;}
+.form-sc-file-left2{left: 16px;}
+
+.evidenceBox button {
+    border: 1px solid #1A6DAE;
+    background: #1A6DAE;
+    border-radius: 4px;
+    margin-left: 60px;
+    padding: 5px 25px;
+    overflow: hidden;
+    color: #fff;
+}
+.shangBaoBtn{margin-left: 34px;background:#1a6dae!important;border:1px solid #1a6dae!important;color:#fff!important;}
+/* 基本信息页面btn样式 */
+.upload-btn{float: left;margin-left: 2.5%;padding: 5px 25px;background: #1a6dae;border: 1px solid #1a6dae;border-radius: 4px;color: #fff;}   
+.form-sc-file3{left: 21px;}
+/* 证照管理页面的btn按钮样式 */
+.upload_input_btn{padding: 5px 25px;background: #1a6dae;border: 1px solid #1a6dae;border-radius: 4px;color: #fff;}
+.btn-default{padding: 6px 26px!important;margin-right: 3%; }
+.ztree li span.button.area_ico_open,.ztree li span.button.area_ico_close,.ztree li span.button.area_ico_docu{margin-right:2px; background: url(../../../plugins/zTree/images/town.png) no-repeat scroll 0 0 transparent; vertical-align:top; *vertical-align:middle; width: 16px;background-size: contain;height: 16px}
+.ztree li span.button.town_ico_open,.ztree li span.button.town_ico_close,.ztree li span.button.town_ico_docu{margin-right:2px; background: url(../../../plugins/zTree/images/area.png) no-repeat scroll 0 0 transparent; vertical-align:top; *vertical-align:middle; width: 16px;background-size: contain;height: 16px}
+.ztree li span.button.device_ico_open,.ztree li span.button.device_ico_close,.ztree li span.button.device_ico_docu{margin-right:2px; background: url(../../../plugins/zTree/images/device.png) no-repeat scroll 0 0 transparent; vertical-align:top; *vertical-align:middle; width: 16px;background-size: contain;height: 16px}
+.ztree li span.button.corp_ico_open,.ztree li span.button.corp_ico_close,.ztree li span.button.corp_ico_docu{margin-right:2px; background: url(../../../plugins/zTree/images/corp.png) no-repeat scroll 0 0 transparent; vertical-align:top; *vertical-align:middle; width: 16px;background-size: contain;height: 16px}
+.ztree li span.button.role_ico_open,.ztree li span.button.role_ico_close,.ztree li span.button.role_ico_docu{margin-right:2px; background: url(../../../plugins/zTree/images/role.png) no-repeat scroll 0 0 transparent; vertical-align:top; *vertical-align:middle; width: 16px;background-size: contain;height: 16px}
+.ztree li span.button.hazards_ico_open,.ztree li span.button.hazards_ico_close,.ztree li span.button.hazards_ico_docu{margin-right:2px; background: url(../../../plugins/zTree/images/hazards.png) no-repeat scroll 0 0 transparent; vertical-align:top; *vertical-align:middle; width: 16px;background-size: contain;height: 16px}
+
+#searchBtn{background: #1A6DAE;
+    border: 1px solid #1A6DAE;
+    border-radius: 4px;
+    padding: 4px 16px;
+    overflow: hidden;
+    color: #fff;                    
+    margin-left: 10px;}
+
+ .input-medium {
+    border: 1px solid #ddd;
+    width: 56%;line-height:29px;
+}                          
+.townCorpbox select {width: 56%;height: 32px;border: 1px solid #e5e6e7;display: inline-block;}
+.form-input-border {
+    border: 1px solid #e7eaec;
+    height: 34px;line-height: 34px;
+}
+.ibox-title{border-width: 0px!important;}
+.tableWide {
+    margin: 0 auto!important;
+}
+.border_btm_none{border-bottom:none!important;}
+.border_bd_none{border:none!important;}
+.padd_R{padding: 6px 26px!important;}
+.title_list i{float: left;margin-right: 1%;margin-top: 10px;cursor:pointer}
+
+.formBorder{border:1px solid #e2e2e2;}
+.formHeight{line-height: 32px;height: 32px;}
+
+.label_Mr{margin-right:5%;}                
+.labelb{text-align: left;}
+.labelb label{margin-bottom:0px!important}
+.labelpd{padding-top:0px!important}
+.laydate-icon {border: 1px solid #e2e2e2!important;height: 32px!important;padding-left: 0px!important;float: left;}
+.btn_left{float: left!important;margin-left: 34.6%!important;padding: 5px 12px!important;}
+.inforBgColor{background: #f3f3f3;padding: 18px 0px 5px 0px;}
+.colorRed{color:#C70000;}
+.colorBlue{color: #3c8dbc;font-size: 15px!important;}
+.btnRight{margin-right:1%;}
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,18 @@
+.navbar-icon{
+	margin:0px 10px;
+}
+.navbar-checkbox{
+	display:inline;
+}
+.navbar-button{
+	margin:0px 2px;
+}
+
+.navbar-button-roadnet{
+	margin:0px 10px;
+}
+
+.navbar-checkbox{
+    width:100px;
+    display:inline;
+}

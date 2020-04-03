@@ -1,0 +1,446 @@
+package com.web.business.generator.system.zhj.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.web.common.util.spring.PageTool;
+import com.shara.common.util.page.PageUtil;
+import com.shara.common.util.page.ValidateUtil;
+import com.sun.tools.classfile.Annotation.element_value;
+import com.web.common.util.spring.RestResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+import com.web.business.generator.monitor.position.model.Position;
+import com.web.business.generator.monitor.position.services.impl.PositionServiceImpl;
+import com.web.business.generator.system.user.model.User;
+import com.web.business.generator.system.zhj.model.Zhj;
+import com.web.business.generator.system.zhj.model.ZhjModel;
+import com.web.business.generator.system.zhj.services.impl.ZhjServiceImpl;
+import com.web.business.generator.util.log.SystemControllerLog;
+
+@Api(description = "zhjAPI", tags = "zhjAPI")
+@Controller
+@RequestMapping("/zhj")
+public class ZhjController {
+	@Resource
+	private ZhjServiceImpl zhjServiceImpl;
+	@Resource
+	private PositionServiceImpl positionServiceImpl;
+
+	
+
+	/**
+	 * 查询Jqgrid
+	 * 
+	 * @author
+	 * @date
+	 * @return json
+	 */
+	@ApiOperation(value = "查询Jqgrid..", notes = "查询Jqgrid..")
+	@ResponseBody
+	@RequestMapping(value = "/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<ZhjModel> list(HttpServletRequest request, String pagination, String zhj) {
+		String page = request.getParameter("page");
+		String rows = request.getParameter("rows");
+		String zhjName = request.getParameter("zhjName");
+		RestResponse result = new RestResponse();
+		PageTool<ZhjModel> pageInfo = null;
+     
+		HttpSession session = request.getSession();
+		User userBean = (User) session.getAttribute("loginInfo");
+		Integer userType = userBean.getType();
+		try {
+			Zhj zhjBean = new Zhj();
+			// 判断是否有查询条件
+			if (zhjName != "" && zhjName != null) {
+				zhjBean.setName(zhjName);
+				zhjBean.setCardNum(zhjName);
+			}
+
+			// 条件+分页查询
+			PageUtil pageUtil = PageUtil.getPageBean(request);
+
+			// 管理员
+			// 条件+分页查询
+			pageInfo = zhjServiceImpl.selectZhjByPage(zhjBean == null ? new Zhj() : zhjBean,
+					pageUtil.getPage() == 0 ? 1 : pageUtil.getPage(),
+					pageUtil.getRows() == pageUtil.getRows() ? 10 : pageUtil.getRows(), userBean);
+
+		} catch (Exception e) {
+			result.setSuccess(false).setMessage("操作失败");
+			e.printStackTrace();
+		}
+		return pageInfo;
+	}
+
+	/**
+	 * 搜索查询
+	 *
+	 * @param page
+	 * @param pageSize
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 *          <com.github.pagehelper.PageInfo>
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "搜索..", notes = "搜索..")
+	@ResponseBody
+	@RequestMapping(value = "/search", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<ZhjModel> search(HttpServletRequest request, String zhj) {
+		RestResponse result = new RestResponse();
+		PageTool<ZhjModel> pageInfo = null;
+		Zhj zhjBean = null;
+		try {
+			// 判断是否有查询条件
+			if (ValidateUtil.isNullAndIsStr(zhj))
+				zhjBean = JSON.parseObject(zhj, Zhj.class);
+			PageUtil pageUtil = PageUtil.getPageBean(request);
+			HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("loginInfo");
+			
+			// 条件+分页查询
+			pageInfo = zhjServiceImpl.selectZhjByPage(zhjBean == null ? new Zhj() : zhjBean,
+					pageUtil.getPage() == 0 ? 1 : pageUtil.getPage(),
+					pageUtil.getRows() == pageUtil.getRows() ? 10 : pageUtil.getRows(),user);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+		return pageInfo;
+//        return new RestResponse().setSuccess(true).setMessage("success").setData(pageInfo);
+	}
+
+
+	/**
+	 * 新增
+	 *
+	 * @param device
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "新增指挥机..", notes = "新增指挥机..")
+	@ResponseBody
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	@SystemControllerLog(type = "新增指挥机" , actionType = "1")
+	public RestResponse doAdd(HttpServletRequest request, Zhj zhj) {
+		RestResponse result = new RestResponse();
+		try {
+			String cityId = request.getParameter("city");
+			String provinceId = request.getParameter("province");
+			String countyId = request.getParameter("county");
+			String industryId = request.getParameter("industName");
+			String type = "0";
+			zhj.setType(Integer.valueOf(type));
+			zhj.setZhjindustry(industryId);
+			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+			zhj.setId(uuid);
+			if (provinceId != null && cityId.equals("") && countyId.equals("")) {
+				zhj.setZhjArea(provinceId);
+			} else if (cityId != null && provinceId != null && countyId.equals("")) {
+				zhj.setZhjArea(cityId);
+			} else {
+				zhj.setZhjArea(countyId);
+			}
+			// 1.判断指挥机名字、卡号不唯一
+			String zhjName = null;
+			String zhjCardNum = null;
+			zhjName = zhj.getName();
+			zhjCardNum = zhj.getCardNum();
+
+			if ((zhjName == null || zhjName.equals("")) || (zhjCardNum == null || zhjCardNum.equals(""))) {
+				// 为空
+				return result.setSuccess(false).setMessage("指挥机名称或卡号为空，请检查！").setDescription("新增一条指挥机数据");
+
+			} else {
+				// 判断指挥机名称、卡号是否唯一
+				// 根据名称查询
+				Zhj zhjNameExist = zhjServiceImpl.selectByName(zhjName);
+
+				// 根据卡号查询
+				Zhj zhjCardNumExist = zhjServiceImpl.selectByCardNum(zhjCardNum);
+
+				if (zhjNameExist == null && zhjCardNumExist == null) {
+					// 卡号和名称都不存在
+					// 1.1唯一，判断其他参数非空
+					// 1.1.1 判断参数是否合法
+					// 1.1.1.1合法，进行新增
+					// 1.1.1.2 非法，结束新增
+					Integer r = zhjServiceImpl.insertSelective(zhj);
+
+					if (r > 0) {
+						result.setSuccess(true).setMessage("操作成功").setDescription("新增一条指挥机数据");
+
+					} else {
+						result.setSuccess(false).setMessage("操作失败").setDescription("新增一条指挥机数据");
+					}
+
+				} else {
+					// 1.2不唯一，结束新增
+					// 卡号和名称存在
+					return result.setSuccess(false).setMessage("指挥机卡号或名称已存在，请检查！").setDescription("新增一条指挥机数据");
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作异常，请重试！").setDescription("新增一条指挥机数据");
+		}
+		return result;
+	}
+
+	/**
+	 * 根据主键更新
+	 *
+	 * @param id
+	 * @param device
+	 * @Author:
+	 * @return: com.hollysys.haier.robot.bean.RestResponse
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "修改..", notes = "修改..")
+	@ResponseBody
+	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+	@SystemControllerLog(type = "指挥机修改" , actionType = "2")
+	public RestResponse doUpdate(HttpServletRequest request, Zhj zhj) {
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			String date = sdf.format(new Date());
+			String cityId = request.getParameter("city");
+			String provinceId = request.getParameter("province");
+			String countyId = request.getParameter("county");
+			String industryId = request.getParameter("industName");
+			zhj.setZhjindustry(industryId);
+			if (provinceId != null && cityId.equals("") && countyId == null) {
+				zhj.setZhjArea(provinceId);
+			} else if (provinceId != null && cityId != null && countyId.equals("")) {
+				zhj.setZhjArea(cityId);
+			} else {
+				zhj.setZhjArea(countyId);
+			}
+			String zhjName = null;
+			String zhjCardNum = null;
+			zhjName = zhj.getName();
+			zhjCardNum = zhj.getCardNum();
+
+			// 1.判断名称和号码是否为空
+			// 1.1 存在为空
+			if (zhjName == null || zhjName.equals("")) {
+				// 为空
+				return result.setSuccess(false).setMessage("指挥机名称为空，请检查！").setDescription("修改一条指挥机数据");
+
+			} else if (zhjCardNum == null || zhjCardNum.equals("")) {
+				return result.setSuccess(false).setMessage("指挥机卡号为空，请检查！").setDescription("修改一条指挥机数据");
+
+			} else if ((zhjName == null || zhjName.equals("")) || (zhjCardNum == null || zhjCardNum.equals(""))) {
+				return result.setSuccess(false).setMessage("指挥机名称和卡号为空，请检查！").setDescription("修改一条指挥机数据");
+
+			} else {
+				// 1.2 都不为空
+				// 当前id对应的数据库中的指挥机
+				ZhjModel zhjExist = zhjServiceImpl.selectByPrimaryKey(zhj.getId());
+
+				// 根据卡号查询出来的指挥机
+				Zhj zhjCardNumExist = zhjServiceImpl.selectByCardNum(zhjCardNum);
+
+				// 根据名称查询出来的指挥机
+				Zhj zhjNameExist = zhjServiceImpl.selectByName(zhjName);
+
+				if (zhjNameExist == null && zhjCardNumExist == null) {
+					// 1.3卡号和名称都不存在
+					// 进行修改
+					Integer r = zhjServiceImpl.updateByPrimaryKeySelective(zhj);
+					if (r > 0) {
+						result.setSuccess(true).setMessage("修改成功").setDescription("修改一条指挥机数据");
+					} else {
+						result.setSuccess(false).setMessage("修改失败").setDescription("修改一条指挥机数据");
+					}
+
+				} else if (zhjNameExist != null && zhjCardNumExist == null) {
+					// 1.4 名称存在，卡号不存在
+					// 判断是否是修改当前的指挥机
+					if (zhjExist.getId().equals(zhjNameExist.getId())) {
+						// 1.4.1 当前指挥机
+						// 名称一致，修改卡号
+						Integer r = zhjServiceImpl.updateByPrimaryKeySelective(zhj);
+						if (r > 0) {
+							return result.setSuccess(true).setMessage("修改成功").setDescription("修改一条指挥机数据");
+						} else {
+							return result.setSuccess(false).setMessage("修改失败，请检查").setDescription("修改一条指挥机数据");
+						}
+					} else {
+						// 1.4.2 不是当前指挥机，名称重复
+						return result.setSuccess(false).setMessage("当前指挥机名称已存在，请修改！").setDescription("修改一条指挥机数据");
+
+					}
+
+				} else if (zhjNameExist == null && zhjCardNumExist != null) {
+					// 1.5 名称不存在，卡号存在
+					// 判断是否是修改当前的指挥机
+					if (zhj.getId().equals(zhjCardNumExist.getId())) {
+						// 1.5 .1当前指挥机
+						// 卡号一致，修改名称
+						Integer r = zhjServiceImpl.updateByPrimaryKeySelective(zhj);
+
+						if (r > 0) {
+							return result.setSuccess(true).setMessage("修改成功").setDescription("修改一条指挥机数据");
+						} else {
+							return result.setSuccess(false).setMessage("修改失败，请检查").setDescription("修改一条指挥机数据");
+						}
+					} else {
+						// 1.4.2 不是当前指挥机，卡号重复
+						return result.setSuccess(false).setMessage("当前指挥机卡号已存在，请修改！").setDescription("修改一条指挥机数据");
+
+					}
+				} else {
+					// zhjNameExist !=null && zhjCardNumExist != null
+					// 1.6 名称存在，卡号存在
+					// 判断是否是修改当前指挥机
+					if ((zhjNameExist.getId().equals(zhj.getId())) && (zhjCardNumExist.getId().equals(zhj.getId()))) {
+
+						// 1.6.1 当前指挥机
+						Integer r = zhjServiceImpl.updateByPrimaryKeySelective(zhj);
+
+						if (r > 0) {
+							return result.setSuccess(true).setMessage("修改成功").setDescription("修改一条指挥机数据");
+						} else {
+							return result.setSuccess(false).setMessage("修改失败，请检查").setDescription("修改一条指挥机数据");
+						}
+
+					} else if ((zhjNameExist.getId().equals(zhj.getId()))
+							&& !(zhjCardNumExist.getId().equals(zhj.getId()))) {
+						// 1.6.2 名称对应指挥机id一致,卡号对应的id不一致，
+						return result.setSuccess(false).setMessage("当前指挥机卡号存在，请修改重试！").setDescription("修改一条指挥机数据");
+
+					} else if (!(zhjNameExist.getId().equals(zhj.getId()))
+							&& (zhjCardNumExist.getId().equals(zhj.getId()))) {
+						// 1.6.3 名称对应指挥机id不一致,卡号对应的id一致，
+						return result.setSuccess(false).setMessage("当前指挥机名称存在，请修改重试！").setDescription("修改一条指挥机数据");
+
+					} else {
+						// 1.6.4 名称对应指挥机id不一致,卡号对应的id不一致
+						return result.setSuccess(false).setMessage("当前指挥机卡号和名称存在，请修改重试！").setDescription("修改一条指挥机数据");
+
+					}
+				}
+
+				/*
+				 * else { // 1.2不唯一，结束新增 // 卡号和名称存在 return
+				 * result.setSuccess(false).setMessage("指挥机卡号或名称已存在，请重新输入！"); }
+				 */
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败").setDescription("修改一条指挥机数据");
+		}
+
+		return result;
+	}
+
+	/**
+	 * 根据主键删除
+	 *
+	 * @param id
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "删除", notes = "删除")
+	@ResponseBody
+	@RequestMapping(value = "/del", method = RequestMethod.POST)
+	@SystemControllerLog(type = "指挥机删除" , actionType = "3")
+	public RestResponse doDelete(String id) {
+		RestResponse result = new RestResponse();
+		try {
+			Integer r = zhjServiceImpl.deleteBatchByPrimaryKey(id);
+			if (r > 0) {
+				result.setSuccess(true).setMessage("删除成功").setDescription("删除一条数据");
+			} else {
+				result.setSuccess(false).setMessage("删除失败，请重试！").setDescription("删除一条数据");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("删除失败，请重试！").setDescription("删除一条数据");
+		}
+
+		return result;
+	}
+
+	/**
+	 * 根据主键获取详情
+	 *
+	 * @param id
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse<>
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "根据id获取信息", notes = "根据id获取信息")
+	@ResponseBody
+	@RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+	public RestResponse<Zhj> doGetDetail(@PathVariable String id) {
+		RestResponse result = new RestResponse();
+		try {
+			ZhjModel zhj = zhjServiceImpl.selectByPrimaryKey(id);
+			result.setSuccess(true).setMessage("success").setData(zhj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+	@ApiOperation(value = "指挥机位置查询", notes = "指挥机位置查询")
+	@ResponseBody
+	@RequestMapping(value = "/getPosition", method = RequestMethod.POST)
+	public RestResponse getPosition() {
+		RestResponse result = new RestResponse();
+		try {
+			Zhj zhj = zhjServiceImpl.getCurrentZhj();
+			String posiId = zhj.getPosition();
+			Position position = positionServiceImpl.selectByPrimaryKey(posiId);
+			ZhjModel model = new ZhjModel();
+			model.setLongitude(String.valueOf(position.getLongitude()));
+			model.setLatitude(String.valueOf(position.getLatitude()));
+			model.setAltitude(0 + "");
+			model.setName(zhj.getName());
+			model.setCardNum(zhj.getCardNum());
+			model.setId(zhj.getId());
+			if (position.getLocateTime() != null) {
+				model.setGpstime(position.getLocateTime().toString());
+			} else {
+				model.setGpstime("");
+			}
+			result.setSuccess(true).setMessage("success").setData(model);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+}

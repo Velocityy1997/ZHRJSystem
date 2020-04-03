@@ -1,0 +1,60 @@
+/**
+ * 菜单树插件
+ *
+ * @author baitao 2017/2/16 菜单树专用等
+ */
+
+var deptDeviceTree = {
+    // 树数据
+    data_url: 'department/selectTreeBeanGroup',
+    leaf_url: '',
+    data: [],
+    deptDeviceTreeObj : null,
+    // 加载中的layerIndex
+    loadingLayer: null,
+    // 隐藏的 nodes
+    hideenNodes: [],
+    setting: '',
+    // 定时器
+    timer: '',
+    nodes : [],
+    init : function(){
+    		// deptDeviceTree 属性设置
+    	deptDeviceTree.setting = {
+    			async : {
+    				autoParam : [ "id", "checked" ],
+    				enable : true,
+    				url : deptDeviceTree.data_url,
+    				type: 'get',
+    				dataFilter : deptDeviceTree.dataFilter
+    			},
+    			check : {
+    				enable : false
+    			},
+    			data : {
+    				 key: {
+    						name: "name"
+    					},
+    				simpleData : {
+    					enable : true,
+    					pIdKey: "pId",
+    					idKey: "id"
+    				}
+    			},
+    			view : {
+    				expandSpeed : ""
+    			},
+    			callback : {
+    				onClick:zTreeOnClick
+    			}
+    		};
+    		// 初始化zTree
+    	deptDeviceTree.deptDeviceTreeObj = $.fn.zTree.init($("#deptDeviceTree"), deptDeviceTree.setting, new Array());
+    },
+    // 获取数据加载封装
+	dataFilter : function(treeId, parentNode, treeDatas) {
+		deptDeviceTree.nodes = treeDatas.data ;
+		return treeDatas.data;
+	} 
+};
+deptDeviceTree.init();

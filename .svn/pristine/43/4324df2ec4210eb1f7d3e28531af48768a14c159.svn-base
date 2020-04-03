@@ -1,0 +1,192 @@
+html,
+body {
+  min-width: 290px;
+  -ms-overflow-style: scrollbar;
+}
+body {
+  background-color: #ecf0f5;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: normal;
+  font-variant: normal;
+  color: #758697;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased !important;
+}
+h1,
+.h1 {
+  font-size: 34px;
+}
+h2,
+.h2 {
+  font-size: 28px;
+}
+h3,
+.h3 {
+  font-size: 22px;
+}
+h4,
+.h4 {
+  font-size: 16px;
+}
+h5,
+.h5 {
+  font-size: 12px;
+}
+h6,
+.h6 {
+  font-size: 10px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-weight: 600;
+  color: #2b425b;
+}
+::selection {
+  background-color: #42a5f5;
+  color: #fff;
+}
+::-moz-selection {
+  background-color: #42a5f5;
+  color: #fff;
+}
+
+#container {
+  min-height: 100vh;
+  height: auto;
+  position: relative;
+  min-width: 290px;
+  overflow: hidden;
+}
+.cls-container {
+  background-color: #ecf0f5;
+  text-align: center;
+}
+.cls-container,
+.cls-container a,
+.cls-container a:hover,
+.cls-container a:focus {
+  color: #647484;
+}
+
+.bg-img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* opacity: .8; */
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+/* Content */
+.cls-content {
+  padding: 50px 15px 15px;
+  padding-top: 35vh;
+  position: relative;
+}
+
+.cls-content .cls-content-sm{
+  width: 70%;
+  min-width: 450px;
+  margin: 0 auto;
+  position: relative;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .cls-content .cls-content-sm {
+    width: 450px;
+  }
+}
+
+
+.cls-content .panel {
+  background-color: #fff;
+  box-shadow: 0 0px 20px rgba(0, 0, 0, 0.15);
+}
+.contain-login-bj{
+  width: 100%;
+}
+.contain-login-right{
+  width: 62%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+}
+.contain-login-right p {
+  font-size: 18px;
+  text-align: center;
+  color: #666;
+  font-weight: 600;
+  margin: 25px auto 15px auto;
+}
+.contain-login-right .uuInfo input {
+  display: inline-block;
+  border-radius: 5px;
+  width: 80%;
+  height: 30px;
+  padding: 3px 8px;
+  font-weight: 500;
+  margin: 0 auto 15px auto;
+  outline: none;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.contain-login-right button {
+  display: inline-block;
+  border-radius: 5px;
+  width: 80%;
+  height: 30px;
+  padding: 3px 8px;
+  font-weight: 500;
+  margin: 0 auto 20px auto;
+  outline: none;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  color: #fff;
+  background-color: red;
+  position: relative;
+}
+.contain-login-right button:active {
+  top: 2px;
+  background-color:#5cbf2a;
+}
+.footer{
+   position: fixed;
+   bottom: 10px;
+   width: 100%;
+   color: #999;
+ }
+.saveLogin{
+  text-align: left;
+  color: #333!important;
+  width: 80%;
+  margin: 0 auto 10px auto;
+}
+.saveLogin label{
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: normal;
+}

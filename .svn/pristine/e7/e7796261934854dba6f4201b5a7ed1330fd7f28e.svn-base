@@ -1,0 +1,158 @@
+*{
+	margin:0;
+	padding:0;
+}
+body {
+	font-size: 12px;
+	width: 100%;
+	min-width: 1010px;
+}
+span{
+	font-size:10px;
+}
+ul {
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;
+}
+li {
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;
+}
+.m_main{
+	position:relative;
+	left:0px;
+	right:0px;
+	height:100%;
+}
+.m_main_title{
+	height:25px;
+	background-color:#CCCCCC; 
+}
+.m_main_title_img{
+}
+.m_main_title span{
+	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: bold;
+	line-height: 25px;
+	padding-left:10px;
+}
+.m_main_info{
+	padding:10px;
+}
+.m_main_info_condition{
+	border:1px solid #cbcbcb;
+	height:40px;
+}
+.m_main_info_condition div{
+	padding-top: 2px;
+	margin-left:10px;
+	line-height: 25px;
+}
+.m_main_info_condition div select{
+	width:100px;
+	height:25px;
+	border: 1px solid #cbcbcb;
+}
+.m_main_info_condition div label{
+	width:60px;
+}
+.m_main_info_condition div input{
+	width:100px;
+ 	height:22px; 
+	border: 1px solid #cbcbcb;
+} 
+.m_main_info_btns{
+	text-align: center;
+	float:right;	
+	padding-right: 20px;
+	
+}
+.m_main_info_btns ul li{
+	margin-right:10px;
+	float:left;
+	/*background-image: url(../images/func_btn_bg.jpg);*/
+	background-color:#46aee9;
+/* 	line-height:30px; */
+	text-align:center;
+	width:100px;
+/* 	height:30px; */
+	font-weight: bold;
+}
+.m_main_info_btns ul li a{
+	color: #FFFFFF;
+	text-decoration:none;
+	cursor: pointer;
+}
+.m_main_info_list{
+	margin-top:10px;
+}
+.m_main_info_list_grid{
+	width:100%;
+}
+.grid_h{
+	background-color: #ececec;
+	height:25px;
+	line-height: 25px;
+	text-align: center;
+	border-top: 2px solid #d1d1d1;
+	border-bottom: 2px solid #d1d1d1;
+}
+
+.grid_h td{
+	background-color: #ececec;
+	height:25px;
+	line-height: 25px;
+	text-align: center;
+	border-top: 2px solid #d1d1d1;
+	border-bottom: 2px solid #d1d1d1;
+}
+
+.grid_b td{
+	height:21px;
+	line-height: 21px;
+	text-align: center;
+}
+
+.grid_b_bg td{
+	background-color: #c5e9f9;
+}
+.m_main_info_list_nav{
+	height:40px;
+	margin-top:10px;
+	width:100%;
+}
+.nav_total{
+	float:left;
+	line-height: 28px;
+	padding-left:15px;
+}
+.nav_total span{
+	color: red;
+}
+.nav_page{
+	text-align:center;
+	padding-left:35%;
+}
+.nav_page ul li{
+	width:25px;
+	float:left;
+	border:1px solid #cbcbcb;
+	height:25px;
+	line-height: 25px;
+	text-align:center;
+	margin-left:2px;
+}
+.nav_page_size{
+	float:right;
+	line-height: 28px;
+}
+.nav_page_size div{
+	margin-right:10px;
+}
+.select{
+
+	width: 136px;
+}

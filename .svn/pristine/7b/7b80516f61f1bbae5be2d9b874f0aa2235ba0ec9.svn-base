@@ -1,0 +1,26 @@
+package com.web.common.util.model;
+
+public class AutoModel {
+
+	private int start;
+	
+	private int max;
+	
+	public int getStart() {
+		return start;
+	}
+
+	public void setStart(int start) {
+		this.start = start;
+	}
+
+	public int getMax() {
+		return max;
+	}
+
+	public void setMax(int max) {
+		this.max = max;
+	}
+
+	
+}

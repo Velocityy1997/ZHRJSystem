@@ -1,0 +1,92 @@
+var main = {
+	 //update pw
+		changePw : function(){
+		        	 layer.open({
+						  type: 1,
+						  title: '修改密码',
+						  btn: ['确认', '取消'],
+						  area: ['600px', '360px'],
+						  shadeClose: true, //点击遮罩关闭
+						  content:$('#passwordBox')   
+							  ,btn2: function(index, layero){
+								 
+							  }
+							  ,get:function getJsonStr() {
+									var params = {
+											password:$('#inputPassword2').val(),
+											oldPassword:$('#inputPassword1').val()
+									};
+									
+									return JSON.stringify(params);
+								}
+							  ,yes: function(index, layero){
+								  
+									
+								  
+									$.post("modifyPWD", "systemUser="+this.get(), function(data){               
+										if (data == "1") {
+											//$('#loginForm').form('clear');
+											layer.msg('修改失败!<br/>密码錯誤!');
+										} else {
+											var index = layer.index; //获取当前弹层的索引号
+											layer.close(index); //关闭当前弹层
+										}
+									});
+									
+							  }
+							
+						  });
+		        	 
+		        },
+		      //cancellation(注销)
+		        cancellation : function(){
+		        	layer.confirm('您确定要退出登录?', {
+		        		title: '提示' ,//不显示标题栏
+		        		closeBtn: false,                
+		        		 shadeClose: true, //点击遮罩关闭
+		        		  btn: ['确定', '取消']             
+		        	      ,btnAlign: 'c'
+		        	  ,yes: function(index, layero){
+		        		  
+		        		  $.post("cancellation",function(data){               
+								if (data == "1") {
+									layer.msg('不能注销');
+								} else {
+									window.location = "index.jsp";
+									var index = layer.index; //获取当前弹层的索引号
+									layer.close(index); //关闭当前弹层
+								}
+							});
+		        		    
+		        	  }
+		        	  , btn2: function(index, layero){
+		        		 
+		        	  }
+		        	});
+				}
+
+};
+$(function(){
+	$(document).off('click', '#navbar-collapse li a')
+    .on('click', '#navbar-collapse li a', function (e) {
+    	var index = $(this).attr('index');
+    	var pid = $(this).attr('pid');
+    	var text = $(this).attr('text');
+    	var icon = $(this).attr('icon');
+    	var url = $(this).attr('url');
+    	var common = $(this).attr('common');
+    	if(pid == '0' && common == 'tree'){
+    		$("body").removeClass("sidebar-collapse");
+    		$("body").removeClass("layout-top-nav");
+    		$(".sidebar-toggle").css("display","block");
+    		$('#content').attr('src','');
+    		$('.sidebar-menu li').css('display','none');
+    		$('.sidebar-menu li[menu='+index+']').css('display','block');
+    	}else{
+    		$("body").addClass("sidebar-collapse");
+    		$("body").addClass("layout-top-nav");
+    		$(".sidebar-toggle").css("display","none");
+    	}
+    });
+});
+

@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.zhj.dao.ZhjMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.zhj.model.Zhj" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="zone" property="zone" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="card_num" property="cardNum" jdbcType="VARCHAR" />
+    <result column="txlevel" property="txlevel" jdbcType="VARCHAR" />
+    <result column="brocast_add" property="brocastAdd" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="frequency" property="frequency" jdbcType="VARCHAR" />
+    <result column="encryptflag" property="encryptflag" jdbcType="VARCHAR" />
+    <result column="num_in_zone" property="numInZone" jdbcType="VARCHAR" />
+    <result column="usercount" property="usercount" jdbcType="VARCHAR" />
+    <result column="iscurrent" property="iscurrent" jdbcType="VARCHAR" />
+    <result column="user_feature" property="userFeature" jdbcType="VARCHAR" />
+    <result column="txlength" property="txlength" jdbcType="VARCHAR" />
+    <result column="position" property="position" jdbcType="VARCHAR" />
+    <result column="zhjarea" property="zhjArea" jdbcType="VARCHAR" />
+    <result column="zhjindustry" property="zhjIndustry" jdbcType="VARCHAR" />
+    <result column="area_name" property="areaName" jdbcType="VARCHAR" />
+    <result column="industry_name" property="industryName" jdbcType="VARCHAR" />
+    
+ 	<!-- <collection property="areaList" resultMap="com.web.business.generator.system.area.dao.AreaMapper.BaseResultMap"></collection>
+ 	<collection property="industryList" resultMap="com.web.business.generator.system.industry.dao.IndustryMapper.BaseResultMap"></collection> -->
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	name,
+     	type,
+     	zone,
+     	status,
+     	card_num,
+     	txlevel,
+     	brocast_add,
+     	remark,
+     	frequency,
+     	encryptflag,
+     	num_in_zone,
+     	usercount,
+     	iscurrent,
+     	user_feature,
+     	txlength,
+     	position,
+     	zhjarea,
+     	zhjindustry
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		z.ID,
+		z.NAME,
+		z.TYPE,
+		z.ZONE,
+		z.STATUS,
+		z.CARD_NUM,
+		z.TXLEVEL,
+		z.BROCAST_ADD,
+		z.REMARK,
+		z.FREQUENCY,
+		z.ENCRYPTFLAG,
+		z.NUM_IN_ZONE,
+		z.USERCOUNT,
+		z.ISCURRENT,
+		z.USER_FEATURE,
+		z.TXLENGTH,
+		z.POSITION,
+		a.area_name as area_name,
+		i.Indust_name as industry_name
+		from zhj as z
+		left join area as a on z.ZHJAREA = a.area_id
+		left join industry as i on z.ZHJINDUSTRY = i.indust_id
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据指挥机名字查询  -->
+  <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from zhj 
+    where  name = #{ name,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据指挥机卡号查询   -->
+  <select id="selectByCardNum" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from zhj 
+    where  card_num = #{ cardNum,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getCurrentZhj" resultMap="BaseResultMap"  >
+    select
+		<include refid="Base_Column_List" />
+    from zhj 
+    where  ISCURRENT = '1'
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from zhj 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from zhj
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.zhj.model.Zhj">
+		insert into zhj
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="zone != null">
+				zone,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="cardNum != null">
+				card_num,
+			</if>
+			<if test="txlevel != null">
+				txlevel,
+			</if>
+			<if test="brocastAdd != null">
+				brocast_add,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="frequency != null">
+				frequency,
+			</if>
+			<if test="encryptflag != null">
+				encryptflag,
+			</if>
+			<if test="numInZone != null">
+				num_in_zone,
+			</if>
+			<if test="usercount != null">
+				usercount,
+			</if>
+			<if test="iscurrent != null">
+				iscurrent,
+			</if>
+			<if test="userFeature != null">
+				user_feature,
+			</if>
+			<if test="txlength != null">
+				txlength,
+			</if>
+			<if test="position != null">
+				position,
+			</if>
+			<if test="zhjArea != null">
+				zhjarea,
+			</if>
+			<if test="zhjIndustry != null">
+				zhjindustry
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="name != null">
+				 #{ name,jdbcType= VARCHAR },
+			</if>
+			<if test="type != null">
+				 #{ type,jdbcType= VARCHAR },
+			</if>
+			<if test="zone != null">
+				 #{ zone,jdbcType= VARCHAR },
+			</if>
+			<if test="status != null">
+				 #{ status,jdbcType= VARCHAR },
+			</if>
+			<if test="cardNum != null">
+				 #{ cardNum,jdbcType= VARCHAR },
+			</if>
+			<if test="txlevel != null">
+				 #{ txlevel,jdbcType= VARCHAR },
+			</if>
+			<if test="brocastAdd != null">
+				 #{ brocastAdd,jdbcType= VARCHAR },
+			</if>
+			<if test="remark != null">
+				 #{ remark,jdbcType= VARCHAR },
+			</if>
+			<if test="frequency != null">
+				 #{ frequency,jdbcType= VARCHAR },
+			</if>
+			<if test="encryptflag != null">
+				 #{ encryptflag,jdbcType= VARCHAR },
+			</if>
+			<if test="numInZone != null">
+				 #{ numInZone,jdbcType= VARCHAR },
+			</if>
+			<if test="usercount != null">
+				 #{ usercount,jdbcType= VARCHAR },
+			</if>
+			<if test="iscurrent != null">
+				 #{ iscurrent,jdbcType= VARCHAR },
+			</if>
+			<if test="userFeature != null">
+				 #{ userFeature,jdbcType= VARCHAR },
+			</if>
+			<if test="txlength != null">
+				 #{ txlength,jdbcType= VARCHAR },
+			</if>
+			<if test="position != null">
+				 #{ position,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjArea != null">
+				 #{ zhjArea,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjIndustry != null">
+				 #{ zhjIndustry,jdbcType= VARCHAR }
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.zhj.model.Zhj">
+		select
+		z.ID,
+		z.NAME,
+		z.TYPE,
+		z.ZONE,
+		z.STATUS,
+		z.CARD_NUM,
+		z.TXLEVEL,
+		z.BROCAST_ADD,
+		z.REMARK,
+		z.FREQUENCY,
+		z.ENCRYPTFLAG,
+		z.NUM_IN_ZONE,
+		z.USERCOUNT,
+		z.ISCURRENT,
+		z.USER_FEATURE,
+		z.TXLENGTH,
+		z.POSITION,
+		z.ZHJAREA,
+		a.area_name as area_name,
+		i.Indust_name as industry_name
+		from zhj as z
+		left join area as a on z.ZHJAREA = a.area_id
+		left join industry as i on z.ZHJINDUSTRY = i.indust_id
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null">
+			AND name like CONCAT('%',#{ name,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zone != null">
+			AND zone =  #{ zone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="status != null">
+			AND status =  #{ status,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardNum != null">
+			OR card_num like CONCAT('%',#{ cardNum,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="txlevel != null">
+			AND txlevel =  #{ txlevel,jdbcType= VARCHAR }
+		  </if>
+		  <if test="brocastAdd != null">
+			AND brocast_add =  #{ brocastAdd,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="frequency != null">
+			AND frequency =  #{ frequency,jdbcType= VARCHAR }
+		  </if>
+		  <if test="encryptflag != null">
+			AND encryptflag =  #{ encryptflag,jdbcType= VARCHAR }
+		  </if>
+		  <if test="numInZone != null">
+			AND num_in_zone =  #{ numInZone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="usercount != null">
+			AND usercount =  #{ usercount,jdbcType= VARCHAR }
+		  </if>
+		  <if test="iscurrent != null">
+			AND iscurrent =  #{ iscurrent,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userFeature != null">
+			AND user_feature =  #{ userFeature,jdbcType= VARCHAR }
+		  </if>
+		  <if test="txlength != null">
+			AND txlength =  #{ txlength,jdbcType= VARCHAR }
+		  </if>
+		  <if test="position != null">
+			AND position =  #{ position,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjArea != null">
+			AND zhjarea =  #{ zhjArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjIndustry != null">
+			AND zhjindustry =  #{ zhjIndustry,jdbcType= VARCHAR }
+		  </if>
+		  <if test="start != null and max != null">
+			limit    #{start},   #{max}
+		   </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.zhj.model.Zhj">
+		select
+		count(1)
+		from zhj
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null">
+			AND name =  #{ name,jdbcType= VARCHAR }
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zone != null">
+			AND zone =  #{ zone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="status != null">
+			AND status =  #{ status,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardNum != null">
+			AND card_num =  #{ cardNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="txlevel != null">
+			AND txlevel =  #{ txlevel,jdbcType= VARCHAR }
+		  </if>
+		  <if test="brocastAdd != null">
+			AND brocast_add =  #{ brocastAdd,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="frequency != null">
+			AND frequency =  #{ frequency,jdbcType= VARCHAR }
+		  </if>
+		  <if test="encryptflag != null">
+			AND encryptflag =  #{ encryptflag,jdbcType= VARCHAR }
+		  </if>
+		  <if test="numInZone != null">
+			AND num_in_zone =  #{ numInZone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="usercount != null">
+			AND usercount =  #{ usercount,jdbcType= VARCHAR }
+		  </if>
+		  <if test="iscurrent != null">
+			AND iscurrent =  #{ iscurrent,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userFeature != null">
+			AND user_feature =  #{ userFeature,jdbcType= VARCHAR }
+		  </if>
+		  <if test="txlength != null">
+			AND txlength =  #{ txlength,jdbcType= VARCHAR }
+		  </if>
+		  <if test="position != null">
+			AND position =  #{ position,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjArea != null">
+			AND zhjarea =  #{ zhjArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjIndustry != null">
+			AND zhjindustry =  #{ zhjIndustry,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.zhj.model.Zhj">
+		<if test="id !=null">
+			update zhj
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 name =  #{ name,jdbcType= VARCHAR },
+     			 type =  #{ type,jdbcType= VARCHAR },
+     			 zone =  #{ zone,jdbcType= VARCHAR },
+     			 status =  #{ status,jdbcType= VARCHAR },
+     			 card_num =  #{ cardNum,jdbcType= VARCHAR },
+     			 txlevel =  #{ txlevel,jdbcType= VARCHAR },
+     			 brocast_add =  #{ brocastAdd,jdbcType= VARCHAR },
+     			 remark =  #{ remark,jdbcType= VARCHAR },
+     			 frequency =  #{ frequency,jdbcType= VARCHAR },
+     			 encryptflag =  #{ encryptflag,jdbcType= VARCHAR },
+     			 num_in_zone =  #{ numInZone,jdbcType= VARCHAR },
+     			 usercount =  #{ usercount,jdbcType= VARCHAR },
+     			 iscurrent =  #{ iscurrent,jdbcType= VARCHAR },
+     			 user_feature =  #{ userFeature,jdbcType= VARCHAR },
+     			 txlength =  #{ txlength,jdbcType= VARCHAR },
+     			 position =  #{ position,jdbcType= VARCHAR },
+     			 zhjarea =  #{ zhjArea,jdbcType= VARCHAR },
+     			 zhjindustry =  #{ zhjIndustry,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+	
+	<!-- 普通用户查询下属指挥机 -->
+	 <select id="selectZhjByCommonUser" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.zhj.model.Zhj">
+		select
+		z.ID,
+		z.NAME,
+		z.TYPE,
+		z.ZONE,
+		z.STATUS,
+		z.CARD_NUM,
+		z.TXLEVEL,
+		z.BROCAST_ADD,
+		z.REMARK,
+		z.FREQUENCY,
+		z.ENCRYPTFLAG,
+		z.NUM_IN_ZONE,
+		z.USERCOUNT,
+		z.ISCURRENT,
+		z.ZHJAREA,
+		z.USER_FEATURE,
+		z.TXLENGTH,
+		z.POSITION,
+		a.area_name as area_name,
+		i.Indust_name as industry_name
+		from zhj as z
+		left join area as a on z.ZHJAREA = a.area_id
+		left join industry as i on z.ZHJINDUSTRY = i.indust_id
+		where 1=1
+		  <if test="zhj.id != null">
+			AND id =  #{ zhj.id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.type != null">
+			AND type =  #{ zhj.type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.zone != null">
+			AND zone =  #{ zhj.zone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.status != null">
+			AND status =  #{ zhj.status,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.txlevel != null">
+			AND txlevel =  #{ zhj.txlevel,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.brocastAdd != null">
+			AND brocast_add =  #{ zhj.brocastAdd,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.remark != null">
+			AND remark =  #{ zhj.remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.frequency != null">
+			AND frequency =  #{ zhj.frequency,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.encryptflag != null">
+			AND encryptflag =  #{ zhj.encryptflag,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.numInZone != null">
+			AND num_in_zone =  #{ zhj.numInZone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.usercount != null">
+			AND usercount =  #{ zhj.usercount,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.iscurrent != null">
+			AND iscurrent =  #{ zhj.iscurrent,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.userFeature != null">
+			AND user_feature =  #{ zhj.userFeature,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.txlength != null">
+			AND txlength =  #{ zhj.txlength,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.position != null">
+			AND position =  #{ zhj.position,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhj.zhjIndustry != null">
+			AND zhjindustry =  #{ zhj.zhjIndustry,jdbcType= VARCHAR }
+		  </if>
+		   and  FIND_IN_SET(ZHJAREA,(#{areaIdList ,jdbcType=VARCHAR}))
+		  <if test="zhj.name != null and zhj.name !=''">
+			AND (name like CONCAT('%',#{ zhj.name,jdbcType= VARCHAR },'%')
+		  </if>
+		   <if test="zhj.cardNum != null and zhj.cardNum !=''">
+			OR card_num like CONCAT('%',#{ zhj.cardNum,jdbcType= VARCHAR },'%'))
+		  </if>
+	</select>
+	
+		<!-- 根据区域id集合来遍历查找下属终端 -->
+  	<select id="selectZhjByAreaIds" resultType="java.lang.Long"
+		parameterType="java.util.List">
+		select
+		count(*)
+		from zhj
+		where ZHJAREA in
+    		<foreach collection="list" item="areaId" index="index" open="(" close=")" separator=",">
+             #{ areaId,jdbcType=VARCHAR}
+   			 </foreach>
+	</select>
+	
+	
+	
+  
+</mapper>

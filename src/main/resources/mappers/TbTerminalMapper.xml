@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuiji.dao.TbTerminalMapper">
+  <resultMap id="BaseResultMap" type="com.zhihuiji.model.TbTerminal">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="terminalName" jdbcType="VARCHAR" property="terminalName" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="cardNum" jdbcType="VARCHAR" property="cardNum" />
+    <result column="txLevel" jdbcType="INTEGER" property="txLevel" />
+    <result column="brocastAddress" jdbcType="VARCHAR" property="brocastAddress" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="frequency" jdbcType="INTEGER" property="frequency" />
+    <result column="zhjNum" jdbcType="VARCHAR" property="zhjNum" />
+    <result column="txLength" jdbcType="INTEGER" property="txLength" />
+    <result column="positiomState" jdbcType="INTEGER" property="positiomState" />
+    <result column="createDate" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="positionId" jdbcType="VARCHAR" property="positionId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, terminalName, type, status, cardNum, txLevel, brocastAddress, remark, frequency, 
+    zhjNum, txLength, positiomState, createDate, positionId
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_terminal
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_terminal
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zhihuiji.model.TbTerminal">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_terminal (terminalName, type, status, 
+      cardNum, txLevel, brocastAddress, 
+      remark, frequency, zhjNum, 
+      txLength, positiomState, createDate, 
+      positionId)
+    values (#{terminalName,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{cardNum,jdbcType=VARCHAR}, #{txLevel,jdbcType=INTEGER}, #{brocastAddress,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{frequency,jdbcType=INTEGER}, #{zhjNum,jdbcType=VARCHAR}, 
+      #{txLength,jdbcType=INTEGER}, #{positiomState,jdbcType=INTEGER}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{positionId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhihuiji.model.TbTerminal">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_terminal
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="terminalName != null">
+        terminalName,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="cardNum != null">
+        cardNum,
+      </if>
+      <if test="txLevel != null">
+        txLevel,
+      </if>
+      <if test="brocastAddress != null">
+        brocastAddress,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="frequency != null">
+        frequency,
+      </if>
+      <if test="zhjNum != null">
+        zhjNum,
+      </if>
+      <if test="txLength != null">
+        txLength,
+      </if>
+      <if test="positiomState != null">
+        positiomState,
+      </if>
+      <if test="createDate != null">
+        createDate,
+      </if>
+      <if test="positionId != null">
+        positionId,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="terminalName != null">
+        #{terminalName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="cardNum != null">
+        #{cardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="txLevel != null">
+        #{txLevel,jdbcType=INTEGER},
+      </if>
+      <if test="brocastAddress != null">
+        #{brocastAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="frequency != null">
+        #{frequency,jdbcType=INTEGER},
+      </if>
+      <if test="zhjNum != null">
+        #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="txLength != null">
+        #{txLength,jdbcType=INTEGER},
+      </if>
+      <if test="positiomState != null">
+        #{positiomState,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="positionId != null">
+        #{positionId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhihuiji.model.TbTerminal">
+    update tb_terminal
+    <set>
+      <if test="terminalName != null">
+        terminalName = #{terminalName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="cardNum != null">
+        cardNum = #{cardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="txLevel != null">
+        txLevel = #{txLevel,jdbcType=INTEGER},
+      </if>
+      <if test="brocastAddress != null">
+        brocastAddress = #{brocastAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="frequency != null">
+        frequency = #{frequency,jdbcType=INTEGER},
+      </if>
+      <if test="zhjNum != null">
+        zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="txLength != null">
+        txLength = #{txLength,jdbcType=INTEGER},
+      </if>
+      <if test="positiomState != null">
+        positiomState = #{positiomState,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null">
+        createDate = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="positionId != null">
+        positionId = #{positionId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhihuiji.model.TbTerminal">
+    update tb_terminal
+    set terminalName = #{terminalName,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      cardNum = #{cardNum,jdbcType=VARCHAR},
+      txLevel = #{txLevel,jdbcType=INTEGER},
+      brocastAddress = #{brocastAddress,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      frequency = #{frequency,jdbcType=INTEGER},
+      zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      txLength = #{txLength,jdbcType=INTEGER},
+      positiomState = #{positiomState,jdbcType=INTEGER},
+      createDate = #{createDate,jdbcType=TIMESTAMP},
+      positionId = #{positionId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

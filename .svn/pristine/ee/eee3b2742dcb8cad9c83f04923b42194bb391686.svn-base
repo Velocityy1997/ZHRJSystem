@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="expires" content="0">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!-- jquery -->
+<script src="./scripts/jquery-1.9.1.min.js"></script>
+<!-- Map3 -->
+<script src="./scripts/Map.js"></script>
+<link rel="stylesheet" href="./css/Map.css">
+<script language=javascript src='scripts/W.Map.js'></script>
+<link rel='stylesheet' href='css/font-awesome-4.7.0.min.css' />
+
+<link rel='stylesheet' href='css/bootstrap3.min.css' />
+<script language=javascript src='scripts/popper.min.js'></script>
+<script language=javascript src='scripts/bootstrap3.min.js'></script>
+<!-- Leaflet -->
+<link rel='stylesheet' href='css/leaflet.css' />
+<script language=javascript src='scripts/leaflet.js'></script>
+<!-- SearchBar -->
+<link rel='stylesheet' href='css/SearchBar.css' />
+<script language=javascript src='scripts/SearchBar.js'></script>
+<!-- PostionBar -->
+<link rel='stylesheet' href='css/PostionBar.css' />
+<script language=javascript src='scripts/PostionBar.js'></script>
+<!-- NavBar -->
+<link rel='stylesheet' href='css/NavBar.css' />
+<script language=javascript src='scripts/NavBar.js'></script>
+<!-- Measure -->
+<link rel='stylesheet' href='css/leaflet-measure.css' />
+<script language=javascript src='scripts/leaflet-measure.js'></script>
+<!-- Ruler -->
+<link rel='stylesheet' href='css/leaflet-ruler.css' />
+<script language=javascript src='scripts/leaflet-ruler.js'></script>
+<!-- MousePosition -->
+<link rel='stylesheet' href='css/L.Control.MousePosition.css' />
+<script language=javascript src='scripts/L.Control.MousePosition.js'></script>
+<!-- MiniMap -->
+<link rel='stylesheet' href='css/Control.MiniMap.min.css' />
+<script language=javascript src='scripts/Control.MiniMap.min.js'></script>
+<!-- MarkerCluster -->
+<link rel='stylesheet' href='css/MarkerCluster.css' />
+<link rel='stylesheet' href='css/MarkerCluster.Default.css' />
+<script language=javascript src='scripts/leaflet.markercluster.js'></script>
+<!-- routing -->
+<link rel='stylesheet' href='css/leaflet-routing-machine.css' />
+<script language=javascript src='scripts/leaflet-routing-machine.js'></script>
+<!-- Draw -->
+<link rel='stylesheet' href='css/leaflet.draw-src.css' />
+<script language=javascript src='scripts/leaflet.draw-src.js'></script>
+<!-- easybutton -->
+<link rel='stylesheet' href='css/easy-button.css' />
+<script language=javascript src='scripts/easy-button.js'></script>
+<!-- level -->
+<link rel='stylesheet' href='css/LevelControl.css' />
+<script language=javascript src='scripts/LevelControl.js'></script>
+<!-- FenceBar -->
+<link rel='stylesheet' href='css/Fence.css' />
+<script language=javascript src='scripts/Fence.js'></script>
+<!-- datapicker -->
+
+<!-- notify -->
+<script language=javascript src='scripts/bootstrap-notify.min.js'></script>
+<!-- tags -->
+<link rel='stylesheet' href='css/bootstrap-tagsinput.css' />
+<script language=javascript src='scripts/bootstrap-tagsinput.js'></script>
+<!-- jquery ui -->
+<link rel='stylesheet' href='css/jquery-ui.min.css' />
+<script language=javascript src='scripts/jquery-ui.min.js'></script>
+<!-- route -->
+<link rel='stylesheet' href='css/RouteBar.css' />
+<script language=javascript src='scripts/RouteBar.js'></script>
+<script src="plugins/js/base.js"></script>
+<title>中心地图v2.0</title>
+</head>
+<body>
+<div id="mymap" style="z-index:0">
+</div>
+</body>
+</html>

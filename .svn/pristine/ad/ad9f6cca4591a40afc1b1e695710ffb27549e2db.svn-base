@@ -1,0 +1,227 @@
+function Refresher(internal, type) {
+
+	var internalProcess = null;
+	this.internal = internal;
+	this.start = function() {
+
+		if (type == "stateBarRefresh") {
+			internalProcess = setInterval(this.stateBarRefresh, internal);
+		} else if (type == "taskRefresh") {
+			internalProcess = setInterval(this.taskRefresh, internal);
+		} else if (type == "unreadSmsRefresh") {
+			internalProcess = setInterval(this.unreadSmsRefresh, internal);
+		} else if (type == "monitorTableRefresh") {
+			internalProcess = setInterval(this.monitorTableRefresh, internal);
+		} else if (type == "urgencySmsRefresh") {
+			internalProcess = setInterval(this.urgencySmsRefresh, internal);
+		} else if (type == "userLoginRefresh") {
+			internalProcess = setInterval(this.userLoginRefresh, internal);
+		} else if (type == "realTimeHistoryTask") {
+			internalProcess = setInterval(this.realTimeHistoryTask, internal);
+		} else if (type == "finishHistoryTask") {
+			internalProcess = setInterval(this.finishHistoryTask, internal);
+		}
+	};
+	
+	
+
+	/*
+	 * 轮询完成的任务
+	 */
+	this.finishHistoryTask = function() {
+		
+		getFinishHistoryTask();
+	};
+	
+
+	
+	
+	
+	function getFinishHistoryTask(){
+		$.ajax({
+			type : "POST",
+			async : false,
+			url : "getFinishTask.action",
+			success : function(date) {
+				var message=date.message;
+				if (message != null) {
+
+					$.messager.show({
+                		title:'提示',
+                		height:150,
+                		msg:message,
+                		timeout:3000,
+                		showType:'slide'
+                	}); 
+					
+					if (date.status == 103) { // 本机定位
+					
+						getZhjLocation();
+
+					} 				                
+				}
+			},
+		});
+	}
+	
+	this.stop = function() {
+		if (internalProcess != null) {
+			clearTimeout(internalProcess);
+		}
+	};
+
+	
+
+	// 检测通信后台是否运行
+	this.runMonitorRefresh = function() {
+	};
+	// 刷新状态栏(电量，北斗信号，北斗时间)
+	this.stateBarRefresh = function() {		
+		
+		$.ajax({		
+			url:'/ZHRJSystem/user/getUserInfo',
+			type:'POST',	
+			async:false,
+			success : function(date) {
+				if (date.data == null) {
+					showTipConfig($("#errorInfo"), date.message, function() {
+						window.location = "index.html";
+					});
+				}
+			},
+			complete:function(XMLHttpRequest){
+				if(XMLHttpRequest.status == 0)
+				{
+					window.location.href="index.html";
+				}			
+			}
+		});	
+		$.getJSON(
+			"/ZHRJSystem/baudInfo/signal",
+			function(result) {
+				// 找出状态栏：
+				if(document.getElementById('iframebottom').contentWindow.
+				document.getElementById('ri').contentWindow.
+				document.getElementById('topFrame') != null) {
+					var topbar = document.getElementById('iframebottom').contentWindow.
+					document.getElementById('ri').contentWindow.
+					document.getElementById('topFrame').contentWindow;
+					// 清空-组织-填充数据；
+					
+					var topcontent = "电量：" + result.batteryStatus+"    信号："+result.baudsInfo;								
+					topbar.document.getElementById('battery').innerText  = topcontent;
+														   	
+				}
+				 document.getElementById('date').innerText  = result.date;
+				 document.getElementById('time').innerText  = result.time;
+			});
+	};
+	// 刷新待执行信息和最新信息
+	this.taskRefresh = function() {		
+		
+		document.getElementById('iframebottom').contentWindow.
+		document.getElementById('ri').contentWindow.document.getElementById('bottomFrame').
+		contentWindow.location.reload(true);
+		document.getElementById('iframebottom').contentWindow.
+		document.getElementById('ri').contentWindow.document.getElementById('bottomFrame').
+		contentWindow.location.reload(true);
+    	
+	};
+
+	
+	this.monitorTableRefresh = function() {	
+		realTimeInfo();
+		getFinishHistoryTask();
+	};
+
+	var currentNum = 0;
+	
+	this.urgencySmsRefresh = function() {		
+		var content = "";
+		var height = $("#frame_content")[0].clientHeight;
+		height = height - 65;
+		url = "/BAISTMonitor/getUnReadMsgNum.action";
+		$.getJSON(
+		url,
+		function(result) {
+			content += "</br><a href='#' onclick='showUnreadUrgencySms()' style='color:#FF0000'>您有"
+					+ result.status + "条短信未读!</a>";
+			if (result.status > currentNum) {
+				$("#myTune")
+						.html(
+								"<audio autoplay><source src=\"newmessage.mp3\" hidden=\"true\"></audio>");
+				currentNum = result.status;
+			}
+
+			$("#urgencySms").html(content);
+			$("#urgencySms").dialog({
+				width : 210,
+				height : 120,
+				close : function(event, ui) {
+					$("#urgencySms").fadeOut(700);
+				},
+				modal : false,
+				title : "提示信息",
+				position : [ 10, height ]
+			});
+			$("#urgencySms").dialog('recover');
+			if (result.status == 0) {
+				currentNum = 0;
+				$("#urgencySms").dialog('minimize');
+			} else {
+				$("#urgencySms").dialog('recover');
+			}
+
+			if(result.message == "您已被上级管理员修改权限，请重新登录！"){
+				showTipConfig($("#errorInfo"), result.message, function() {
+					//window.location = "login.html";
+					window.location.href="login.html";
+				});
+			}
+			
+		});
+	};
+	// 用户登录状态监控
+	this.userLoginRefresh = function() {
+		// //url = "/XJJYJMonitor/changeUserLoginTime.action";
+		// $.ajax({
+		// type : "POST",
+		// url : "/BAISTMonitor/changeUserLoginTime.action",
+		// data:"",
+		// dataType : "json",
+		// success : function(data) {
+		//				
+		//				
+		//					
+		// },
+		// error : function(data){
+		// }
+		// });
+		//
+	};
+	function showTipConfig(div, message, ok_fun) {
+		var mydiv = arguments[0];
+		var msg = arguments[1];
+		var okfun = arguments[2];
+		$(mydiv).html("<left></br>" + msg + "</left>");
+		$(mydiv).dialog({
+			modal : true,
+			height : 210,
+			width : 350,
+			title : "提示",
+			close : function(event, ui) {
+				$(this).dialog("close");
+				okfun();
+			},
+			resizable : false,
+			buttons : {
+				"确定" : function() {
+					$(this).dialog("close");
+					okfun();
+				}
+			}
+		}).show();
+
+	}
+	;
+}

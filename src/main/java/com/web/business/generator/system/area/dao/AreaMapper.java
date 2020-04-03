@@ -1,0 +1,187 @@
+package com.web.business.generator.system.area.dao;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.web.business.generator.system.area.model.Area;
+
+@Mapper
+public interface AreaMapper {
+
+	/*****
+	 * 根据主键查询
+	 ****/
+	Area selectByPrimaryKey(String areaId);
+
+	
+	/*****
+	 * 根据主键查询
+	 ****/
+	Area selectByAreaId(String id);
+	
+	/****
+	 * 根据主键删除
+	 ****/
+	int deleteByPrimaryKey(String areaId);
+
+	/****
+	 * 根据主键批量删除
+	 ****/
+	int deleteBatchByPrimaryKey(List<String> list);
+
+	/****
+	 * 新增
+	 ****/
+	int insertSelective(Area record);
+
+	/****
+	 * 根据属性分页查询
+	 ****/
+	List<Area> selectByPropertyByPage(Area record);
+
+	/****
+	 * 根据主键更新记录
+	 ****/
+	int updateByPrimaryKeySelective(Area record);
+
+	/**
+	 * 分页总数
+	 * 
+	 * @param record
+	 * @return
+	 */
+	int selectCountByProperty(Area record);
+
+	/**
+	 * 查询所有的区域
+	 * 
+	 * @return
+	 */
+	List<Area> selectAll();
+
+	/*****
+	 * 根据父id递归查找子节点的id
+	 ****/
+	List<String> selectSonAreaIdsById(String parentid);
+
+	/*****
+	 * 根据父id递归查找子节点
+	 ****/
+	List<Area> selectById(String parentid);
+
+	/**
+	 * \ 根据父级id查询父级区域名称
+	 * 
+	 * @param parentid
+	 * @return
+	 */
+	String selectParentNameById(String parentid);
+
+	/**
+	 * 查询所有的省份信息
+	 * 
+	 * @return
+	 */
+	List<Area> selectAllProvince();
+
+	/**
+	 * 根据省查询所有市信息
+	 * 
+	 * @return
+	 */
+	List<Area> selectAllCity(String provinceId);
+
+	/**
+	 * 根据市查询所有下属区县信息
+	 * 
+	 * @return
+	 */
+	List<Area> selectAllZone(String cityId);
+
+	/**
+	 * 查上级省市信息，封装在area类中
+	 * 
+	 * @param areaId
+	 * @return
+	 */
+	Area selectParentAreaInfoById(String areaId);
+
+	/**
+	 * 根据区域名来查询是否已经存在区域
+	 * 
+	 * @param name
+	 * @return
+	 */
+	Area selectAreaByName(String name);
+
+	/**
+	 * 根据区域名来查询是否已经存在区域
+	 * @param name
+	 * @return
+	 */
+	
+	List<Area> selectAreaName(String areaName);
+	
+	
+	List<Area> selectByName(String areaName);
+	
+	/**
+	 * 根据父id查儿子id 
+	 * 
+	 * @return
+	 */
+	List<String> selectSonIdsByParentId(String parentid);
+
+	
+	/**
+	 * 根据父id查儿子id集合
+	 * 
+	 * @return
+	 */
+	List<String> selectSonIdListByParentId(String parentid);
+
+	/**
+	 * 根据区域name 模糊查询相关areaId
+	 * @param areaName
+	 * @return
+	 */
+	List<String> selectByIds(String areaName);
+	
+	
+	/**
+	 * 根据父id及区域名称查儿子id集合
+	 * 
+	 * @return
+	 */
+	List<String> selectSonIdsByParentIdAndName(@Param("parentid")String parentid,@Param("areaName")String areaName );
+
+	
+	/**
+	 * 根据区域name 模糊查询相关areaId
+	 * @param areaName
+	 * @return
+	 */
+	List<String> selectBySonIdsByName(String areaName);
+	
+	/**
+	 * 根据id集合查找区域
+	 * 
+	 * @return
+	 */
+	List<Area> selectAreaByIds(List<String> ids);
+	
+	
+	List<Area> selectAreaByPIds(List<String> ids);
+	
+	/**查所有区域id 
+	 * @param areaName
+	 * @return
+	 */
+	List<String> selectAllAreaIds();
+	
+	
+	
+	
+	
+}

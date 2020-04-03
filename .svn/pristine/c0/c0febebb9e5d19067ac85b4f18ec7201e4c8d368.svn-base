@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.comm.historyTask.dao.HistoryTaskMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.comm.historyTask.model.HistoryTask" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="VARCHAR" />
+    <result column="end_time" property="endTime" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="zhj_num" property="zhjNum" jdbcType="VARCHAR" />
+    <result column="sender" property="sender" jdbcType="VARCHAR" />
+    <result column="receiver" property="receiver" jdbcType="VARCHAR" />
+    <result column="send_times" property="sendTimes" jdbcType="VARCHAR" />
+    <result column="send_type" property="sendType" jdbcType="VARCHAR" />
+    <result column="user_ip" property="userIp" jdbcType="VARCHAR" />
+    <result column="success" property="success" jdbcType="VARCHAR" />
+    <result column="record_state" property="recordState" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	type,
+     	content,
+     	description,
+     	start_time,
+     	end_time,
+     	user_name,
+     	zhj_num,
+     	sender,
+     	receiver,
+     	send_times,
+     	send_type,
+     	user_ip,
+     	success,
+     	record_state
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from history_task 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from history_task 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteAll" parameterType="java.lang.String" >
+    delete
+		
+    from history_task  
+   
+  </delete>
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from history_task
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.comm.historyTask.model.HistoryTask">
+		insert into history_task
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="content != null">
+				content,
+			</if>
+			<if test="description != null">
+				description,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="zhjNum != null">
+				zhj_num,
+			</if>
+			<if test="sender != null">
+				sender,
+			</if>
+			<if test="receiver != null">
+				receiver,
+			</if>
+			<if test="sendTimes != null">
+				send_times,
+			</if>
+			<if test="sendType != null">
+				send_type,
+			</if>
+			<if test="userIp != null">
+				user_ip,
+			</if>
+			<if test="success != null">
+				success,
+			</if>
+			<if test="recordState != null">
+				record_state,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="type != null">
+				 #{ type,jdbcType= VARCHAR },
+			</if>
+			<if test="content != null">
+				 #{ content,jdbcType= VARCHAR },
+			</if>
+			<if test="description != null">
+				 #{ description,jdbcType= VARCHAR },
+			</if>
+			<if test="startTime != null">
+				 #{ startTime,jdbcType= VARCHAR },
+			</if>
+			<if test="endTime != null">
+				 #{ endTime,jdbcType= VARCHAR },
+			</if>
+			<if test="userName != null">
+				 #{ userName,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjNum != null">
+				 #{ zhjNum,jdbcType= VARCHAR },
+			</if>
+			<if test="sender != null">
+				 #{ sender,jdbcType= VARCHAR },
+			</if>
+			<if test="receiver != null">
+				 #{ receiver,jdbcType= VARCHAR },
+			</if>
+			<if test="sendTimes != null">
+				 #{ sendTimes,jdbcType= VARCHAR },
+			</if>
+			<if test="sendType != null">
+				 #{ sendType,jdbcType= VARCHAR },
+			</if>
+			<if test="userIp != null">
+				 #{ userIp,jdbcType= VARCHAR },
+			</if>
+			<if test="success != null">
+				 #{ success,jdbcType= VARCHAR },
+			</if>
+			<if test="recordState != null">
+				 #{ recordState,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.comm.historyTask.model.HistoryTask">
+		select
+		<include refid="Base_Column_List" />
+		from history_task
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="type != null and type != ''" >
+			AND type = #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="description != null">
+			AND description =  #{ description,jdbcType= VARCHAR }
+		  </if>
+		  
+		  <if test="startTime !=null ">
+         	<![CDATA[ and start_time  >=  #{startTime}  ]]>
+    	  </if>
+    	  
+    	  <if test="endTime !=null ">
+         	<![CDATA[ and end_time  <=  #{endTime}  ]]>
+    	  </if>
+    	  
+		  <!-- <if test="startTime != null">
+			AND start_time   = #{ startTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="endTime != null">
+			AND end_time  = #{ endTime,jdbcType= VARCHAR }
+		  </if> -->
+		  <if test="userName != null">
+			AND  user_name  like  CONCAT('%',#{ userName,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null">
+			AND sender =  #{ sender,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiver != null">
+			AND receiver =  #{ receiver,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sendTimes != null">
+			AND send_times =  #{ sendTimes,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sendType != null">
+			AND send_type =  #{ sendType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="success != null">
+			AND success =  #{ success,jdbcType= VARCHAR }
+		  </if>
+		  <if test="recordState != null">
+			AND record_state =  #{ recordState,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY start_time desc
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.comm.historyTask.model.HistoryTask">
+		select
+		count(1)
+		from history_task
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="description != null">
+			AND description =  #{ description,jdbcType= VARCHAR }
+		  </if>
+		  <if test="startTime != null">
+			AND start_time =  #{ startTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="endTime != null">
+			AND end_time =  #{ endTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userName != null">
+			AND user_name =  #{ userName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null">
+			AND sender =  #{ sender,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiver != null">
+			AND receiver =  #{ receiver,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sendTimes != null">
+			AND send_times =  #{ sendTimes,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sendType != null">
+			AND send_type =  #{ sendType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="success != null">
+			AND success =  #{ success,jdbcType= VARCHAR }
+		  </if>
+		  <if test="recordState != null">
+			AND record_state =  #{ recordState,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.comm.historyTask.model.HistoryTask">
+		<if test="id !=null">
+			update history_task
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 type =  #{ type,jdbcType= VARCHAR },
+     			 content =  #{ content,jdbcType= VARCHAR },
+     			 description =  #{ description,jdbcType= VARCHAR },
+     			 start_time =  #{ startTime,jdbcType= VARCHAR },
+     			 end_time =  #{ endTime,jdbcType= VARCHAR },
+     			 user_name =  #{ userName,jdbcType= VARCHAR },
+     			 zhj_num =  #{ zhjNum,jdbcType= VARCHAR },
+     			 sender =  #{ sender,jdbcType= VARCHAR },
+     			 receiver =  #{ receiver,jdbcType= VARCHAR },
+     			 send_times =  #{ sendTimes,jdbcType= VARCHAR },
+     			 send_type =  #{ sendType,jdbcType= VARCHAR },
+     			 user_ip =  #{ userIp,jdbcType= VARCHAR },
+     			 success =  #{ success,jdbcType= VARCHAR },
+     			 record_state =  #{ recordState,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+	
+	
+	<!--获取未处理  -->
+	
+	<select id="findUnProcessedTask" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from history_task 
+    where  record_state != 2
+  </select>
+  
+  
+  <insert id="insertData" parameterType="com.web.business.generator.comm.historyTask.model.HistoryTask">
+  	
+  </insert>
+  
+</mapper>

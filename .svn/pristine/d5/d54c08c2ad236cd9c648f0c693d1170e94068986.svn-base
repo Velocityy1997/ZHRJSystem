@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>待执行任务</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<!-- basic styles -->
+		<link href="plugins/assets/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="plugins/assets/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/jquery-ui-1.10.3.full.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/datepicker.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ui.jqgrid.css" />
+
+		<!-- fonts -->
+		<!-- ace styles -->
+		<link rel="stylesheet" href="plugins/assets/css/ace.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-rtl.min.css" />
+		<link rel="stylesheet" href="plugins/assets/css/ace-skins.min.css" />
+		
+		<!-- ztree样式 -->
+		<link rel="stylesheet" href="plugins/assets/css/metro.css" />
+		
+		<!-- toast.css -->
+		<link rel="stylesheet" href="plugins/assets/css/style.css">
+
+		<script type="text/javascript" src="plugins/assets/js/jquery-1.10.2.min.js"></script> 
+		<script type="text/javascript" src="plugins/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="plugins/assets/js/jquery.form.js"></script>
+		<script src="plugins/assets/js/ui.js"></script>
+		<script src="plugins/js/bootbox.js"></script>
+		<style>
+.ui-jqgrid tr.jqgrow td {
+  white-space: normal !important; 
+ }
+ .tab-pane{
+ 	display: none;
+ }
+ .tab-pane.active{
+ 	display: block;
+ }
+.widget-toolbar{
+	float: left;
+}
+.ui-jqgrid-view>.ui-jqgrid-titlebar{
+	display: none;
+}
+
+.ui-jqgrid .ui-paging-info {
+    font-weight: normal;
+    height: 19px;
+    margin-top: 3px;
+    margin-right: 22px;
+}
+#grid-table-top-toolbar{
+	    display: none;
+}
+
+.ui-jqgrid .ui-jqgrid-pager{
+	height: 45px;
+}
+</style>		
+		<script>
+			if (document.referrer=='') {
+				window.location.href="/ZHRJSystem/index.html"; 
+			}
+		</script>
+	</head>
+	<body>		
+		<script src="plugins/assets/js/bootstrap.min.js"></script>
+		<script src="plugins/assets/js/typeahead-bs2.min.js"></script>
+
+		<!-- page specific plugin scripts -->
+
+		<script src="plugins/assets/js/date-time/bootstrap-datepicker.min.js"></script>
+		<script src="plugins/assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+		<script src="plugins/assets/js/jqGrid/i18n/grid.locale-en.js"></script>
+		<!-- ace scripts -->
+		<script src="plugins/assets/js/ace-elements.min.js"></script>
+		<script src="plugins/assets/js/ace.min.js"></script>
+		<script src="plugins/assets/js/ace-extra.min.js"></script>	
+		<!-- ztree scripts -->
+		<script src="plugins/assets/js/jquery.ztree.all-3.5.min.js"></script>
+		<script src="business\comm\taskList\taskList.js"></script>
+		<script src="business\comm\taskList\newList.js"></script>
+		<script src="plugins/js/jquery.jqGrid.extensions.topToolbar.js"></script>		
+		<script type="text/javascript">
+		
+			
+
+		</script>
+		
+		<div class="widget-toolbar no-border">
+			<ul class="nav nav-tabs" id="recent-tab">
+				<li class="active">
+					<a data-toggle="tab" href="#task-tab">最新信息</a>
+				</li>
+
+				<li>
+					<a data-toggle="tab" href="#member-tab"> 待执行任务</a>
+				</li>
+
+				<!-- <li>
+					<a data-toggle="tab" href="#comment-tab">Comments</a>
+				</li> -->
+			</ul>
+		</div>
+		
+		
+		<div id="task-tab" class="tab-pane active">
+
+		<div class="page-content">
+				<div class="row">
+					<div class="col-xs-12">
+						<table id="grid-table1"></table>
+						<div id="grid-pager1"></div>
+						<!-- PAGE CONTENT ENDS -->
+					</div><!-- /.col -->
+				</div><!-- /.row -->
+			</div>
+		</div>
+		
+		
+		<div id="member-tab" class="tab-pane">
+			<div class="page-content">
+				<div class="row">
+					<div class="col-xs-12">
+						<table id="grid-table"></table>
+						<div id="grid-pager"></div>
+						<!-- PAGE CONTENT ENDS -->
+					</div><!-- /.col -->
+				</div><!-- /.row -->
+			</div>
+		</div>
+		
+		
+					<!-- <div class="page-content">
+						<div class="row">
+							<div class="col-xs-12">
+								<table id="grid-table"></table>
+								<div id="grid-pager"></div>
+								PAGE CONTENT ENDS
+							</div>/.col
+						</div>/.row
+					</div> -->
+</body>
+</html>

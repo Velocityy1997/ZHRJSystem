@@ -1,0 +1,960 @@
+		    var type = 0;
+			var grid_data = [];			
+			var userId = "";
+			var queryName= "";//查询初始化
+			var queryAera= "";//查询初始化
+			
+			getLoginUser();
+			function getLoginUser() {
+				$.ajax({
+        			type : "POST",
+        			url : "/ZHRJSystem/user/getUserInfo",
+        			dataType : "json",
+        			success : function(result) {      				
+        		    	type = result.data.type;
+        		    	userId = result.data.id;
+        		    	getUserGrid();
+        			},
+        			error : function(result) {
+        				
+        			}
+        		});
+			}
+			
+			/**
+			 从后台读取终端数据，并加载jqjrid表格
+			*/
+		    function getUserGrid() {
+		    	jQuery(function($) {
+					$(window).resize(function(){   
+			        	$("#grid-table").setGridWidth($(window).width());
+			        });
+					
+					var grid_selector = "#grid-table";
+					var pager_selector = "#grid-pager";
+					jQuery(grid_selector).jqGrid({						
+						//扩展配置项,是否开启顶部工具栏
+						topToolbar:true,
+						//扩展配置项,jqGrid顶部工具栏ID,此id必须唯一，在创建顶部工具栏时，将会使用此ID
+						topToolbarId:'grid-table-top-toolbar',
+						url:"/ZHRJSystem/user/list", //这是数据的请求地址 
+						mtype: 'POST',
+						datatype: "json", //将这里改为使用JSON数据
+						postData : {queryName:queryName,
+				  			queryAera,queryAera},
+						ajaxEditOptions: {contentType: 'application/json; charset=utf-8'},
+						height: "100%",
+						colNames:['编号', '用户名', '用户角色' , '所属区域' , '所属行业', '电话','备注','省','市','区/县','省ID','市ID','区/县ID','所属行业ID'],
+						colModel:[
+							{name:'userID', index:'userID', sorttype:"int",  hidden:true},			//, hidden:true
+							{name:'userName', index:'userName', width:100, fixed:true, resize:false, sortable:true, editable: true, searchoptions:{sopt:['cn']}},	//登录名				
+							{name:'userType', index:'userType', width:100, fixed:true, resize:false, sortable:true, editable: false},	//IP地址
+							{name:'areaName', index:'areaName', width:200, fixed:true, resize:false, sortable:true, editable:true},
+							{name:'industryName', index:'industryName', width:150, fixed:true, resize:false, sortable:true, editable:true},
+							{name:'userPhone', index:'userPhone', width:150, fixed:true, resize:false, sortable:true, editable:true},						//操作时间							
+							{name: 'userRemark', index: 'userRemark', width:500, fixed:true, resize:false, sortable:true, editable: true},													
+							{name:'provinceName', index:'provinceName',   hidden:true},	
+							{name:'cityName', index:'cityName',   hidden:true},
+							{name:'zoneName', index:'zoneName',   hidden:true},
+							{name:'provinceId', index:'provinceId',   hidden:true},
+							{name:'cityId', index:'cityId',   hidden:true},
+							{name:'zoneId', index:'zoneId',   hidden:true},
+							{name:'industryId', index:'industryId',   hidden:true}
+							],
+	                                       
+				        rownumbers: true,
+						viewrecords: true,
+						rowNum: 10,
+						rowList: [10,20,50],
+						jsonReader: {  
+							root:"rows", page:"page", total:"total",
+							records:"records", repeatitems:false, id:"userID"
+						},
+						pager: pager_selector,
+						altRows: true,
+						prmNames: {
+							page:"page",
+							rows:"rows",
+							oper:"oper",
+							editoper:"edit",
+							addoper:"add",
+							deloper:"del",
+						},
+																
+						multiselect: true,					
+				        multiboxonly: true,
+						loadComplete : function() {
+							$(grid_selector).closest(".ui-jqgrid-bdiv").css({ 'overflow-y' : 'scroll' });
+							$(grid_selector).closest(".ui-jqgrid-bdiv").css({ 'overflow-x' : 'scroll' });
+							
+							var table = this;
+							setTimeout(function(){
+								styleCheckbox(table);
+								
+								updateActionIcons(table);
+								updatePagerIcons(table);
+								enableTooltips(table);
+							}, 0);
+						},						
+						caption: "用户管理",
+						autowidth: true
+					});
+				
+					//enable search/filter toolbar
+					//jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
+					//switch element when editing inline
+					function aceSwitch( cellvalue, options, cell ) {
+						setTimeout(function(){
+							$(cell) .find('input[type=checkbox]')
+									.wrap('<label class="inline" />')
+								.addClass('ace ace-switch ace-switch-5')
+								.after('<span class="lbl"></span>');
+						}, 0);
+					}
+					//enable datepicker
+					function pickDate( cellvalue, options, cell ) {
+						setTimeout(function(){
+							$(cell) .find('input[type=text]')
+									.datepicker({format:'yyyy-mm-dd' , autoclose:true}); 
+						}, 0);
+					}
+				
+					//navButtons
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar",
+						{ 	//navbar options
+						edit : false,
+						editicon : 'icon-pencil blue',
+						edittitle : '修改',
+						edittext : '修改',
+						add : false,
+						addicon : 'icon-plus-sign purple',
+						addtitle : '新增',
+						addtext : '新增',
+						del : false,
+						delicon : 'icon-trash red',
+						deltext : '删除',
+						deltitle : '删除',
+						search : false,
+						searchicon : 'icon-search orange',
+						refresh : true,
+						refreshicon : 'icon-refresh green',
+						refreshtext : '刷新',
+						view : false,
+						viewicon : 'icon-zoom-in grey',
+					},						
+						{
+							//search form
+							recreateForm: true,
+							afterShowSearch: function(e){
+								var form = $(e[0]);
+								form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
+								style_search_form(form);
+							},
+							afterRedraw: function(){
+								style_search_filters($(this));
+							}
+							,
+							multipleSearch: true,						
+						}
+					)
+					//type=1 管理员新增、修改、删除	
+				if(type == 1)	 {
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+					).navSeparatorAdd("#grid-table-top-toolbar",				//navSeparatorAdd是增加一个|进行按钮分割.
+							{sepclass : "ui-separator",sepcontent: ''}
+					).navButtonAdd("#grid-table-top-toolbar",{						
+						caption:"新增",
+						title:"新增",
+						buttonicon : 'icon-plus-sign purple',			
+						onClickButton:function()
+						{
+							$("#saveUserForm")[0].reset(); //清空form中的数据
+							$("#saveUser").dialog({ 
+								autoOpen: true,
+								height:450, 
+								width: 400,  
+								resizable: false, 
+								modal: true
+							});
+							getIndustyList();//获取行业List
+							getProvince();//获取省市区县LIst
+						}
+						}).navButtonAdd("#grid-table-top-toolbar",{
+							
+							caption:"修改",
+							title:"修改",
+							buttonicon : 'icon-pencil blue',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');					
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} 
+								else if (ids.length > 1){
+									mizhu.toast("只能选择修改一个用户");
+								}
+								else {
+									var rowid = $( "#grid-table" ).getGridParam( "selrow" );
+					             	var rowData = $("#grid-table").jqGrid('getRowData',rowid);			           
+					             	$("#updateUserForm")[0].reset();  //清空form中的数据			               
+					            	$("#updateUser").dialog({ 
+										autoOpen: true,
+										height: 450, 
+										width: 400,  
+										resizable: false, 
+										modal: true
+									});	
+					            	getUpdateProvince();
+					            	getIndustyList();
+					                //数据进行回显
+					            	document.getElementById('uuid1').value=rowData.userID;
+					            	document.getElementById('updateName').value=rowData.userName;
+					            	document.getElementById('updatePhone').value=rowData.userPhone;
+					            	document.getElementById('updateRemark').value=rowData.userRemark;
+					            	var provinceName = rowData.provinceName;
+					            	var provinceId = rowData.provinceId;
+					            	var cityName = rowData.cityName;
+					            	var cityId = rowData.cityId;
+					            	var zoneName =  rowData.zoneName;
+					            	var zoneId =  rowData.zoneId;
+					            	var industryId = rowData.industryId; 				     
+					            	$("#updateProvince").find("option[value="+provinceId+"]").attr("selected",true);
+					            	 getUpdateCity();
+					                $('#updateCity').find('option[value='+cityId+']').attr('selected',true);
+					                getUpdateCounty();
+					                $('#updateCounty').find('option[value='+zoneId+']').attr('selected',true);
+					                $('#updateIndustName').find('option[value='+industryId+']').attr('selected',true);					                          						            	
+								}
+							}
+						}).navButtonAdd("#grid-table-top-toolbar",{
+							caption:"删除",
+							title:"删除",
+							buttonicon : 'icon-trash red',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} 
+								else {
+									for(var i=0; i<ids.length; i++) {
+										if(userId == ids[i]) {
+											mizhu.toast("不能删除当前登录用户");
+											return;
+										}
+									}
+									$("#deleteUserDialog").dialog({ 
+										autoOpen: true,
+										height: 180, 
+										width: 300,  
+										resizable: false, 
+										modal: true
+									});	
+								}
+							}
+						}).navButtonAdd("#grid-table-top-toolbar",{
+							//修改密码
+							caption:"修改密码",
+							title:"修改密码",
+							buttonicon : 'icon-edit blue',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} 										
+								else if (ids.length > 1){
+									mizhu.toast("只能选择修改一个用户");
+								}
+								else {
+									if(userId != ids[0]) {
+										mizhu.toast("只能修改自己的密码");
+										return;
+									}
+									
+									$("#updatePassword").dialog({ 
+										autoOpen: true,
+										height: 200, 
+										width: 400,  
+										resizable: false, 
+										modal: true
+									});	
+								}
+							}
+						}).navButtonAdd("#grid-table-top-toolbar",{
+							//重置密码
+							caption:"重置密码",
+							title:"重置密码",
+							buttonicon : 'icon-cogs purple',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} 
+								else if (ids.length > 1){
+									mizhu.toast("只能选择一条记录");
+								}
+								else {
+									
+									if(userId == ids[0]) {
+										mizhu.toast("管理员只能重置下属用户的密码，不能重置自己的");
+										return;
+									}
+									
+									$.ajax({
+					        			type : "POST",
+					        			url : "/ZHRJSystem/user/initial",
+					        			data : "userId=" + ids[0],
+					        			dataType : "json",
+					        			success : function(result) {      				
+					        		    		mizhu.toast(result.message);				        					
+					        			},
+					        			error : function(result) {
+
+					        				mizhu.toast("重置密码失败");
+					        			}
+					        		});
+								}
+							}
+						})
+						var trtr = ($("#grid-table-top-toolbar").find("table"))[1].getElementsByTagName("tr")[0];		  	
+						trtr.appendChild(document.createElement('td'));
+						var length = trtr.getElementsByTagName("td").length;
+						trtr.getElementsByTagName("td")[length-1].innerHTML = "<input type='text' id='queryName'  placeholder='请输入用户名'   style = 'margin-left: 330px;width:150px;'/>";
+						trtr.appendChild(document.createElement('td'));
+						var length = trtr.getElementsByTagName("td").length;
+						trtr.getElementsByTagName("td")[length-1].innerHTML = "<input type='text' id='queryAera'  placeholder='请输入所属区域'   style = 'margin-left: 30px;;width:150px;'/>";
+						
+						jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+						).navButtonAdd("#grid-table-top-toolbar",{
+								
+							caption:"查询",
+							title:"查询",
+							buttonicon : 'icon-search orange',			
+							onClickButton:function()
+							{
+								var  queryName = document.getElementById('queryName').value;
+								var  queryAera = document.getElementById('queryAera').value;
+								$("#grid-table").jqGrid('setGridParam', {
+							  		datatype : 'json',
+							  		postData : {queryName:queryName,
+							  			queryAera,queryAera},
+							  		page : 1
+							  	}).trigger("reloadGrid");
+							}
+							})					
+				}
+				else {
+					//普通用户 权限
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+					).navSeparatorAdd("#grid-table-top-toolbar",				//navSeparatorAdd是增加一个|进行按钮分割.
+							{sepclass : "ui-separator",sepcontent: ''}
+					).navButtonAdd("#grid-table-top-toolbar",{
+						
+						caption:"修改",
+						title:"修改",
+						buttonicon : 'icon-pencil blue',
+						onClickButton:function()
+						{
+							var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');					
+							if (ids.length == 0){
+								mizhu.toast("请选择记录");
+							} 
+							else if (ids.length > 1){
+								mizhu.toast("只能选择修改一个用户");
+							}
+							else {
+								var rowid = $( "#grid-table" ).getGridParam( "selrow" );
+				             	var rowData = $("#grid-table").jqGrid('getRowData',rowid);			           
+				             	$("#updateUserForm")[0].reset();  //清空form中的数据			               
+				            	$("#updateUser").dialog({ 
+									autoOpen: true,
+									height: 450, 
+									width: 400,  
+									resizable: false, 
+									modal: true
+								});	
+				                //数据进行回显
+				            	getUpdateProvince();
+				            	getIndustyList();
+				                //数据进行回显
+				            	document.getElementById('uuid1').value=rowData.userID;
+				            	document.getElementById('updateName').value=rowData.userName;
+				            	document.getElementById('updatePhone').value=rowData.userPhone;
+				            	document.getElementById('updateRemark').value=rowData.userRemark;
+				            	var provinceName = rowData.provinceName;
+				            	var provinceId = rowData.provinceId;
+				            	var cityName = rowData.cityName;
+				            	var cityId = rowData.cityId;
+				            	var zoneName =  rowData.zoneName;
+				            	var zoneId =  rowData.zoneId;
+				            	var industryId = rowData.industryId; 				     
+				            	$("#updateProvince").find("option[value="+provinceId+"]").attr("selected",true);
+				            	getUpdateCity();
+				                $('#updateCity').find('option[value='+cityId+']').attr('selected',true);
+				                getUpdateCounty();
+				                $('#updateCounty').find('option[value='+zoneId+']').attr('selected',true);
+				                $('#updateIndustName').find('option[value='+industryId+']').attr('selected',true);
+				               
+				            	
+						}
+						}
+					}).navButtonAdd("#grid-table-top-toolbar",{
+							//修改密码
+							caption:"修改密码",
+							title:"修改密码",
+							buttonicon : 'icon-edit blue',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} 										
+								else if (ids.length > 1){
+									mizhu.toast("只能选择修改一个用户");
+								}
+								else {
+									$("#updatePassword").dialog({ 
+										autoOpen: true,
+										height: 200, 
+										width: 400,  
+										resizable: false, 
+										modal: true
+									});	
+								}
+							}
+						})
+						var trtr = ($("#grid-table-top-toolbar").find("table"))[1].getElementsByTagName("tr")[0];		  	
+						trtr.appendChild(document.createElement('td'));
+						var length = trtr.getElementsByTagName("td").length;
+						trtr.getElementsByTagName("td")[length-1].innerHTML = "<input type='text' id='queryName'  placeholder='请输入用户名'   style = 'margin-left: 360px;width:150px;'/>";
+						trtr.appendChild(document.createElement('td'));
+						var length = trtr.getElementsByTagName("td").length;
+						trtr.getElementsByTagName("td")[length-1].innerHTML = "<input type='text' id='queryAera'  placeholder='请输入所属区域'   style = 'margin-left: 30px;;width:150px;'/>";
+						
+						jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+						).navButtonAdd("#grid-table-top-toolbar",{
+								
+							caption:"查询",
+							title:"查询",
+							buttonicon : 'icon-search orange',			
+							onClickButton:function()
+							{
+								var  queryName = document.getElementById('queryName').value;
+								var  queryAera = document.getElementById('queryAera').value;
+								$("#grid-table").jqGrid('setGridParam', {
+							  		datatype : 'json',
+							  		postData : {queryName:queryName,
+							  			queryAera,queryAera},
+							  		page : 1
+							  	}).trigger("reloadGrid");
+							}
+							})		
+				}
+					
+					function style_edit_form(form) {
+						//enable datepicker on "sdate" field and switches for "stock" field
+						form.find('input[name=sdate]').datepicker({format:'yyyy-mm-dd' , autoclose:true})
+							.end().find('input[name=stock]')
+								  .addClass('ace ace-switch ace-switch-5').wrap('<label class="inline" />').after('<span class="lbl"></span>');
+				
+						//update buttons classes
+						var buttons = form.next().find('.EditButton .fm-button');
+						buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
+						buttons.eq(0).addClass('btn-primary').prepend('<i class="icon-ok"></i>');
+						buttons.eq(1).prepend('<i class="icon-remove"></i>')
+						
+						buttons = form.next().find('.navButton a');
+						buttons.find('.ui-icon').remove();
+						buttons.eq(0).append('<i class="icon-chevron-left"></i>');
+						buttons.eq(1).append('<i class="icon-chevron-right"></i>');		
+					}
+				
+					function style_delete_form(form) {
+						var buttons = form.next().find('.EditButton .fm-button');
+						buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
+						buttons.eq(0).addClass('btn-danger').prepend('<i class="icon-trash"></i>');
+						buttons.eq(1).prepend('<i class="icon-remove"></i>');
+					}
+					
+					function style_search_filters(form) {
+						form.find('.delete-rule').val('X');
+						form.find('.add-rule').addClass('btn btn-xs btn-primary');
+						form.find('.add-group').addClass('btn btn-xs btn-success');
+						form.find('.delete-group').addClass('btn btn-xs btn-danger');
+					}
+					function style_search_form(form) {
+						var dialog = form.closest('.ui-jqdialog');
+						var buttons = dialog.find('.EditTable')
+						buttons.find('.EditButton a[id*="_reset"]').addClass('btn btn-sm btn-info').find('.ui-icon').attr('class', 'icon-retweet');
+						buttons.find('.EditButton a[id*="_query"]').addClass('btn btn-sm btn-inverse').find('.ui-icon').attr('class', 'icon-comment-alt');
+						buttons.find('.EditButton a[id*="_search"]').addClass('btn btn-sm btn-purple').find('.ui-icon').attr('class', 'icon-search');
+					}
+					
+					function beforeDeleteCallback(e) {
+						var form = $(e[0]);
+						if(form.data('styled')) return false;
+						
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_delete_form(form);
+						
+						form.data('styled', true);
+					}
+					
+					function beforeEditCallback(e) {
+						var form = $(e[0]);
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_edit_form(form);
+					}
+								
+					function styleCheckbox(table) {
+					
+					}
+				
+					//unlike navButtons icons, action icons in rows seem to be hard-coded
+					//you can change them like this in here if you want
+					function updateActionIcons(table) {
+						
+					}
+					
+					//replace icons with FontAwesome icons like above
+					function updatePagerIcons(table) {
+						var replacement = 
+						{
+							'ui-icon-seek-first' : 'icon-double-angle-left bigger-140',
+							'ui-icon-seek-prev' : 'icon-angle-left bigger-140',
+							'ui-icon-seek-next' : 'icon-angle-right bigger-140',
+							'ui-icon-seek-end' : 'icon-double-angle-right bigger-140'
+						};
+						$('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function(){
+							var icon = $(this);
+							var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+							
+							if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
+						})
+					}
+				
+					function enableTooltips(table) {
+						$('.navtable .ui-pg-button').tooltip({container:'body'});
+						$(table).find('.ui-pg-div').tooltip({container:'body'});
+					}
+					
+				});
+			}
+		    
+		    
+		    	  
+		    
+		    
+		    function checkInfo() {
+		    	var name = $('#username').val();
+		    	
+		    	if(name == null || name == "") {
+		    		
+		    		mizhu.toast("请输入用户名称");
+		    		return false;
+		    	}
+		    	var phone = $('#phone').val();
+		    	if(phone != "") {
+		    		var reg = /^1[3,5,7,8][0-9]{9}$/;	            
+		            if(!reg.test(phone)) {
+		            	mizhu.toast("请输入正确的手机号");
+		            	return false;
+		            }
+		    	}
+		    	
+		    	
+		    	var province = $('#province').val();
+		    	var city = $('#city').val();
+		    	var county = $('#county').val();
+		    	
+		    	
+		    	if(province == null || province == ""){
+		    		mizhu.toast("请选择省份");
+		    		return false;
+		    	}/*else if(city == null || city == ""){
+		    		mizhu.toast("请选择市");
+		    		return false;
+		    	}else if(county == null || county == ""){
+		    		mizhu.toast("请选择区/县");
+		    		return false;
+		    	}*/
+		    	
+		    	var industName = $('#industName').val();
+		    	if(industName == null || industName == ""){
+		    		mizhu.toast("请选择所属行业");
+		    		return false;
+		    	}
+		    	
+		    	/*if(province !="" && province != null  ||  city != null && city != ""  || county != null && county != "" ){
+		    		mizhu.toast("请选择所属区域") 
+		    		return false;
+		    	}else if(province =="" && province == null  ||  city != null && city != ""  || county != null && county != "" ){
+		    		mizhu.toast("请选择省份");
+		    		return false;
+		    	}else if(province !="" && province != null  ||  city == null && city == ""  || county != null && county != "" ){
+		    		mizhu.toast("请选择市");
+		    		return false;
+		    	}else{
+		    		mizhu.toast("请选择区/县");
+		    		return false;
+		    	}*/
+		    	
+	            return true;
+		    }
+		    //修改确认
+		    function checkRule(){
+		    	
+		    	
+		    	var name = $('#updateName').val();
+		    	
+		    	if(name == null || name == "") {
+		    		
+		    		mizhu.toast("请输入用户名称");
+		    		return false;
+		    	}
+		    	var phone = $('#updatePhone').val();
+		    	if(phone != "") {
+		    		var reg = /^1[3,5,7,8][0-9]{9}$/;	            
+		            if(!reg.test(phone)) {
+		            	mizhu.toast("请输入正确的手机号");
+		            	return false;
+		            }
+		    	}
+		    	
+		    	
+		    	
+		    	var province = $('#updateProvince').val();
+		    	var city = $('#updateCity').val();
+		    	var county = $('#updateCounty').val();
+		    	
+		    	
+		    	
+		    	var industName = $('#updateIndustName').val();
+		    	if(industName == null || industName == ""){
+		    		mizhu.toast("请选择所属行业");
+		    		return false;
+		    	}
+		    	
+		    	return true;
+		    }
+		    
+		    
+		    //新增用户
+		    function editUser() {
+		    	var url = "/ZHRJSystem/user/add";//新增的url
+		    	$("#saveUserForm").attr("action",url);
+		        var options={  
+				        type:"post",  //提交方式    
+				        url:url,
+				        success:showResponse,//提交成功的回调函数  
+				        }  
+				$("#saveUserForm").ajaxForm(options); 
+				
+		    }
+		    
+		    function showResponse(responseText, statusText){  
+		    	if(responseText.success){
+		    		
+		    		$('#saveUser').dialog('close');
+		    		mizhu.toast(responseText.message);
+					setTimeout(function() {
+						location.reload();
+					}, 2000); 
+					window.parent.leftFrame.location.reload();
+	             }else{
+	            	 mizhu.toast(responseText.message); 	            	 
+	             }		       
+		    } 
+		    
+		    //更新用户
+		    function updateUser() {
+		    	var url = "/ZHRJSystem/user/edit";//新增的url
+		    	
+		        $("#updateUserForm").attr("action",url);
+		        var options={  
+				        type:"post",  //提交方式    
+				        url:url,
+				        success:updateResponse,//提交成功的回调函数  
+				        }  
+				$("#updateUserForm").ajaxForm(options); 
+				
+		    }
+		    
+		    function updateResponse(responseText, statusText){  
+		    	if(responseText.success){
+		    		
+		    		$('#updateUser').dialog('close');
+		    		mizhu.toast(responseText.message);
+					setTimeout(function() {
+						location.reload();
+					}, 2000); 
+					window.parent.leftFrame.location.reload();
+	             }else{
+	            	 mizhu.toast(responseText.message); 	            	 
+	             }
+		       
+		    }
+		    
+		    
+		    function deleteUser() {
+		    	var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+		    	$.ajax({
+        			type : "POST",
+        			url : "/ZHRJSystem/user/del",
+        			data : "id=" + ids,
+        			dataType : "json",
+        			success : function(result) {      				
+        		    		mizhu.toast(result.message);
+        					setTimeout(function() {
+        						location.reload();
+        					}, 2000); 
+        					window.parent.leftFrame.location.reload();
+        	            
+        			},
+        			error : function(result) {
+
+        				mizhu.toast("删除失败");
+        			}
+        		});
+		    }
+		    		    
+		    
+		    function updatePassword() {
+		    	var password = $('#password').val();
+                var reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{9,12}$/;
+                var password1 = $('#password1').val();
+		    	if(password == null || password == "") {		    		
+		    		mizhu.toast("请输入密码");
+		    	}		    	            
+		    	else if(!reg.test(password)) {
+	            	mizhu.toast("密码是9到12位数字和字母的组合");
+	            }                		    	
+		    	else if(password1 != password) {		    		
+		    		mizhu.toast("两次输入的密码不一样");
+		    	}	
+		    	else {
+		    		var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+			    	var password = $('#password').val();
+			    	var password1 = $('#password1').val();
+			    	$.ajax({
+	        			type : "POST",
+	        			url : "/ZHRJSystem/user/changePwd",
+	        			data : "id=" + ids[0] +"&password="+password+"&password1="+password1,
+	        			dataType : "json",
+	        			success : function(result) {      				
+	        		    		mizhu.toast(result.message); 
+	        		    		$('#updatePassword').dialog('close')
+	        			},
+	        			error : function(result) {
+	        				$('#updatePassword').dialog('close')
+	        				mizhu.toast("修改密码失败");
+	        			}
+	        		});
+		    	}	  
+		    	
+		    }
+		    
+		    
+		    
+		    
+// 获取行业列表
+		    function getIndustyList(){
+		    	$("#industName").empty();
+		    	$("#updateIndustName").empty();
+		    	var options =  '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/industry/industList",
+        			dataType : "json",
+        			success : function(data) {   
+        				var optionName;
+        		    	for(var i=0;i<data.length;i++){
+        		    		optionName = data[i].industName;
+        		    		options +='<option value="'+data[i].industId+'">'+optionName+'</option>';
+        		    	}
+        		    	$("#industName").append(options);
+        		    	$("#updateIndustName").append(options);
+        			},
+        			error : function(industyList) {
+        				alert(industyList);
+        			}
+        		});
+			}
+
+		    
+		    //新增用户选择区域
+		    //获取省
+		    
+		    function getProvince(){
+		    	$("#province").empty();
+		    	var options = '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getAllProvince",
+        			dataType : "json",
+        			success : function(result) {   
+        				var optionName;
+        				if(result.data != null) {
+        		    	for(var i=0;i<result.data.length;i++){
+        		    		optionName = result.data[i].areaName;
+        		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+        		    	}
+        				}
+        		    	$("#province").append(options);
+        		    	
+        			},
+        			error : function(result) {
+        				alert(getProvince);
+        			}
+        		});
+		    }
+		    
+		    
+		    //获取市
+		    function getCity( ){
+		    	$("#city").empty();
+		    	var provinceId = $("#province option:selected").val();
+		    	var options = '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getCitys",
+        			data : "provinceId=" + provinceId,
+        			dataType : "json",
+        			success : function(result) {      				
+        				var optionName;
+        				if(result.data != null) {
+        		    	for(var i=0;i<result.data.length;i++){
+        		    		optionName = result.data[i].areaName;
+        		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+        		    	}
+        				}
+        		    	$("#city").append(options);
+        			},
+        			error : function(result) {
+
+        				alert(getCity);
+        			}
+        		});
+		    	
+		    }
+		    
+		   
+		    //获取区、县
+		    function getCounty(){
+		    	$("#county").empty();
+		    	var cityId =  $("#city option:selected").val();
+		    	var options = '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getAllZone",
+        			data : "cityId=" + cityId,
+        			dataType : "json",
+        			success : function(result) {   
+        				var optionName;
+        				if(result.data != null) {
+        					for(var i=0;i<result.data.length;i++){
+            		    		optionName =result.data[i].areaName;
+            		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+            		    	}
+            		    	
+        				}
+        				$("#county").append(options);
+        		    	
+        			},
+        			error : function(result) {
+        				alert(getCounty);
+        			}
+        		});
+		    }
+		    
+		    
+		    
+	//修改用户选择区域
+		    
+		    function getUpdateProvince(){
+		    	$("#updateProvince").empty();
+		    	var options = '';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getAllProvince",
+        			dataType : "json",
+        			success : function(result) {   
+        				var optionName;
+        		    	for(var i=0;i<result.data.length;i++){
+        		    		optionName = result.data[i].areaName;
+        		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+        		    	}
+        		    	
+        		    	$("#updateProvince").append(options);
+        			},
+        			error : function(result) {
+        				alert(getUpdateProvince);
+        			}
+        		});
+		    }
+		    
+		    
+		    //获取市
+		    function getUpdateCity( ){
+		    	
+		    	
+		    	$("#updateCity").empty();
+		    	var provinceId = $("#updateProvince option:selected").val();
+		    	var options = '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getCitys",
+        			data : "provinceId=" + provinceId,
+        			dataType : "json",
+        			success : function(result) {      				
+        				var optionName;
+        		    	for(var i=0;i<result.data.length;i++){
+        		    		optionName = result.data[i].areaName;
+        		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+        		    	}
+        		    	$("#updateCity").append(options);
+        			},
+        			error : function(result) {
+
+        				alert(getUpdateCity);
+        			}
+        		});
+		    	getUpdateCounty();
+		    }
+		    
+		   
+		    //获取区、县
+		    function getUpdateCounty(){
+		    	
+		    	$("#updateCounty").empty();
+		    	var cityId =  $("#updateCity option:selected").val();
+		    	var options = '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getAllZone",
+        			data : "cityId=" + cityId,
+        			dataType : "json",
+        			success : function(result) {   
+        				var optionName;
+        		    	for(var i=0;i<result.data.length;i++){
+        		    		optionName =result.data[i].areaName;
+        		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+        		    	}
+        		    	$("#updateCounty").append(options);
+        			},
+        			error : function(result) {
+        				alert(getUpdateCounty);
+        			}
+        		});
+		    }
+		    
+	

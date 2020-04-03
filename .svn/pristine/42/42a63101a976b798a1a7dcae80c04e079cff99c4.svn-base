@@ -1,0 +1,195 @@
+package com.web.business.generator.comm.taskList.services.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.web.common.util.spring.PageTool;
+import com.shara.common.util.page.PageUtil;
+import com.web.common.util.spring.PageTool;
+
+import com.web.business.generator.comm.taskList.model.TaskList;
+import com.web.business.generator.comm.taskList.model.TaskListModel;
+import com.web.business.generator.comm.taskList.dao.TaskListMapper;
+import com.web.business.generator.comm.taskList.services.ITaskListService;
+import com.web.business.generator.system.zhj.dao.ZhjMapper;
+import com.web.business.generator.util.AnalysisService;
+import com.web.business.generator.util.task.TaskType;
+
+@Service
+public class TaskListServiceImpl implements ITaskListService {
+	@Resource
+	private TaskListMapper taskListMapper;
+	
+	/**
+	 * 根据主键删除
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Integer deleteByPrimaryKey(String id) throws Exception {
+		int result = -1;
+		result = taskListMapper.deleteByPrimaryKey(id);
+		return result;
+	}
+	
+	/**
+	 * 根据主键批量删除
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public Integer deleteBatchByPrimaryKey(String id) throws Exception{
+		int result = -1;
+		result = taskListMapper.deleteBatchByPrimaryKey(PageUtil.getIdsForList(id));
+		return result;
+	}
+	
+	/**
+	 * 新增
+	 * @param record
+	 * @return
+	 */
+	public Integer insertSelective(TaskList record) throws Exception{
+		int result = -1;
+		result = taskListMapper.insertSelective(record);
+		if(result == 0 && record.getType() == TaskType.BDDW)
+		{
+			AnalysisService.taskIds.add(record.getId());
+		}
+		return result;
+	}
+	
+	/**
+	 * 根据主键查询对象
+	 * @param id
+	 * @return
+	 */
+	public TaskList selectByPrimaryKey(String id) throws Exception{
+		return taskListMapper.selectByPrimaryKey(id);
+	}
+	
+    /**
+     * 修改
+     * @param record
+     * @return
+     */
+	public Integer updateByPrimaryKeySelective(TaskList record) throws Exception{
+		int result = -1;
+		result = taskListMapper.updateByPrimaryKeySelective(record);
+		return result;
+	}
+	
+    /**
+     * 搜索
+     * @param record
+     * @param page
+     * @return
+     * by:gyd
+     */
+	public PageTool<TaskList> selectTaskListByPage(TaskList record, Integer page, Integer pageSize) throws Exception{
+		List<TaskList> list = new ArrayList<TaskList>();
+    	
+    	int start = (page != null ? page : 1);
+    		int max = pageSize != null ? pageSize : 5;
+            record.setStart((start-1)*pageSize);
+           record.setMax(max);
+		// 查询分页
+		list = taskListMapper.selectByPropertyByPage(record);
+		// 查询总数
+		int count = taskListMapper.selectCountByProperty(record);
+		PageTool<TaskList> pageTool = new PageTool<>( page, count, list, pageSize);
+        return pageTool;
+		
+	}
+	
+	 /**
+     * 分页查询数据列表
+     * @param record
+     * @param page
+     * @return
+     * by:gyd
+     */
+	public PageTool<TaskListModel> selectByPage(TaskList record, Integer page, Integer pageSize) throws Exception{
+		List<TaskList> list = new ArrayList<TaskList>();
+		List<TaskListModel> modelList = new ArrayList<TaskListModel>();
+    	
+    	int start = (page != null ? page : 1);
+    		int max = pageSize != null ? pageSize : 5;
+            record.setStart((start-1)*pageSize);
+           record.setMax(max);
+		// 查询分页
+		list = taskListMapper.selectByPropertyByPage(record);
+		for (TaskList taskList : list) {
+			
+			TaskListModel model= new TaskListModel();
+
+			if (taskList.getId() ==null || taskList.getId().equals("")) {
+				model.setId("编号暂无");
+			}else {
+				model.setId(taskList.getId());
+			}
+			//2019-11-15 09:03:57.221
+			if (taskList.getStartTime().toString().length()>19) {
+				model.setStartTime(taskList.getStartTime().toString().substring(0, 19));
+			} else  {
+				model.setStartTime("开始时间暂无");
+			}
+			
+			if (taskList.getSender() ==null || taskList.getSender().equals("")) {
+				model.setSender("卡号不详");
+			}else {
+				model.setSender(taskList.getSender());
+			}
+			
+			if (taskList.getReceiver() == null || taskList.getReceiver().equals("")) {
+				model.setReceiver("卡号不详");
+			} else {
+				model.setReceiver(taskList.getReceiver());
+			}
+			
+			if (taskList.getType() == null || taskList.getType().equals("")) {
+				
+				model.setType("暂无");
+			} else {
+				
+				int num = taskList.getType();
+				String info = TaskType.getTaskType(num);
+				model.setType(info);
+			}
+			
+			if (taskList.getContent()== null || taskList.getContent().equals("")) {
+				model.setContent("暂无");
+			} else {
+				model.setContent(taskList.getContent());
+			}
+			
+			modelList.add(model);
+		}
+		// 查询总数
+		int count = taskListMapper.selectCountByProperty(record);
+		PageTool<TaskListModel> pageTool = new PageTool<>( page, count, modelList, pageSize);
+        return pageTool;
+		
+	}
+
+	
+	/**
+	 * 清空任务列表
+	 */
+	@Override
+	public Integer clearTaskList() throws Exception {
+		int result = -1;
+		result = taskListMapper.clearTaskList();
+		return result;
+	}
+
+
+	 
+
+}

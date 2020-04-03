@@ -1,0 +1,565 @@
+			var userType = 0;
+			var grid_data = [];
+			var queryBuilder= "";//查询初始化
+			var queryArea = "";
+			getLoginUser();
+			function getLoginUser() {
+				$.ajax({
+        			type : "POST",
+        			url : "/ZHRJSystem/user/getUserInfo",
+        			dataType : "json",
+        			success : function(result) {      				
+        		    	userType = result.data.type;
+        		    	//selectBlock();
+        		    	getAreaGrid();
+        			},
+        			error : function(result) {
+        				
+        			}
+        		});
+			}
+			
+			
+			
+		
+			/**
+			 从后台读取终端数据，并加载jqjrid表格
+			*/
+		    function getAreaGrid() {
+		    	jQuery(function($) {
+					$(window).resize(function(){   
+			        	$("#grid-table").setGridWidth($(window).width());
+			        });
+					
+					var grid_selector = "#grid-table";
+					var pager_selector = "#grid-pager";
+					jQuery(grid_selector).jqGrid({						
+						//扩展配置项,是否开启顶部工具栏
+						topToolbar:true,
+						//扩展配置项,jqGrid顶部工具栏ID,此id必须唯一，在创建顶部工具栏时，将会使用此ID
+						topToolbarId:'grid-table-top-toolbar',
+						url:"/ZHRJSystem/area/list", //这是数据的请求地址 
+						mtype: 'POST',
+						datatype: "json", //将这里改为使用JSON数据
+						postData: {queryBuilder:queryBuilder},
+						ajaxEditOptions: {contentType: 'application/json; charset=utf-8'},
+						height: "100%",
+						colNames:['编号', '区域名称', '上级区域', '备注','级别','省','市','省ID','市ID'],
+						colModel:[
+							{name:'areaId', index:'areaId', sorttype:"int",  hidden:true},			//, hidden:true
+							{name:'areaName', index:'areaName', width:400, fixed:true, resize:false, sortable:true, editable: true},												
+							{name:'parentName', index:'parentName', width:300, fixed:true, resize:false, sortable:true, editable: true},				
+							{name:'remark', index:'remark', width:350, fixed:true, resize:false, sortable:true, editable: true},
+							{name:'level', index:'level',   hidden:true},
+							{name:'provinceName', index:'provinceName',   hidden:true},	
+							{name:'cityName', index:'cityName',   hidden:true},
+							{name:'provinceId', index:'provinceId',   hidden:true},
+							{name:'cityId', index:'cityId',   hidden:true}
+							
+							],
+	                                       
+				        rownumbers: true,
+						viewrecords: true,
+						rowNum: 10,
+						rowList: [10,20,50],
+						jsonReader: {  
+							root:"rows", page:"page", total:"total",
+							records:"records", repeatitems:false, id:"areaId"
+						},
+						pager: pager_selector,
+						altRows: true,
+						prmNames: {
+							page:"page",
+							rows:"rows",
+							oper:"oper",
+							clearoper:"clear",
+							deloper:"del",
+						},
+																
+						multiselect: true,					
+				        multiboxonly: true,
+						loadComplete : function() {
+							$(grid_selector).closest(".ui-jqgrid-bdiv").css({ 'overflow-y' : 'scroll' });
+							$(grid_selector).closest(".ui-jqgrid-bdiv").css({ 'overflow-x' : 'scroll' });
+							
+							var table = this;
+							setTimeout(function(){
+								styleCheckbox(table);
+								
+								updateActionIcons(table);
+								updatePagerIcons(table);
+								enableTooltips(table);
+							}, 0);
+						},						
+						caption: "区域管理",
+						autowidth: true
+					});
+				
+					function aceSwitch( cellvalue, options, cell ) {
+						setTimeout(function(){
+							$(cell) .find('input[type=checkbox]')
+									.wrap('<label class="inline" />')
+								.addClass('ace ace-switch ace-switch-5')
+								.after('<span class="lbl"></span>');
+						}, 0);
+					}
+					//enable datepicker
+					function pickDate( cellvalue, options, cell ) {
+						setTimeout(function(){
+							$(cell) .find('input[type=text]')
+									.datepicker({format:'yyyy-mm-dd' , autoclose:true}); 
+						}, 0);
+					}
+				
+					//navButtons
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar",
+						{ 	//navbar options
+						edit : false,
+						editicon : 'icon-pencil blue',
+						edittitle : '修改',
+						edittext : '修改',
+						add : false,
+						addicon : 'icon-plus-sign purple',
+						addtitle : '新增',
+						addtext : '新增',
+						del : false,
+						delicon : 'icon-trash red',
+						deltext : '删除',
+						deltitle : '删除',
+						search : false,
+						searchicon : 'icon-search orange',
+						refresh : true,
+						refreshicon : 'icon-refresh green',
+						refreshtext : '刷新',
+						view : false,
+						viewicon : 'icon-zoom-in grey',
+					},						
+						{
+							//search form
+							recreateForm: true,
+							afterShowSearch: function(e){
+								var form = $(e[0]);
+								form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
+								style_search_form(form);
+							},
+							afterRedraw: function(){
+								style_search_filters($(this));
+							}
+							,
+							multipleSearch: true,						
+						}
+					)
+						
+				if(userType == 1 ){
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+					).navSeparatorAdd("#grid-table-top-toolbar",				//navSeparatorAdd是增加一个|进行按钮分割.
+							{sepclass : "ui-separator",sepcontent: ''}
+					).navButtonAdd("#grid-table-top-toolbar",{						
+						caption:"新增",
+						title:"新增",
+						buttonicon : 'icon-plus-sign purple',			
+						onClickButton:function()
+						{
+							$("#saveOrUpdateAreaForm")[0].reset(); //清空form中的数据
+							$("#saveOrUpdateArea").dialog({ 
+								autoOpen: true,
+								height:350, 
+								width: 400,  
+								resizable: false, 
+								modal: true
+							});
+							getProvince();//获取省市区县LIst
+						}
+						}).navButtonAdd("#grid-table-top-toolbar",{	
+							caption:"删除",
+							title:"删除",
+							buttonicon : 'icon-trash red',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} else {
+									$("#deleteAreaDialog").dialog({ 
+										autoOpen: true,
+										height: 180, 
+										width: 300,  
+										resizable: false, 
+										modal: true
+									});	
+								}
+							}
+						}).navButtonAdd("#grid-table-top-toolbar",{
+							
+							caption:"修改",
+							title:"修改",
+							buttonicon : 'icon-pencil blue',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');					
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} 
+								else if (ids.length > 1){
+									mizhu.toast("只能选择修改一条记录");
+								}
+								else {
+									var rowid = $( "#grid-table" ).getGridParam( "selrow" );
+					             	var rowData = $("#grid-table").jqGrid('getRowData',rowid);			           
+					             	$("#saveOrUpdateAreaForm")[0].reset();  //清空form中的数据			               
+					            	$("#saveOrUpdateArea").dialog({ 
+										autoOpen: true,
+										height: 350, 
+										width: 400,  
+										resizable: false, 
+										modal: true
+									});				                
+					                //数据进行回显
+					            	getProvince();
+					            	document.getElementById('uuid').value=rowData.areaId;
+					            	document.getElementById('areaName').value=rowData.areaName;				            	
+					            	document.getElementById('remark').value=rowData.remark;
+					            	//document.getElementById('parentName').value=rowData.parentName;
+					            	var provinceName = rowData.provinceName;
+					            	var provinceId = rowData.provinceId;
+					            	var cityName = rowData.cityName;
+					            	var cityId = rowData.cityId;
+					            	var parentName = rowData.parentName;
+					            	$("#provinceId").find("option[value="+provinceId+"]").attr("selected",true);
+					            	getCity();
+					            	$("#cityId").find("option[value="+cityId+"]").attr("selected",true);
+					            	
+							}
+							}
+						})
+						var trtr = ($("#grid-table-top-toolbar").find("table"))[1].getElementsByTagName("tr")[0];		  	
+						trtr.appendChild(document.createElement('td'));
+						var length = trtr.getElementsByTagName("td").length;
+						trtr.getElementsByTagName("td")[length-1].innerHTML = "<input type='text' id='queryArea'placeholder='请输入所属区域'  style = 'margin-left: 50px;'/>";
+						
+						
+						jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+						).navButtonAdd("#grid-table-top-toolbar",{
+								
+							caption:"查询",
+							title:"查询",
+							buttonicon : 'icon-search orange',			
+							onClickButton:function()
+							{
+								var  queryArea = document.getElementById('queryArea').value;
+								
+								$("#grid-table").jqGrid('setGridParam', {
+							  		datatype : 'json',
+							  		postData : {queryArea:queryArea },
+							  		page : 1
+							  	}).trigger("reloadGrid");
+							}
+							})	
+						
+						
+				}else{	
+					jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+					).navSeparatorAdd("#grid-table-top-toolbar",				//navSeparatorAdd是增加一个|进行按钮分割.
+							{sepclass : "ui-separator",sepcontent: ''}
+					).navButtonAdd("#grid-table-top-toolbar",{						
+						caption:"新增",
+						title:"新增",
+						buttonicon : 'icon-plus-sign purple',			
+						onClickButton:function()
+						{
+							$("#saveOrUpdateAreaForm")[0].reset(); //清空form中的数据
+							$("#saveOrUpdateArea").dialog({ 
+								autoOpen: true,
+								height:350, 
+								width: 400,  
+								resizable: false, 
+								modal: true
+							});
+							getProvince();//获取省市区县LIst
+						}
+						}).navButtonAdd("#grid-table-top-toolbar",{	
+							caption:"删除",
+							title:"删除",
+							buttonicon : 'icon-trash red',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} else {
+									$("#deleteAreaDialog").dialog({ 
+										autoOpen: true,
+										height: 180, 
+										width: 300,  
+										resizable: false, 
+										modal: true
+									});	
+								}
+							}
+						}).navButtonAdd("#grid-table-top-toolbar",{
+							
+							caption:"修改",
+							title:"修改",
+							buttonicon : 'icon-pencil blue',
+							onClickButton:function()
+							{
+								var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');					
+								if (ids.length == 0){
+									mizhu.toast("请选择记录");
+								} 
+								else if (ids.length > 1){
+									mizhu.toast("只能选择修改一条记录");
+								}
+								else {
+									var rowid = $( "#grid-table" ).getGridParam( "selrow" );
+					             	var rowData = $("#grid-table").jqGrid('getRowData',rowid);			           
+					             	$("#saveOrUpdateAreaForm")[0].reset();  //清空form中的数据			               
+					            	$("#saveOrUpdateArea").dialog({ 
+										autoOpen: true,
+										height: 350, 
+										width: 400,  
+										resizable: false, 
+										modal: true
+									});			
+					            	getProvince();
+					                //数据进行回显
+					            	document.getElementById('uuid').value=rowData.areaId;
+					            	document.getElementById('areaName').value=rowData.areaName;				            	
+					            	document.getElementById('remark').value=rowData.remark;					            	
+					            	var provinceName = rowData.provinceName;
+					            	var provinceId = rowData.provinceId;
+					            	var cityName = rowData.cityName;
+					            	var cityId = rowData.cityId;
+					            	var parentName = rowData.parentName;
+					            	$("#provinceId").find("option[value="+provinceId+"]").attr("selected",true);
+					            	getCity();
+					            	$("#cityId").find("option[value="+cityId+"]").attr("selected",true);
+							}
+							}
+						})
+						
+						
+						var trtr = ($("#grid-table-top-toolbar").find("table"))[1].getElementsByTagName("tr")[0];		  	
+						trtr.appendChild(document.createElement('td'));
+						var length = trtr.getElementsByTagName("td").length;
+						trtr.getElementsByTagName("td")[length-1].innerHTML = "<input type='text' id='queryArea'placeholder='请输入所属区域'  style = 'margin-left: 50px;'/>";
+					
+						
+						jQuery(grid_selector).jqGrid('navGrid',"#grid-table-top-toolbar"
+						).navButtonAdd("#grid-table-top-toolbar",{
+								
+							caption:"查询",
+							title:"查询",
+							buttonicon : 'icon-search orange',			
+							onClickButton:function()
+							{
+								var  queryArea = document.getElementById('queryArea').value;
+								
+								$("#grid-table").jqGrid('setGridParam', {
+							  		datatype : 'json',
+							  		postData : {queryArea:queryArea },
+							  		page : 1
+							  	}).trigger("reloadGrid");
+							}
+							})	
+						
+						
+					}	
+				
+					function style_delete_form(form) {
+						var buttons = form.next().find('.EditButton .fm-button');
+						buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
+						buttons.eq(0).addClass('btn-danger').prepend('<i class="icon-trash"></i>');
+						buttons.eq(1).prepend('<i class="icon-remove"></i>');
+					}
+					
+					function style_search_filters(form) {
+						form.find('.delete-rule').val('X');
+						form.find('.add-rule').addClass('btn btn-xs btn-primary');
+						form.find('.add-group').addClass('btn btn-xs btn-success');
+						form.find('.delete-group').addClass('btn btn-xs btn-danger');
+					}
+					function style_search_form(form) {
+						var dialog = form.closest('.ui-jqdialog');
+						var buttons = dialog.find('.EditTable')
+						buttons.find('.EditButton a[id*="_reset"]').addClass('btn btn-sm btn-info').find('.ui-icon').attr('class', 'icon-retweet');
+						buttons.find('.EditButton a[id*="_query"]').addClass('btn btn-sm btn-inverse').find('.ui-icon').attr('class', 'icon-comment-alt');
+						buttons.find('.EditButton a[id*="_search"]').addClass('btn btn-sm btn-purple').find('.ui-icon').attr('class', 'icon-search');
+					}
+					
+					function beforeDeleteCallback(e) {
+						var form = $(e[0]);
+						if(form.data('styled')) return false;
+						
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_delete_form(form);
+						
+						form.data('styled', true);
+					}
+					
+					function beforeEditCallback(e) {
+						var form = $(e[0]);
+						form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
+						style_edit_form(form);
+					}
+								
+					function styleCheckbox(table) {
+					
+					}
+				
+					//unlike navButtons icons, action icons in rows seem to be hard-coded
+					//you can change them like this in here if you want
+					function updateActionIcons(table) {
+						
+					}
+					
+					//replace icons with FontAwesome icons like above
+					function updatePagerIcons(table) {
+						var replacement = 
+						{
+							'ui-icon-seek-first' : 'icon-double-angle-left bigger-140',
+							'ui-icon-seek-prev' : 'icon-angle-left bigger-140',
+							'ui-icon-seek-next' : 'icon-angle-right bigger-140',
+							'ui-icon-seek-end' : 'icon-double-angle-right bigger-140'
+						};
+						$('.ui-pg-table:not(.navtable) > tbody > tr > .ui-pg-button > .ui-icon').each(function(){
+							var icon = $(this);
+							var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
+							
+							if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
+						})
+					}
+				
+					function enableTooltips(table) {
+						$('.navtable .ui-pg-button').tooltip({container:'body'});
+						$(table).find('.ui-pg-div').tooltip({container:'body'});
+					}
+					
+				});
+			}
+		    
+		    function editArea() {
+		    	var url = "/ZHRJSystem/area/add";//新增的url
+		        var id = $("#uuid").val(); //拿到表单中的id	
+		        if(id){
+		            url = "/ZHRJSystem/area/edit"; //修改的url
+		        }
+		        $("#saveOrUpdateAreaForm").attr("action",url);
+		        var options={  
+				        type:"post",  //提交方式    
+				        url:url,
+				        success:showResponse,//提交成功的回调函数  
+				        }  
+				$("#saveOrUpdateAreaForm").ajaxForm(options); 
+				
+		    }
+		    function showResponse(responseText, statusText){  
+		    	if(responseText.success){
+		    		
+		    		$('#saveOrUpdateArea').dialog('close');
+		    		mizhu.toast(responseText.message);
+					setTimeout(function() {
+						location.reload();
+					}, 2000); 
+					window.parent.leftFrame.location.reload();
+	             }else{
+	            	 mizhu.toast(responseText.message); 	            	 
+	             }
+		       
+		    } 
+		    
+		   
+		    function checkRule(){
+		    	var areaName = $('#areaName').val();
+		    	
+		    	if(areaName == null || areaName ==""){
+		    		mizhu.toast("请填写所属区域");
+		    		return false;
+		    	}
+		    	return true;
+		    }
+		 
+		    function deleteArea() {
+		    	var ids = $("#grid-table").jqGrid('getGridParam','selarrrow');
+		    	$.ajax({
+        			type : "POST",
+        			url : "/ZHRJSystem/area/del",
+        			data : "id=" + ids,
+        			dataType : "json",
+        			success : function(result) {      				
+        		    		mizhu.toast(result.message);
+        					setTimeout(function() {
+        						location.reload();
+        					}, 2000); 
+        					window.parent.leftFrame.location.reload();
+        	            
+        			},
+        			error : function(result) {
+
+        				mizhu.toast("删除失败");
+        			}
+        		});
+		    }
+		    
+		    
+		    
+		  
+		  //获取区域
+		    //获取省
+		    function getProvince(){
+		    	$("#provinceId").empty();
+		    	var options = '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getAllProvince",
+        			dataType : "json",
+        			success : function(result) {   
+        				var optionName;
+        		    	for(var i=0;i<result.data.length;i++){
+        		    		optionName = result.data[i].areaName;
+        		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+        		    	}
+        		    	$("#provinceId").append(options);
+        		    
+        			},
+        			error : function(result) {
+        				alert(getProvince);
+        			}
+        		});
+		    	
+		    }
+		    
+		    
+		    //获取市
+		    function getCity(){
+		    	
+		    	$("#cityId").empty();
+		    	var provinceId = $("#provinceId option:selected").val();
+		    	var options = '<option selected="selected" value="">请选择</option>';
+		    	$.ajax({
+        			type : "POST",
+        			async : false,
+        			url : "/ZHRJSystem/area/getCitys",
+        			data : "provinceId=" + provinceId,
+        			dataType : "json",
+        			success : function(result) {      				
+        				var optionName;
+        		    	for(var i=0;i<result.data.length;i++){
+        		    		optionName = result.data[i].areaName;
+        		    		options +='<option value="'+result.data[i].areaId +'">'+optionName+'</option>';
+        		    	}
+        		    	$("#cityId").append(options);
+        	            
+        			},
+        			error : function(result) {
+
+        				alert(getCity);
+        			}
+        		});
+		    	
+		    }
+		    
+		   
+		  
+		    

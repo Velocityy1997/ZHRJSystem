@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)https://s1.mi.com/loginbanner.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0,user-scalable=no">
+<title></title>
+<link type="text/css" rel="stylesheet" href="./reset.css">
+<style>
+	.h_panel,.login_banner{ width:1130px; margin:0 auto;}
+	.h_logo{ width:100%; height: 98px; background:url(logo2.png) no-repeat;margin-top: 5px;}
+	.login_banner_panel{background:url(bg-img.jpg) no-repeat top center; width:100%; min-height:46%; position:absolute; left:0; top:13.5%;}
+	.lbnr,.rbnr{ width:50%; height:100%; position:absolute;}
+	.login_banner{ height:588px; position:relative;}
+</style>
+</head>
+<body>
+	<div class="h_panel">
+    <div class="h_logo"></div>
+  </div>
+  <div class="login_banner_panel">
+    <!-- 底部定位的bg -->
+    <div class="lbnr"></div>
+		<div class="rbnr"></div>
+    <div class="login_banner"></div>
+  </div>
+
+</body></html>

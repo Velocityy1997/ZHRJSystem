@@ -1,0 +1,88 @@
+package com.web.business.generator.system.bdcard.dao;
+
+import java.util.Date;
+import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.web.business.generator.system.bdcard.model.BdCard;
+import com.web.business.generator.system.bdcard.model.BdCardModel;
+@Mapper
+public interface BdCardMapper {
+
+	 
+     /*****
+     *根据主键查询
+     ****/
+     BdCard selectByPrimaryKey(String cardId);
+	
+	 /****
+	 *根据主键删除
+	 ****/
+     int deleteByPrimaryKey(String cardId);
+     
+     /****
+	 *根据主键批量删除
+	 ****/
+     int deleteBatchByPrimaryKey(List<String> list);
+     
+     /****
+	 *新增
+	 ****/
+     int insertSelective(BdCard record);
+     
+     /****
+	 *根据属性分页查询
+	 ****/
+     List<BdCard> selectByPropertyByPage(BdCard record);
+	 
+	 /****
+     *根据主键更新记录
+	 ****/
+	 int updateByPrimaryKeySelective(BdCard record);
+	 /**
+	  * 分页总数
+	  * @param record
+	  * @return
+	  */
+	 int selectCountByProperty(BdCard record);
+
+	 /**
+	  * Excel插入数据
+	 * 
+	  */
+	 int insertData(List<BdCard> modelList);
+
+	 /**
+	  * 根据cardId查询北斗卡信息状态
+	  * @param list
+	  * @return
+	  */
+	int getCardList(List<String> list);
+
+	
+	/**
+	 * 根据ID查询此条信息所以内容
+	 * @param cardId
+	 * @return
+	 */
+	BdCard getList(BdCard record);
+
+	/**
+	 * 查询是否有重复的北斗卡号
+	 * @param cardNum
+	 * @return
+	 */
+	List<BdCard> findCardNum(String cardNum);
+
+	
+	/**
+	 * 根据到期时间进行数据更新
+	 * @param model
+	 * @return
+	 */
+	Integer update(BdCardModel model);
+
+	
+	
+}

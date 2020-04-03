@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.monitor.position.dao.PositionMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.monitor.position.model.Position" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="locate_time" property="locateTime" jdbcType="TIMESTAMP" />
+    <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+    <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+    <result column="altitude" property="altitude" jdbcType="VARCHAR" />
+    <result column="terminal_id" property="terminalId" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	locate_time,
+     	latitude,
+     	longitude,
+     	altitude,
+     	terminal_id
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from position 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <select id="selectAll" resultMap="BaseResultMap"  >
+    select
+		<include refid="Base_Column_List" />
+    from position 
+   
+  </select>
+  
+   <select id="selectIds" resultType="java.lang.String"  >
+    select  DISTINCT Terminal_Id
+    from position 
+  </select>
+  
+  <select id="selectNewPositionById" resultMap="BaseResultMap"  parameterType="java.lang.String" >
+    select  
+		<include refid="Base_Column_List" />
+    from   position   WHERE Terminal_Id =  #{ id,jdbcType=VARCHAR} and  Locate_Time = 
+    (select MAX(Locate_Time) from  position  WHERE Terminal_Id = #{ id,jdbcType=VARCHAR} )
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from position 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from position
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.monitor.position.model.Position">
+		insert into position
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="locateTime != null">
+				locate_time,
+			</if>
+			<if test="latitude != null">
+				latitude,
+			</if>
+			<if test="longitude != null">
+				longitude,
+			</if>
+			<if test="altitude != null">
+				altitude,
+			</if>
+			<if test="terminalId != null">
+				terminal_id,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="locateTime != null">
+				 #{ locateTime,jdbcType= VARCHAR },
+			</if>
+			<if test="latitude != null">
+				 #{ latitude,jdbcType= VARCHAR },
+			</if>
+			<if test="longitude != null">
+				 #{ longitude,jdbcType= VARCHAR },
+			</if>
+			<if test="altitude != null">
+				 #{ altitude,jdbcType= VARCHAR },
+			</if>
+			<if test="terminalId != null">
+				 #{ terminalId,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.monitor.position.model.Position">
+		select
+		<include refid="Base_Column_List" />
+		from position
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="locateTime != null">
+			AND locate_time =  #{ locateTime,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="latitude != null">
+			AND latitude =  #{ latitude,jdbcType= VARCHAR }
+		  </if>
+		  <if test="longitude != null">
+			AND longitude =  #{ longitude,jdbcType= VARCHAR }
+		  </if>
+		  <if test="altitude != null">
+			AND altitude =  #{ altitude,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terminalId != null">
+			AND terminal_id =  #{ terminalId,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY update_time desc
+		<if test="start != null and max != null">
+			limit    #{  start},   #{  max }
+		 </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.monitor.position.model.Position">
+		select
+		count(1)
+		from position
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="locateTime != null">
+			AND locate_time =  #{ locateTime,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="latitude != null">
+			AND latitude =  #{ latitude,jdbcType= VARCHAR }
+		  </if>
+		  <if test="longitude != null">
+			AND longitude =  #{ longitude,jdbcType= VARCHAR }
+		  </if>
+		  <if test="altitude != null">
+			AND altitude =  #{ altitude,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terminalId != null">
+			AND terminal_id =  #{ terminalId,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.monitor.position.model.Position">
+		<if test="id !=null">
+			update position
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 locate_time =  #{ locateTime,jdbcType= TIMESTAMP },
+     			 latitude =  #{ latitude,jdbcType= VARCHAR },
+     			 longitude =  #{ longitude,jdbcType= VARCHAR },
+     			 altitude =  #{ altitude,jdbcType= VARCHAR },
+     			 terminal_id =  #{ terminalId,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+	
+	 <select id="selectByTermianlId"  resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from position 
+    where  Terminal_Id = #{ Terminal_Id,jdbcType=VARCHAR} order by Locate_Time DESC
+  </select>
+  
+  
+  <!-- 根据id和时间查询位置信息 -->
+  <select id="selectByIdAndTime"  resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from position 
+    where  Terminal_Id = #{ Terminal_Id,jdbcType=VARCHAR} and Locate_Time &gt;=#{startTime,jdbcType=VARCHAR}  AND Locate_Time  &lt;=#{endTime,jdbcType=VARCHAR} ORDER BY Locate_Time ASC 
+  </select>
+  
+
+  
+</mapper>

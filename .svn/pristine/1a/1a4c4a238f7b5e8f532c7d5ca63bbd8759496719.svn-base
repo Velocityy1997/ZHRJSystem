@@ -1,0 +1,30 @@
+/**
+ * 角色弹出框JS
+ * 
+ * @author  彈出框插件初始化等
+ */
+ var pageWin_role = {
+		// 角色管理JS
+			init:function(){
+				// caption:标题
+				var caption = "角色管理";
+				// colNames:列名
+				var  colNames = [
+				'roleId'
+					 ,'角色名称'
+				];
+				// colModel:列对应实体类名
+				var colModel = [  
+			               { name: 'roleId', index: 'roleId', width: 10, key: true, hidden: true }
+			               ,{ name: 'roleName', index: 'roleName', width: 10}
+			           ];
+				// 调用分页插件初始化列表
+				page_util.tablePlugin("systemRole/list",caption,colNames,colModel);
+				page_util.searchName = 'roleName';
+			},// 查询
+			search:function(){
+//				utilButtons.searchLike();
+			}
+		};
+		// 初始化加载
+ pageWin_role.init();

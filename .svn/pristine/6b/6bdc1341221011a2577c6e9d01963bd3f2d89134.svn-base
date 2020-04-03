@@ -1,0 +1,80 @@
+		 
+//通播
+function getSendBroadcastDialog() {
+	hideRMenu();
+	var _iframe = window.parent;
+	console.log(_iframe);
+	_iframe.showSendBroadcastDialog();
+	
+}
+//本机信息
+function getzhiSysinfoDialog() {
+	hideRMenu();
+	var _iframe = window.parent;
+	_iframe.showzhiSysinfoDialog();
+	
+}
+//本机定位
+function getzhiPosition() {
+	hideRMenu();
+	var _iframe = window.parent;
+	_iframe.getzhiPositionf();
+	
+}
+//友邻位置
+function sendYlwz() {
+	hideRMenu();
+	var treeObj=$.fn.zTree.getZTreeObj("terminal_tree");
+    nodes=treeObj.getCheckedNodes(true);
+    
+	var _iframe = window.parent;
+	_iframe.sendYlwzf(nodes);
+    
+	
+}
+//任务重置
+function resetTask() {
+	hideRMenu();
+	var _iframe = window.parent;
+	_iframe.resetTaskf();
+	
+}
+//发送短信
+function sendMessageDialog() {
+	hideRMenuT();
+	var treeObj=$.fn.zTree.getZTreeObj("terminal_tree");
+    nodes=treeObj.getCheckedNodes(true);
+    
+	var _iframe = window.parent;
+	_iframe.sendMessageDialogf(nodes);
+    
+	
+}
+//指令导航
+function sendZldhDialog() {
+	hideRMenuT();
+	var treeObj=$.fn.zTree.getZTreeObj("terminal_tree");
+    nodes=treeObj.getCheckedNodes(true);
+    
+	var _iframe = window.parent;
+	_iframe.sendZldhDialogf(nodes);
+    
+	
+}
+//终端位置查询
+function getTerminalPosition() {
+	hideRMenuT();
+	var treeObj=$.fn.zTree.getZTreeObj("terminal_tree");
+    nodes=treeObj.getCheckedNodes(true);
+    var _iframe = window.parent;
+	_iframe.getTerminalPositionf(nodes);
+	
+}
+function historyTraceWindow() {
+	hideRMenuT();
+	var treeObj=$.fn.zTree.getZTreeObj("terminal_tree");
+    nodes=treeObj.getCheckedNodes(true);
+    var _iframe = window.parent;
+	_iframe.historyTraceWindowf(nodes);
+	
+}

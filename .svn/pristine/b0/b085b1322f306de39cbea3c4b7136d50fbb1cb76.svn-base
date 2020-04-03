@@ -1,0 +1,110 @@
+var top_left = {
+		text : '',
+	init : function(){
+		
+	},treeSearch : function(){
+		top_left.text = $('#treeSearchText').val();
+		var treeObj = $.fn.zTree.getZTreeObj("deptDeviceTree");
+		var node = treeObj.getNodeByParam("id", 0, null);
+		if(top_left.text != ''){
+			var nodes = treeObj.getNodesByFilter(filter); // 查找节点集合
+		treeObj.removeChildNodes(node);
+		treeObj.addNodes(node, nodes);
+	    }else{
+	    	treeObj.removeChildNodes(node);
+	    	treeObj.removeNode(node);
+			treeObj.addNodes(null,deptDeviceTree.nodes);
+	    }
+	} 
+}
+
+var bdtime = {
+		
+		show_url : 'ws://localhost:8080/timeserver/websocket',
+	
+	// webstock 获取时间
+	getTimes : function() {
+		var ws = new WebSocket(bdtime.show_url);
+
+		ws.onopen = function(evt) {
+			console.log("Connection open ...");
+			ws.send("Hello WebSockets!");
+		};
+
+		ws.onmessage = function(evt) {
+			//console.log("Received Message: " + evt.data);
+			if(evt.data == '连接成功' || evt.data =='Hello WebSockets!'){
+				return;
+			}
+			var data = eval("(" + evt.data + ")");
+			// $('.title_'+data.deviceCode).html(data.deviceCode);
+//			var id = "time_" + data.deviceCode;
+			
+			var time; 
+			//显示当前从时统服务器获得的天文时间
+			if (data.deviceCode=="R01") {
+				time =data.year+"-"+data.month+"-"+data.day+" "+data.hour+":"+data.min+":"+data.seconds;
+				$('#bdtime').text(time);
+				
+			}/*if(data.deviceCode=="") {
+				time ="平台与时统服务器断开连接";
+				$('#bdtime').text(time);
+			}*/
+			//if(add_serverTime.deviceCode == data.deviceCode)
+			//time="2019年05月28日19：10：10";
+			
+			// ws.close();
+
+		};
+
+		ws.onclose = function(evt) {
+			console.log("Connection closed.");
+		};
+	},
+	
+};
+bdtime.getTimes();
+
+top_left.init();
+function zTreeOnClick(event, treeId, treeNode) {
+	if(treeNode.type == '1' || treeNode.id == '-1'){// 分组
+		var id = treeNode.id;
+	    if(window.frames['content'].overview_deviceInfo){
+	    	 window.frames['content'].overview_deviceInfo.deviceCode= null;
+	    	 window.frames['content'].overview_deviceInfo.depId = id;
+	    	    window.frames['content'].overview_deviceInfo.showTimes();
+	    }else  if(window.frames['content'].time_deviceInfo){
+	    	 window.frames['content'].time_deviceInfo.deviceCode= null;
+	    	 window.frames['content'].time_deviceInfo.depId = id;
+	    	    window.frames['content'].time_deviceInfo.showTimes();
+	    }
+	}else if(treeNode.type == '2'){// 设备
+		
+		var deviceCode = treeNode.deviceCode;
+	    if(window.frames['content'].overview_deviceInfo){
+	    	 window.frames['content'].overview_deviceInfo.depId= null;
+	    	 window.frames['content'].overview_deviceInfo.deviceCode = deviceCode;
+	    	    window.frames['content'].overview_deviceInfo.showTimes();
+	    }else  if(window.frames['content'].time_deviceInfo){
+	    	 window.frames['content'].time_deviceInfo.depId= null;
+	    	 window.frames['content'].time_deviceInfo.deviceCode = deviceCode;
+	    	    window.frames['content'].time_deviceInfo.showTimes();
+	    }
+	}else{
+			if(window.frames['content'].overview_deviceInfo){
+		    	 window.frames['content'].overview_deviceInfo.depId= null;
+		    	 window.frames['content'].overview_deviceInfo.deviceCode = null;
+		    	    window.frames['content'].overview_deviceInfo.showTimes();
+		    }else  if(window.frames['content'].time_deviceInfo){
+		    	 window.frames['content'].time_deviceInfo.depId= null;
+		    	 window.frames['content'].time_deviceInfo.deviceCode = null;
+		    	    window.frames['content'].time_deviceInfo.showTimes();
+		    }
+		}
+    
+   
+};
+
+function filter(node) {
+    return   node.name.indexOf(top_left.text)>-1;
+}

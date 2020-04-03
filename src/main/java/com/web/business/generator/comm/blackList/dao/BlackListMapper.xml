@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.comm.blackList.dao.BlackListMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.comm.blackList.model.BlackList" >
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="sim_id" property="simId" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	sim_id,
+     	create_date,
+     	remark
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from black_list 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from black_list 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from black_list
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.comm.blackList.model.BlackList">
+		insert into black_list
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="simId != null">
+				sim_id,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="simId != null">
+				 #{ simId,jdbcType= VARCHAR },
+			</if>
+			<if test="createDate != null">
+				 #{ createDate,jdbcType= TIMESTAMP },
+			</if>
+			<if test="remark != null">
+				 #{ remark,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.comm.blackList.model.BlackList">
+		select 
+		<include refid="Base_Column_List" />
+		from black_list
+		where 1=1
+		<if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		</if>
+		<if test="simId != null">
+			AND sim_id like  CONCAT('%',#{ simId,jdbcType= VARCHAR },'%')
+		</if>
+		<if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		<if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		</if>
+		ORDER BY create_date  desc
+		
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.comm.blackList.model.BlackList">
+		select
+		count(1)
+		from black_list
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="simId != null">
+			AND sim_id =  #{ simId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.comm.blackList.model.BlackList">
+		<if test="id !=null">
+			update black_list
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 sim_id =  #{ simId,jdbcType= VARCHAR },
+     			 create_date =  #{ createDate,jdbcType= TIMESTAMP },
+     			 remark =  #{ remark,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+  
+   <select id="selectBySimId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from black_list
+    where  sim_id = #{ simId, jdbcType=VARCHAR}
+  </select>
+  
+  
+</mapper>

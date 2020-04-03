@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuiji.dao.TbZhjMapper">
+  <resultMap id="BaseResultMap" type="com.zhihuiji.model.TbZhj">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="zhjName" jdbcType="VARCHAR" property="zhjName" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="zone" jdbcType="INTEGER" property="zone" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="cardNum" jdbcType="VARCHAR" property="cardNum" />
+    <result column="brocastAddress" jdbcType="VARCHAR" property="brocastAddress" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="frequency" jdbcType="INTEGER" property="frequency" />
+    <result column="encrypFlag" jdbcType="INTEGER" property="encrypFlag" />
+    <result column="userCount" jdbcType="INTEGER" property="userCount" />
+    <result column="isCurrent" jdbcType="INTEGER" property="isCurrent" />
+    <result column="txLength" jdbcType="INTEGER" property="txLength" />
+    <result column="position" jdbcType="VARCHAR" property="position" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, zhjName, type, zone, status, cardNum, brocastAddress, remark, frequency, encrypFlag, 
+    userCount, isCurrent, txLength, position
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_zhj
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_zhj
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zhihuiji.model.TbZhj">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_zhj (zhjName, type, zone, 
+      status, cardNum, brocastAddress, 
+      remark, frequency, encrypFlag, 
+      userCount, isCurrent, txLength, 
+      position)
+    values (#{zhjName,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{zone,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{cardNum,jdbcType=VARCHAR}, #{brocastAddress,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{frequency,jdbcType=INTEGER}, #{encrypFlag,jdbcType=INTEGER}, 
+      #{userCount,jdbcType=INTEGER}, #{isCurrent,jdbcType=INTEGER}, #{txLength,jdbcType=INTEGER}, 
+      #{position,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhihuiji.model.TbZhj">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_zhj
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="zhjName != null">
+        zhjName,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="zone != null">
+        zone,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="cardNum != null">
+        cardNum,
+      </if>
+      <if test="brocastAddress != null">
+        brocastAddress,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="frequency != null">
+        frequency,
+      </if>
+      <if test="encrypFlag != null">
+        encrypFlag,
+      </if>
+      <if test="userCount != null">
+        userCount,
+      </if>
+      <if test="isCurrent != null">
+        isCurrent,
+      </if>
+      <if test="txLength != null">
+        txLength,
+      </if>
+      <if test="position != null">
+        position,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="zhjName != null">
+        #{zhjName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="zone != null">
+        #{zone,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="cardNum != null">
+        #{cardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="brocastAddress != null">
+        #{brocastAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="frequency != null">
+        #{frequency,jdbcType=INTEGER},
+      </if>
+      <if test="encrypFlag != null">
+        #{encrypFlag,jdbcType=INTEGER},
+      </if>
+      <if test="userCount != null">
+        #{userCount,jdbcType=INTEGER},
+      </if>
+      <if test="isCurrent != null">
+        #{isCurrent,jdbcType=INTEGER},
+      </if>
+      <if test="txLength != null">
+        #{txLength,jdbcType=INTEGER},
+      </if>
+      <if test="position != null">
+        #{position,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhihuiji.model.TbZhj">
+    update tb_zhj
+    <set>
+      <if test="zhjName != null">
+        zhjName = #{zhjName,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="zone != null">
+        zone = #{zone,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="cardNum != null">
+        cardNum = #{cardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="brocastAddress != null">
+        brocastAddress = #{brocastAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="frequency != null">
+        frequency = #{frequency,jdbcType=INTEGER},
+      </if>
+      <if test="encrypFlag != null">
+        encrypFlag = #{encrypFlag,jdbcType=INTEGER},
+      </if>
+      <if test="userCount != null">
+        userCount = #{userCount,jdbcType=INTEGER},
+      </if>
+      <if test="isCurrent != null">
+        isCurrent = #{isCurrent,jdbcType=INTEGER},
+      </if>
+      <if test="txLength != null">
+        txLength = #{txLength,jdbcType=INTEGER},
+      </if>
+      <if test="position != null">
+        position = #{position,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhihuiji.model.TbZhj">
+    update tb_zhj
+    set zhjName = #{zhjName,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      zone = #{zone,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      cardNum = #{cardNum,jdbcType=VARCHAR},
+      brocastAddress = #{brocastAddress,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      frequency = #{frequency,jdbcType=INTEGER},
+      encrypFlag = #{encrypFlag,jdbcType=INTEGER},
+      userCount = #{userCount,jdbcType=INTEGER},
+      isCurrent = #{isCurrent,jdbcType=INTEGER},
+      txLength = #{txLength,jdbcType=INTEGER},
+      position = #{position,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

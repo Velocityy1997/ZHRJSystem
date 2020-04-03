@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.comm.route.dao.RouteMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.comm.route.model.Route" >
+    <id column="routeId" property="routeId" jdbcType="VARCHAR" />
+    <result column="route_id" property="routeId" jdbcType="VARCHAR" />
+    <result column="route_name" property="routeName" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	route_id,
+     	route_name,
+     	content,
+     	create_date,
+     	remark
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from route 
+    where  routeId = #{ routeId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectAll" resultMap="BaseResultMap"  >
+    select
+		<include refid="Base_Column_List" />
+    from route 
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from route 
+    where routeId =  #{ routeId,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteByName" parameterType="java.lang.String" >
+    delete from route 
+    where route_name =  #{ name,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from route
+    where routeId in
+    <foreach collection="list" item="routeId" index="index"
+            open="(" close=")" separator=",">
+             #{ routeId,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.comm.route.model.Route">
+		insert into route
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="routeId != null">
+				route_id,
+			</if>
+			<if test="routeName != null">
+				route_name,
+			</if>
+			<if test="content != null">
+				content,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="routeId != null">
+				 #{ routeId,jdbcType= VARCHAR },
+			</if>
+			<if test="routeName != null">
+				 #{ routeName,jdbcType= VARCHAR },
+			</if>
+			<if test="content != null">
+				 #{ content,jdbcType= VARCHAR },
+			</if>
+			<if test="createDate != null">
+				 #{ createDate,jdbcType= TIMESTAMP },
+			</if>
+			<if test="remark != null">
+				 #{ remark,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.comm.route.model.Route">
+		select
+		<include refid="Base_Column_List" />
+		from route
+		where 1=1
+		  <if test="routeId != null">
+			AND route_id =  #{ routeId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="routeName != null">
+			AND route_name =  #{ routeName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY update_time desc
+		<if test="start != null and max != null">
+			limit    #{  start},   #{  max }
+		 </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.comm.route.model.Route">
+		select
+		count(1)
+		from route
+		where 1=1
+		  <if test="routeId != null">
+			AND route_id =  #{ routeId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="routeName != null">
+			AND route_name =  #{ routeName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.comm.route.model.Route">
+		<if test="routeId !=null">
+			update route
+			<set>
+     			 route_id =  #{ routeId,jdbcType= VARCHAR },
+     			 route_name =  #{ routeName,jdbcType= VARCHAR },
+     			 content =  #{ content,jdbcType= VARCHAR },
+     			 create_date =  #{ createDate,jdbcType= TIMESTAMP },
+     			 remark =  #{ remark,jdbcType= VARCHAR }
+			</set>
+			where route_id =  #{ routeId,jdbcType=VARCHAR}
+		</if>
+	</update>
+	
+	<!-- 根据名称修改路线 -->
+	<update id="updateByName" >
+		<if test="routeName !=null">
+			update route
+			<set>
+			 	 route_name =  #{ routeName,jdbcType= VARCHAR },
+     			 content =  #{ route.content,jdbcType= VARCHAR },
+     			 create_date =  #{ route.createDate,jdbcType= TIMESTAMP },
+     			 remark =  #{ route.remark,jdbcType= VARCHAR }
+			</set>
+			where route_name =  #{ routeName,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

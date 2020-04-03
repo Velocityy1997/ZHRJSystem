@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuiji.dao.TbPreMessageMapper">
+  <resultMap id="BaseResultMap" type="com.zhihuiji.model.TbPreMessage">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, content, time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_pre_message
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_pre_message
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zhihuiji.model.TbPreMessage">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_pre_message (content, time)
+    values (#{content,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhihuiji.model.TbPreMessage">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_pre_message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="content != null">
+        content,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhihuiji.model.TbPreMessage">
+    update tb_pre_message
+    <set>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhihuiji.model.TbPreMessage">
+    update tb_pre_message
+    set content = #{content,jdbcType=VARCHAR},
+      time = #{time,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

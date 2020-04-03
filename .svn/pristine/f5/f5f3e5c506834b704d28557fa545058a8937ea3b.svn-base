@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.terminal.dao.TerminalMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.terminal.model.Terminal" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="card_num" property="cardNum" jdbcType="VARCHAR" />
+    <result column="tx_level" property="txLevel" jdbcType="VARCHAR" />
+    <result column="brocast_address" property="brocastAddress" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="frequency" property="frequency" jdbcType="VARCHAR" />
+    <result column="zhj_num" property="zhjNum" jdbcType="VARCHAR" />
+    <result column="tx_length" property="txLength" jdbcType="VARCHAR" />
+    <result column="position_state" property="positionState" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="position_id" property="positionId" jdbcType="VARCHAR" />
+     <result column="ter_area" property="terArea" jdbcType="VARCHAR" />
+    <result column="ter_industry" property="terIndustry" jdbcType="VARCHAR" />
+  
+  
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	name,
+     	type,
+     	status,
+     	card_num,
+     	tx_level,
+     	brocast_address,
+     	remark,
+     	frequency,
+     	zhj_num,
+     	tx_length,
+     	position_state,
+     	create_date,
+     	position_id,
+     	ter_area,
+     	ter_industry
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from terminal 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  
+    <select id="selectAll" resultMap="BaseResultMap" >
+    select
+		<include refid="Base_Column_List" />
+    from terminal 
+  </select>
+  
+  <!--根据卡号查终端  -->
+  <select id="selectByCardNum" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from terminal 
+    where  CARD_NUM = #{ CARD_NUM,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByTerminalName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from terminal 
+    where  name = #{name}
+  </select>
+  
+  <select id="selectBycardNum" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from terminal 
+    where  card_num = #{cardNum}
+  </select>
+  
+  <!-- 批量查询终端 -->
+  <select id="getterminalList" resultMap="BaseResultMap"  >
+    select
+		<include refid="Base_Column_List" />
+    from terminal 
+   
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from terminal 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from terminal
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+    and type = 0
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.terminal.model.Terminal">
+		insert into terminal
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="cardNum != null">
+				card_num,
+			</if>
+			<if test="txLevel != null">
+				tx_level,
+			</if>
+			<if test="brocastAddress != null">
+				brocast_address,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="frequency != null">
+				frequency,
+			</if>
+			<if test="zhjNum != null">
+				zhj_num,
+			</if>
+			<if test="txLength != null">
+				tx_length,
+			</if>
+			<if test="positionState != null">
+				position_state,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="positionId != null">
+				position_id,
+			</if>
+			<if test="terArea != null">
+				ter_area,
+			</if>
+			<if test="terIndustry != null">
+				ter_industry,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="name != null">
+				 #{ name,jdbcType= VARCHAR },
+			</if>
+			<if test="type != null">
+				 #{ type,jdbcType= VARCHAR },
+			</if>
+			<if test="status != null">
+				 #{ status,jdbcType= VARCHAR },
+			</if>
+			<if test="cardNum != null">
+				 #{ cardNum,jdbcType= VARCHAR },
+			</if>
+			<if test="txLevel != null">
+				 #{ txLevel,jdbcType= VARCHAR },
+			</if>
+			<if test="brocastAddress != null">
+				 #{ brocastAddress,jdbcType= VARCHAR },
+			</if>
+			<if test="remark != null">
+				 #{ remark,jdbcType= VARCHAR },
+			</if>
+			<if test="frequency != null">
+				 #{ frequency,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjNum != null">
+				 #{ zhjNum,jdbcType= VARCHAR },
+			</if>
+			<if test="txLength != null">
+				 #{ txLength,jdbcType= VARCHAR },
+			</if>
+			<if test="positionState != null">
+				 #{ positionState,jdbcType= VARCHAR },
+			</if>
+			<if test="createDate != null">
+				 #{ createDate,jdbcType= VARCHAR },
+			</if>
+			<if test="positionId != null">
+				 #{ positionId,jdbcType= VARCHAR },
+			</if>
+			<if test="terArea != null">
+				 #{ terArea,jdbcType= VARCHAR },
+			</if>
+			<if test="terIndustry != null">
+				 #{ terIndustry,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   <!-- 根据管理员查询 -->
+   <select id="selectByPropertyByAdminPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.terminal.model.Terminal">
+		select
+		<include refid="Base_Column_List" />
+		from terminal
+		where 1=1
+			<if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null and name != ''">
+			AND name like  CONCAT('%',#{ name,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="status != null">
+			AND status =  #{ status,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardNum != null and cardNum != ''">
+			OR card_num  like  CONCAT('%',#{ cardNum,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="txLevel != null">
+			AND tx_level =  #{ txLevel,jdbcType= VARCHAR }
+		  </if>
+		  <if test="brocastAddress != null">
+			AND brocast_address =  #{ brocastAddress,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="frequency != null">
+			AND frequency =  #{ frequency,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="txLength != null">
+			AND tx_length =  #{ txLength,jdbcType= VARCHAR }
+		  </if>
+		  <if test="positionState != null">
+			AND position_state =  #{ positionState,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="positionId != null">
+			AND position_id =  #{ positionId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terArea != null">
+			AND ter_area =  #{ terArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terIndustry != null">
+			AND ter_industry =  #{ terIndustry,jdbcType= VARCHAR }
+		  </if>
+		order by CREATE_DATE desc
+	</select>
+	
+	 <!-- 根据普通用户查询 -->
+   <select id="selectByPropertyByNomalPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.terminal.model.Terminal">
+		select
+		<include refid="Base_Column_List" />
+		from terminal
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null and name != ''">
+			AND name like  CONCAT('%',#{ name,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="status != null">
+			AND status =  #{ status,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardNum != null and cardNum != ''">
+			OR card_num  like  CONCAT('%',#{ cardNum,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="txLevel != null">
+			AND tx_level =  #{ txLevel,jdbcType= VARCHAR }
+		  </if>
+		  <if test="brocastAddress != null">
+			AND brocast_address =  #{ brocastAddress,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="frequency != null">
+			AND frequency =  #{ frequency,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="txLength != null">
+			AND tx_length =  #{ txLength,jdbcType= VARCHAR }
+		  </if>
+		  <if test="positionState != null">
+			AND position_state =  #{ positionState,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="positionId != null">
+			AND position_id =  #{ positionId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terArea != null">
+			AND ter_area =  #{ terArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terIndustry != null">
+			AND ter_industry =  #{ terIndustry,jdbcType= VARCHAR }
+		  </if>
+		  order by CREATE_DATE desc
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.terminal.model.Terminal">
+		select
+		count(1)
+		from terminal
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null and name != ''">
+			AND name like  CONCAT('%',#{ name,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="status != null">
+			AND status =  #{ status,jdbcType= VARCHAR }
+		  </if>
+		  <if test="cardNum != null and cardNum != ''">
+			OR card_num like  CONCAT('%',#{ cardNum,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="txLevel != null">
+			AND tx_level =  #{ txLevel,jdbcType= VARCHAR }
+		  </if>
+		  <if test="brocastAddress != null">
+			AND brocast_address =  #{ brocastAddress,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="frequency != null">
+			AND frequency =  #{ frequency,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="txLength != null">
+			AND tx_length =  #{ txLength,jdbcType= VARCHAR }
+		  </if>
+		  <if test="positionState != null">
+			AND position_state =  #{ positionState,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="positionId != null">
+			AND position_id =  #{ positionId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terArea != null">
+			AND ter_area =  #{ terArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terIndustry != null">
+			AND ter_industry =  #{ terIndustry,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.terminal.model.Terminal">
+		<if test="id !=null">
+			update terminal
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 name =  #{ name,jdbcType= VARCHAR },
+     			 type =  #{ type,jdbcType= VARCHAR },
+     			 status =  #{ status,jdbcType= VARCHAR },
+     			 card_num =  #{ cardNum,jdbcType= VARCHAR },
+     			 tx_level =  #{ txLevel,jdbcType= VARCHAR },
+     			 brocast_address =  #{ brocastAddress,jdbcType= VARCHAR },
+     			 remark =  #{ remark,jdbcType= VARCHAR },
+     			 frequency =  #{ frequency,jdbcType= VARCHAR },
+     			 zhj_num =  #{ zhjNum,jdbcType= VARCHAR },
+     			 tx_length =  #{ txLength,jdbcType= VARCHAR },
+     			 position_state =  #{ positionState,jdbcType= VARCHAR },
+     			 create_date =  #{ createDate,jdbcType= TIMESTAMP },
+     			 position_id =  #{ positionId,jdbcType= VARCHAR },
+     			  ter_area =  #{ terArea,jdbcType= VARCHAR },
+     			 ter_industry =  #{ terIndustry,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+	
+	 <!-- 根据终端区域id列表来查询终端-->
+	<select id="selectTerminalByIdList"  resultMap="BaseResultMap" >
+		select 
+	    <include refid="Base_Column_List" />
+		from terminal
+		where 1=1
+		  <if test="terminal.type != null">
+			AND type =  #{ terminal.type,jdbcType= INTEGER }
+		  </if>
+		  <if test="terminal.status != null">
+			AND status =  #{ terminal.status,jdbcType= INTEGER }
+		  </if>
+		  <if test="terminal.txLevel != null">
+			AND tx_level =  #{ terminal.txLevel,jdbcType= INTEGER }
+		  </if>
+		  <if test="terminal.brocastAddress != null">
+			AND brocast_address =  #{ terminal.brocastAddress,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terminal.remark != null">
+			AND remark =  #{ terminal.remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terminal.frequency != null">
+			AND frequency =  #{ terminal.frequency,jdbcType= INTEGER }
+		  </if>
+		  <if test="terminal.zhjNum != null">
+			AND zhj_num =  #{ terminal.zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terminal.txLength != null">
+			AND tx_length =  #{ terminal.txLength,jdbcType= INTEGER }
+		  </if>
+		  <if test="terminal.positionState != null">
+			AND position_state =  #{ terminal.positionState,jdbcType= INTEGER }
+		  </if>
+		  <if test="terminal.createDate != null">
+			AND create_date =  #{ terminal.createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="terminal.positionId != null">
+			AND position_id =  #{ terminal.positionId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terminal.terArea != null">
+			AND ter_area =  #{ terminal.terArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="terminal.terIndustry != null">
+			AND ter_industry =  #{ terminal.terIndustry,jdbcType= VARCHAR }
+		  </if>
+		   
+		    <if test="terminal.name != null and terminal.name != ''">
+			 AND (name like  CONCAT('%',#{ terminal.name,jdbcType= VARCHAR },'%')
+		  </if>
+		  <if test="terminal.cardNum != null and terminal.cardNum != ''">
+			and card_num  like  CONCAT('%',#{ terminal.cardNum,jdbcType= VARCHAR },'%'))
+		  </if> 
+		    and TER_AREA in
+    		<foreach collection="idList" item="areaId" index="index" open="(" close=")" separator=",">
+             #{ areaId,jdbcType=VARCHAR}
+   			 </foreach>
+	</select>
+	
+	
+	<!-- 根据区域id集合来统计下属终端数量 -->
+  <select id="sumTerminalByAreaIds" resultType="java.lang.Long"
+		parameterType="java.util.List">
+		select
+		count(*)
+		from terminal
+		where TER_AREA in
+    		<foreach collection="list" item="areaId" index="index" open="(" close=")" separator=",">
+             #{ areaId,jdbcType=VARCHAR}
+   			 </foreach>
+	</select>
+	
+	
+		<!-- 根据区域id来统计下属终端数量 -->
+  <select id="sumTerminalByAreaId" resultType="java.lang.Long"
+		parameterType="java.lang.String">
+		select
+		count(*)
+		from terminal
+		where TER_AREA = #{ areaId,jdbcType=VARCHAR}
+	</select>
+	
+	
+  <!-- 根据区域id来统计区内下属终端数量 -->
+  <select id="sumInZoneTerminalByAreaId" resultType="java.lang.Long"
+		parameterType="java.lang.String">
+		select
+		count(*)
+		from terminal
+		where TER_AREA = #{ areaId,jdbcType=VARCHAR} and type = 1
+	</select>
+	
+	 <!-- 根据区域id来统计区外下属终端数量 -->
+  <select id="sumOutZoneTerminalByAreaId" resultType="java.lang.Long"
+		parameterType="java.lang.String">
+		select
+		count(*)
+		from terminal
+		where TER_AREA = #{ areaId,jdbcType=VARCHAR} and type = 0
+	</select>
+	
+	
+	
+ <!-- 根据区域id集合来查找下属终端 -->
+  <select id="selectTerminalByAreaIds" resultMap="BaseResultMap"	parameterType="java.util.List">
+		select
+		<include refid="Base_Column_List" />
+		from terminal
+		where TER_AREA in
+    		<foreach collection="list" item="areaId" index="index" open="(" close=")" separator=",">
+             #{ areaId,jdbcType=VARCHAR}
+   			 </foreach>
+	</select>
+	
+	
+	<!-- 根据区域id查下属终端集合 -->
+  	<select id="selectTerminalByAreaId" resultMap="BaseResultMap"	parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from terminal
+		where TER_AREA = #{ areaId,jdbcType=VARCHAR}
+	 </select>
+	 
+	 
+	 <!-- 根据区域id集合和终端类型来查找下属终端 -->
+  	<select id="sumTerminalByAreaIdAndType"  resultType="java.lang.Long">
+		select
+		count(1)
+		from terminal
+		where type = #{type,jdbcType=VARCHAR} 
+		and TER_AREA in
+    		<foreach collection="list" item="areaId" index="index" open="(" close=")" separator=",">
+             #{ areaId,jdbcType=VARCHAR}
+   			 </foreach>
+	</select>
+	 
+  
+</mapper>

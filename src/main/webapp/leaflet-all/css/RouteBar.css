@@ -1,0 +1,10 @@
+﻿.routebar-container-ul{
+	border-radius:4px;
+	overflow:auto;
+	max-height:400px;
+}
+
+.routebar-container{
+	border-radius:4px;
+	min-width:280px;
+}

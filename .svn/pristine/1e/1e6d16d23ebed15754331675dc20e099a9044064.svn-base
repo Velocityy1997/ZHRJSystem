@@ -1,0 +1,1103 @@
+package com.web.business.generator.system.area.services.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.web.common.util.spring.PageTool;
+import com.web.common.util.spring.RestResponse;
+import com.github.pagehelper.PageHelper;
+import com.shara.common.util.page.PageUtil;
+import com.shara.common.util.tcp.ArraysUtils;
+import com.sun.tools.classfile.Annotation.element_value;
+import com.test.redisTest;
+import com.web.common.util.spring.PageTool;
+
+import com.web.business.generator.system.area.model.Area;
+import com.web.business.generator.system.area.dao.AreaMapper;
+import com.web.business.generator.system.area.services.IAreaService;
+import com.web.business.generator.system.terminal.dao.TerminalMapper;
+import com.web.business.generator.system.user.dao.UserMapper;
+import com.web.business.generator.system.user.model.User;
+import com.web.business.generator.system.zhj.dao.ZhjMapper;
+import com.web.business.generator.system.zhj.model.Zhj;
+import com.web.business.generator.util.isNull.IsNullUtil;
+
+@Service
+public class AreaServiceImpl implements IAreaService {
+	@Resource
+	private AreaMapper areaMapper;
+
+	@Autowired
+	private HttpServletRequest request;
+
+	@Resource
+	private ZhjMapper zhjMapper;
+
+	@Resource
+	private UserMapper userMapper;
+
+	@Resource
+	private TerminalMapper terminalMapper;
+
+	/**
+	 * 根据主键删除
+	 * 
+	 * @param industId
+	 * @return
+	 */
+	public Integer deleteByPrimaryKey(String areaId) throws Exception {
+		int result = -1;
+		result = areaMapper.deleteByPrimaryKey(areaId);
+		return result;
+	}
+
+	/**
+	 * 根据主键批量删除
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public Integer deleteBatchByPrimaryKey(String areaId) throws Exception {
+
+		int result = 0;
+
+		// 区域下属个数
+		Long userExistNum = 0L;
+		Long zhjExistNum = 0L;
+		Long terminalExistNum = 0L;
+
+		List<String> areaIds = new ArrayList<>();
+
+		// 1.处理批量删除区域的id
+		if (areaId.contains(",")) {
+			areaIds = PageUtil.getIdsForList(areaId);
+		} else {
+			areaIds.add(areaId);
+		}
+
+		// 2.删除的区域是否有下属用户
+		// 3.删除的区域是否有下属指挥机
+		// 4.删除的区域是否有下属终端
+		userExistNum = userMapper.selectUserByAreaIds(areaIds);
+		zhjExistNum = zhjMapper.selectZhjByAreaIds(areaIds);
+		terminalExistNum = terminalMapper.sumTerminalByAreaIds(areaIds);
+		List<Area> as = areaMapper.selectAreaByPIds(areaIds);
+		if (userExistNum == 0L && zhjExistNum == 0L && terminalExistNum == 0L && as.size() == 0) {
+			// 当前区域不存在下属用户、指挥机、终端
+			// 进行删除
+			if (areaId.contains(",")) {
+				// 进行批量删除
+				result = areaMapper.deleteBatchByPrimaryKey(areaIds);
+
+			} else {
+				// 单独删除
+				result = areaMapper.deleteByPrimaryKey(areaId);
+
+			}
+		} else {
+			result = -2; // 存在下属用户、指挥机、终端
+		}
+
+		return result;
+	}
+
+	/**
+	 * 新增
+	 * 
+	 * @param record
+	 * @return
+	 */
+	public Integer insertSelective(Area record) throws Exception {
+
+		int result = -1;
+
+		try {
+			result = areaMapper.insertSelective(record);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	/**
+	 * 根据主键查询对象
+	 * 
+	 * @param industId
+	 * @return
+	 */
+	public Area selectByPrimaryKey(String areaId) throws Exception {
+		Area area = areaMapper.selectByPrimaryKey(areaId);
+		if (area != null) {
+			String parentName = areaMapper.selectParentNameById(area.getParentId().toString());
+			if (parentName != null) {
+				area.setParentName(parentName);
+			} else {
+				area.setParentName("一级区域，不存在上级区域");
+			}
+		}
+		return area;
+	}
+
+	/**
+	 * 修改
+	 * 
+	 * @param record
+	 * @return
+	 */
+	public Integer updateByPrimaryKeySelective(Area record, User user) throws Exception {
+
+		int result = -1;
+
+		Integer userType = null; // 用户类型
+		String userAreaId = null; // 用户区域ID
+		userType = user.getType();
+		Area userArea = new Area();
+		userAreaId = user.getUserArea();
+
+		// 查询用户所在的区域
+		userArea = areaMapper.selectByPrimaryKey(userAreaId);
+
+		String cityId = null;
+		String proviceId = null;
+
+		if (userType != null) {
+			if (userType == 1) {
+				// 管理员：修改所有的区域
+				cityId = record.getCityId();
+				proviceId = record.getProvinceId();
+
+				if (cityId == null || cityId.equals("")) {
+					// 市id为空
+					if (proviceId == null || proviceId.equals("")) {
+						// 省id也为空
+						// 这个区域是省级区域
+						List<Area> provices = new ArrayList<>();
+						List<String> proviceNames = new ArrayList<>();
+						provices = areaMapper.selectAllProvince();
+						for (Area provice : provices) {
+							proviceNames.add(provice.getAreaName());
+						}
+						if (proviceNames.contains(record.getAreaName())) {
+							// 该省已经存在
+							result = 4;
+							return result;
+
+						} else {
+							record.setParentId("0");
+							record.setLevel(0);
+						}
+
+					} else {
+						// 市级区域 ----====
+						List<Area> citys = areaMapper.selectAllCity(record.getProvinceId());
+						List<String> citysNames = new ArrayList<>();
+						for (Area city : citys) {
+							citysNames.add(city.getAreaName());
+						}
+						if (citysNames.contains(record.getAreaName())) {
+							// 该省已有该市
+							result = 3;
+							return result;
+
+						} else {
+							record.setParentId(proviceId);
+							record.setLevel(1);
+						}
+					}
+
+				} else {
+					// 区级区域
+					// 查在该新市下有没有重名
+					List<Area> countys = areaMapper.selectAllZone(cityId);
+					List<String> countNames = new ArrayList<>();
+
+					for (Area county : countys) {
+						countNames.add(county.getAreaName());
+					}
+					if (countNames.contains(record.getAreaName())) {
+						// 重复
+						result = 2; // 新市下属区已存在转移过去的区
+						return result;
+
+					} else {
+						record.setParentId(cityId);
+						record.setLevel(2);
+					}
+
+				}
+				// -------
+				result = areaMapper.updateByPrimaryKeySelective(record); // 修改成功返回1，失败返回 -1
+
+			} else {
+				// 普通用户：只能修该所在区域的最高级别区域一下的区域
+				if (userAreaId == null || userAreaId.equals("")) {
+					// 用户区域为空，脏数据
+					result = -3;
+					return result;
+
+				} else {
+					// 1.查用户区域的下属区域ids
+					List<String> sonAreaIds = areaMapper.selectSonIdListByParentId(userAreaId);
+
+					// 2.判断修改的区域是否在下属ids中
+					sonAreaIds.add(userAreaId); // 将用户所在的区域也添加进去
+
+					if (sonAreaIds.contains(record.getAreaId())) {
+						// 2.1 在，继续修改
+						// 2.1.1 找父id
+						cityId = record.getCityId();
+						proviceId = record.getProvinceId();
+						if (cityId == null || cityId.equals("")) {
+							// 市id为空
+							if (proviceId == null || proviceId.equals("")) {
+								// 省id也为空
+								// 这个区域是省级区域
+								// 判断当前省是否存在
+								List<Area> provices = new ArrayList<>();
+								List<String> proviceNames = new ArrayList<>();
+								provices = areaMapper.selectAllProvince();
+								for (Area provice : provices) {
+									proviceNames.add(provice.getAreaName());
+								}
+								if (proviceNames.contains(record.getAreaName())) {
+									// 该省已经存在
+									result = 4;
+									return result;
+
+								} else {
+									record.setParentId("0");
+									record.setLevel(0);
+								}
+							} else {
+								// 市级区域
+								// 判断当前省是否存在该市
+								List<Area> citys = areaMapper.selectAllCity(record.getProvinceId());
+								List<String> citysNames = new ArrayList<>();
+								for (Area city : citys) {
+									citysNames.add(city.getAreaName());
+								}
+								if (citysNames.contains(record.getAreaName())) {
+									// 该省已有该市
+									result = 3;
+									return result;
+
+								} else {
+									record.setParentId(proviceId);
+									record.setLevel(1);
+								}
+							}
+						} else {
+							// 区级区域
+							// 判断当前市是否存在该区
+							List<Area> countys = areaMapper.selectAllZone(cityId);
+							List<String> countNames = new ArrayList<>();
+
+							for (Area county : countys) {
+								countNames.add(county.getAreaName());
+							}
+							if (countNames.contains(record.getAreaName())) {
+								// 重复
+								result = 2; // 新市下属区已存在转移过去的区
+								return result;
+
+							} else {
+								record.setParentId(cityId);
+								record.setLevel(2);
+							}
+						}
+
+						// 进行修改
+						result = areaMapper.updateByPrimaryKeySelective(record); // 修改成功返回1，失败返回 -1
+
+					} else {
+						// 2.2 不在，不能修改
+						result = -4;
+						return result;
+
+					}
+
+				}
+			}
+
+		} else {
+			// 用户类型为空，脏数据
+			result = -2; // 用户类型为空
+			return result;
+
+		}
+
+		return result;
+
+	}
+
+	/**
+	 * 管理员--分页查询区域数据列表
+	 * 
+	 * @param record
+	 * @param page
+	 * @return
+	 */
+	public PageTool<Area> selectAreaByPage(Area record, Integer page, Integer pageSize) throws Exception {
+ 		List<Area> list = new ArrayList<Area>();
+		List<Area> listReady = new ArrayList<Area>();
+
+		List<Area> areaWithParentInfoList = new ArrayList<>();
+
+		PageHelper.startPage(page, pageSize);
+
+		try {
+			list = areaMapper.selectByPropertyByPage(record);
+
+			// 根据praentId查找上级区域的名称
+			String tempParentName = null;
+			String parentId = null;
+			for (Area area : list) {
+				parentId = area.getParentId();
+				if (parentId != null) {
+					tempParentName = areaMapper.selectParentNameById(area.getParentId());
+					if (tempParentName != null) {
+						area.setParentName(tempParentName);
+
+					} else {
+						area.setParentName("省级区域，不存在上级区域");
+					}
+				} else {
+					area.setParentName("该区域为录入上级区域");
+				}
+
+				listReady.add(area);
+			}
+
+			// 加入上级区域的信息
+
+			areaWithParentInfoList = selectParentInfoByList(listReady);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// 查询总数
+		int count = areaMapper.selectCountByProperty(record);
+		PageTool<Area> pageTool = new PageTool<>(page, count, areaWithParentInfoList, pageSize);
+		return pageTool;
+
+	}
+
+	/**
+	 * 普通用户--- 分页查询区域数据列表 查询当前及下属区域
+	 * 
+	 * @param record
+	 * @param page
+	 * @return
+	 */
+	public PageTool<Area> selectAreaByCommonUserPage(Area record, Integer page, Integer pageSize) throws Exception {
+
+		List<Area> list = new ArrayList<Area>();
+		List<Area> listReady = new ArrayList<Area>();
+
+		List<Area> areaWithParentInfoList = new ArrayList<>(); // 加上对应区域对应省市区的信息
+		List<Area> searchAreaList = new ArrayList<>(); // 存放模糊查询区域
+		
+		int start = (page != null ? page : 1);
+		int max = pageSize != null ? pageSize : 10;
+		record.setStart((start - 1) * pageSize);
+		record.setMax(max);
+
+		PageTool<Area> pageTool = null;
+
+		// 根据praentId查找上级区域的名称
+		String tempParentName = null;
+		String parentId = null;
+
+		HttpSession session = request.getSession();
+
+		// 2.获取当前用户信息
+		User user = (User) session.getAttribute("loginInfo");
+
+		// 2.1 用户所在的区域id
+		String areaId = user.getUserArea();
+
+		boolean tag = false;
+
+		try {
+			// 3.当前用户所在的区域
+			Area userArea = areaMapper.selectByAreaId(areaId);
+			tag = IsNullUtil.isObjectNull(userArea);
+			
+			if (!tag) {
+				// 用户所在的区域不为空
+				Integer areaLevel = null;
+
+				areaLevel = userArea.getLevel();
+
+				if (areaLevel != null) {
+
+					// 区域级别不为空
+					if (areaLevel == 2) {
+
+						// 4.1 当前为区县，不存在下属，不进行查询
+						// 4.1.2 查上级区域的名称
+						parentId = userArea.getParentId();
+						
+						if (parentId != null) {
+							tempParentName = areaMapper.selectParentNameById(parentId);
+							userArea.setParentName(tempParentName);
+
+						} else {
+							tempParentName = "上级区域名称不存在";
+							userArea.setParentName(tempParentName);
+
+						}
+
+						listReady.add(userArea);
+						searchAreaList = searchAreaListByName(listReady,record.getAreaName());
+						pageTool = new PageTool<>(page, 1, searchAreaList, pageSize);
+
+					} else if (areaLevel == 1) {
+
+						// 4.2.1 当前区域为：市
+						// 查询下属区域
+						List<Area> sonAreaList = areaMapper.selectById(userArea.getAreaId());
+						sonAreaList.add(userArea);
+						// 4.2.2 查上级区域的名称
+						for (Area area : sonAreaList) {
+
+							parentId = area.getParentId();
+
+							if (parentId != null) {
+
+								tempParentName = areaMapper.selectParentNameById(parentId);
+
+								if (tempParentName != null) {
+									area.setParentName(tempParentName);
+
+								} else {
+									area.setParentName("省级区域，不存在上级区域");
+								}
+							} else {
+								area.setParentName("该区域为录入上级区域");
+							}
+
+							listReady.add(area);
+
+						}
+
+						// 加入上级区域的信息
+						areaWithParentInfoList = selectParentInfoByList(listReady);
+						
+						//根据区域名称进行模糊查询
+						searchAreaList = searchAreaListByName(areaWithParentInfoList, record.getAreaName());
+						
+						int sum = searchAreaList.size(); // 集合的长度
+						List<Area> areaPageList = new ArrayList<>(); // 存储分页计算后的集合
+
+						// 进行分页
+						// 15条 ，pageSize=10 page=1
+						if (searchAreaList.size() < pageSize) {
+							// 数据小于10条不用分页
+							pageTool = new PageTool<>(page, sum, searchAreaList, pageSize);
+
+						} else {
+							// 数据大于10条
+							// 页数
+							int listPageNum = searchAreaList.size() / pageSize;
+							int areaListSize = searchAreaList.size(); // 集合的长度
+							if (page == 1) {
+								// 第一页
+								pageTool = new PageTool<>(page, sum, searchAreaList, pageSize);
+
+							} else {
+								// 第二页及以上，得进行截取原来的集合 15
+								// 去掉上一页的数据
+								int startIndex = (page - 1) * pageSize; // 起始坐标 0 10
+								int endIndex = startIndex + 10; // 终止坐标，每次取10条 20
+
+								if (searchAreaList.size() < endIndex
+										&& searchAreaList.size() == endIndex) {
+									areaPageList = searchAreaList.subList(startIndex, endIndex + 1);// 包含起始，不包含结尾坐标
+
+								} else {
+									// 集合长度大于终止坐标 25 10 20
+									if (searchAreaList.size() < endIndex) {
+										areaPageList = searchAreaList.subList(startIndex,
+												searchAreaList.size());// 包含起始，不包含结尾坐标
+
+									} else {
+										areaPageList = searchAreaList.subList(startIndex, startIndex + 10);// 包含起始，不包含结尾坐标
+
+									}
+
+								}
+
+								pageTool = new PageTool<>(page, sum, areaPageList, pageSize);
+
+							}
+
+						}
+
+						// 页数 总条数 当前页的数据 每页数据条数
+						// pageTool = new PageTool<>(page, areaWithParentInfoList.size(), areaPageList,
+						// pageSize);
+
+					} else {
+						// 4.3.1 为省
+						// 查询下属区域 市、区
+						List<Area> sonAreaList = areaMapper.selectById(userArea.getAreaId());
+						sonAreaList.add(userArea);
+						// 4.3.2 为省级下属区域查对应的上级区域名称
+						for (Area area : sonAreaList) {
+
+							parentId = area.getParentId();
+
+							if (parentId != null) {
+
+								tempParentName = areaMapper.selectParentNameById(parentId);
+
+								if (tempParentName != null) {
+									area.setParentName(tempParentName);
+
+								} else {
+									area.setParentName("省级区域，不存在上级区域");
+								}
+							} else {
+								area.setParentName("该区域未录入上级区域");
+							}
+
+							listReady.add(area);
+						}
+
+						// 加入上级区域的信息
+						areaWithParentInfoList = selectParentInfoByList(listReady);
+
+						//进行查询
+						searchAreaList = searchAreaListByName(areaWithParentInfoList, record.getAreaName());
+						
+						// 进行分页
+						List<Area> areaPageList = new ArrayList<>(); // 存储分页计算后的集合
+
+						// 进行分页
+						// 15条 ，pageSize=10 page=1
+						if (searchAreaList.size() < pageSize) {
+							// 数据小于10条不用分页
+							pageTool = new PageTool<>(page, searchAreaList.size(), searchAreaList,
+									pageSize);
+
+						} else {
+							// 数据大于10条
+							// 页数
+							int sum = searchAreaList.size(); // 集合的长度
+						
+								// 第二页及以上，得进行截取原来的集合 15
+								// 去掉上一页的数据
+								int startIndex = (page - 1) * pageSize; // 起始坐标 0 10
+								int endIndex = startIndex + 10; // 终止坐标，每次取10条 20
+
+								if (searchAreaList.size() < endIndex
+										&& searchAreaList.size() == endIndex) {
+									areaPageList = searchAreaList.subList(startIndex, endIndex + 1);// 包含起始，不包含结尾坐标
+
+								} else {
+									// 集合长度大于终止坐标 25 10 20
+									if (searchAreaList.size() < endIndex) {
+										areaPageList = searchAreaList.subList(startIndex,
+												searchAreaList.size());// 包含起始，不包含结尾坐标
+
+									} else {
+										areaPageList = searchAreaList.subList(startIndex, startIndex + 10);// 包含起始，不包含结尾坐标
+
+									}
+
+								}
+
+								pageTool = new PageTool<>(page, sum, areaPageList, pageSize);
+
+							
+
+						}
+
+					}
+
+				} else {
+					// 用户区域级别为空
+					// 根据父id递归查找子节点
+					List<Area> sonAreaList = areaMapper.selectById(userArea.getAreaId());
+					sonAreaList.add(userArea);
+					
+					if (sonAreaList == null || sonAreaList.size() == 0) {
+
+						// 下属区域为空
+						parentId = userArea.getParentId();
+
+						if (parentId != null) {
+
+							tempParentName = areaMapper.selectParentNameById(parentId);
+
+							if (tempParentName != null) {
+								userArea.setParentName(tempParentName);
+
+							} else {
+								userArea.setParentName("未录入上级区域名称");
+							}
+						} else {
+							userArea.setParentName("该区域未录入上级区域");
+						}
+
+						listReady.add(userArea);
+
+					} else {
+						// 下属区域不为空
+						for (Area area : sonAreaList) {
+
+							// 查当前区域及下属区域的父级区域名称
+							parentId = area.getParentId();
+
+							if (parentId != null) {
+
+								tempParentName = areaMapper.selectParentNameById(parentId);
+
+								if (tempParentName != null) {
+									area.setParentName(tempParentName);
+
+								} else {
+									area.setParentName("未录入上级区域名称");
+								}
+							} else {
+								area.setParentName("该区域未录入上级区域");
+							}
+
+							listReady.add(area);
+						}
+
+						// 加入上级区域的信息
+						areaWithParentInfoList = selectParentInfoByList(listReady);
+						searchAreaList = searchAreaListByName(areaWithParentInfoList, record.getAreaName());
+
+					}
+
+					pageTool = new PageTool<>(page, searchAreaList.size(), searchAreaList, pageSize);
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return pageTool;
+
+	}
+
+	@Override
+	public List<Area> selectAll() {
+		return areaMapper.selectAll();
+	}
+
+	@Override
+	public List<Area> selectById(String id) {
+		return areaMapper.selectById(id);
+	}
+
+	@Override
+	public String selectParentNameById(String parentid) {
+		return areaMapper.selectParentNameById(parentid);
+	}
+
+	@Override
+	public List<Area> selectAllProvince() {
+		return areaMapper.selectAllProvince();
+	}
+
+	@Override
+	public List<Area> selectAllCity(String provinceId) {
+		return areaMapper.selectAllCity(provinceId);
+	}
+
+	@Override
+	public List<Area> selectAllZone(String cityId) {
+		return areaMapper.selectAllZone(cityId);
+	}
+
+	// 普通用户查当前的省信息
+	public List<Area> selectProvinceByCommonUser(String areaId) {
+		List<Area> province = new ArrayList<>();
+		Area area = areaMapper.selectByPrimaryKey(areaId);
+
+		String parentId = area.getParentId();
+		try {
+			if (parentId.equals("0")) {
+				// 最小区域为：省
+				province.add(area);
+
+			} else {
+
+				area = areaMapper.selectByPrimaryKey(parentId.toString());
+				parentId = area.getParentId();
+				if (parentId.equals("0")) {
+					// 最小区域为：市
+					province.add(area);
+
+				} else {
+					// 最小区域为：区县
+					area = areaMapper.selectByPrimaryKey(parentId.toString());
+					province.add(area);
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return province;
+
+	}
+
+	/**
+	 * 查上级省市信息，封装在area类中
+	 * 
+	 * @param areaId
+	 * @return
+	 */
+	@Override
+	public Area selectParentAreaInfoById(String areaId) {
+
+		// 2.根据id查区域
+		Area areaSearch = areaMapper.selectByPrimaryKey(areaId);
+
+		if (areaSearch != null) {
+
+			Integer level = areaSearch.getLevel();
+
+			// 3.判断level是否为省
+			if (level == 0) {
+				// 4.1省，不能修改上级
+				return null;
+
+			} else if (level == 1) {
+				// 4.2 市
+				Area province = areaMapper.selectByPrimaryKey(areaSearch.getParentId());
+
+				// 4.2.1 查上级省
+				// 4.2.2 将省信息给当前市
+				areaSearch.setProvinceName(province.getAreaName());
+				areaSearch.setProvinceId(province.getAreaId());
+
+			} else {
+				// 4.3 区县
+				// 4.3.1 将省市信息查出来
+				// 4.2 市
+				Area city = areaMapper.selectByPrimaryKey(areaSearch.getParentId());
+				Area province = areaMapper.selectByPrimaryKey(city.getParentId());
+
+				// 4.2.1 查上级省
+				// 4.2.2 将省信息给当前市
+				areaSearch.setCityName(city.getAreaName());
+				areaSearch.setCityId(city.getAreaId());
+
+				areaSearch.setProvinceName(province.getAreaName());
+				areaSearch.setProvinceId(province.getAreaId());
+
+			}
+		}
+
+		return areaSearch;
+	}
+
+	/**
+	 * 根据输入的List来查区域的上级区域名称及ID
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public List<Area> selectParentInfoByList(List<Area> list) {
+
+		// 存查询完上级区域信息的集合
+		List<Area> resultList = new ArrayList<>();
+
+		String parentId = null; // 上级区域的id
+		Integer areaLevel = null;
+
+		Area provice = null;
+		Area city = null;
+
+		boolean tag = false; // 标志位
+
+		try {
+			// 1.判空
+			tag = IsNullUtil.isListNull(list);
+
+			if (!tag) {
+				// 不为空
+				// 1.2 非空
+				// 遍历list
+				for (Area area : list) {
+
+					areaLevel = area.getLevel();
+
+					if (areaLevel != null) {
+						// 不为空
+						// 2.判断区域级别
+						// 2.1 省跳过不查
+						if (areaLevel == 1) {
+							// 2.2 市------查对应的省信息
+							parentId = area.getParentId();
+							tag = IsNullUtil.isStrNull(parentId);
+							if (!tag) {
+								provice = areaMapper.selectByPrimaryKey(parentId);
+								area.setProvinceId(provice.getAreaId());
+								area.setProvinceName(provice.getAreaName());
+							}
+
+						} else if (areaLevel == 2) {
+							// 2.3 区
+							// 2.3.1 查市信息
+							parentId = area.getParentId(); // 市id
+							tag = IsNullUtil.isStrNull(parentId);
+							if (!tag) {
+								city = areaMapper.selectByPrimaryKey(parentId);
+								area.setCityId(city.getAreaId());
+								area.setCityName(city.getAreaName());
+
+								// 2.3.2 查省信息
+								parentId = city.getParentId();
+								tag = IsNullUtil.isStrNull(parentId);
+								if (!tag) {
+									provice = areaMapper.selectByPrimaryKey(parentId);
+									area.setProvinceId(provice.getAreaId());
+									area.setProvinceName(provice.getAreaName());
+								}
+
+							}
+
+						}
+					}
+
+					resultList.add(area);
+				}
+
+			} else {
+				// 为空
+				return list;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return resultList;
+	}
+
+	/**
+	 * 根据输入所属区域进行查询是否重复
+	 */
+	@Override
+	public List<Area> selectAreaName(String areaName) {
+
+		return areaMapper.selectAreaName(areaName);
+	}
+
+	@Override
+	public Area selectAreaByName(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * 不同角色 根据区域名称查询下属区域的id
+	 * 
+	 * 管理员：根据区域名称查对应区域id集合；根据id集合再查下属区域id
+	 * 普通用户：在（用户当前区域及下属区域）中模糊查询区域id集合；根据id集合再查下属区域id
+	 */
+	public List<String> getSonAreasByAreaName(User user, String areaName) {
+
+		List<String> ids = new ArrayList<>(); // 根据条件查询出来的：区域id
+		List<String> sonIds = new ArrayList<>(); // 查询出来的区域ID的：下属id+当前id
+		User onlineUser = user; // 当前的用户
+		String searchName = areaName; // 区域名称
+		Integer userType = null; // 用户类型
+		String areaId = null; // 区域id
+		boolean tag = false; // 校验标志位
+
+		// 1.判断入参合法非空
+		tag = IsNullUtil.isObjectNull(onlineUser);
+
+		if (!tag) {
+			// 1.1用户不为空
+			tag = IsNullUtil.isStrNull(searchName);
+
+			if (!tag) {
+				// 1.1.1区域名不为空
+				userType = onlineUser.getType();
+				tag = IsNullUtil.isIntegerNull(userType);
+
+				if (!tag) {
+					// 用户类型不为空
+					// 2.管理员
+					if (userType == 1) {
+						// 2.1 全查
+						areaId = onlineUser.getUserArea();
+						tag = IsNullUtil.isStrNull(areaId);
+
+						if (!tag) {
+							// 用户当前区域不为空
+							// 管理员根据区域名称来模糊搜索区域id
+							ids = areaMapper.selectBySonIdsByName(searchName);
+							tag = IsNullUtil.isListNull(ids);
+
+							if (!tag) {
+								// 查询结果不为空
+								if (ids.size() == 1) {
+									// 只有一个查询结果，查询下属区域id
+									sonIds = areaMapper.selectSonIdListByParentId(ids.get(0));
+									sonIds.add(ids.get(0));
+
+								} else {
+									// 有多个查询结果，查询下属区域id
+									// 3.1.2.1 有多个元素
+									// 根据ids查找对应的区域对象
+									List<Area> areas = areaMapper.selectAreaByIds(ids);
+									tag = IsNullUtil.isListNull(areas);
+									Integer areaLevel = null;
+
+									if (!tag) {
+										// 区域对象不为空
+										// 进行遍历
+										for (Area area : areas) {
+											areaLevel = area.getLevel();
+											tag = IsNullUtil.isIntegerNull(areaLevel);
+											List<String> tempIds = new ArrayList<>(); //
+
+											if (!tag) {
+												// 级别不为空
+												if (areaLevel == 0) {
+													// 省级用户
+													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
+													tempIds.add(area.getAreaId());
+												}
+												if (areaLevel == 1) {
+													// 市级用户
+													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
+													tempIds.add(area.getAreaId());
+												}
+												if (areaLevel == 2) {
+													// 区级用户
+													tempIds.add(area.getAreaId());
+												}
+											}
+											sonIds.addAll(tempIds);
+										}
+									}
+
+								}
+							}
+						}
+
+					} else {
+						// 3.普通用户
+						// 3.1 查当前用户区域及下属id
+						areaId = onlineUser.getUserArea();
+						tag = IsNullUtil.isStrNull(areaId);
+
+						if (!tag) {
+							// 3.1.1 用户区域不为空
+							ids = areaMapper.selectSonIdsByParentIdAndName(areaId, searchName);
+							tag = IsNullUtil.isListNull(ids);
+
+							if (!tag) {
+								// 3.1.2 ids不为空
+								if (ids.size() == 1) {
+									// 3.1.2.1 只有一个元素
+									// 查下属区域
+									sonIds = areaMapper.selectSonIdListByParentId(ids.get(0));
+
+									// 将当前查询到的区域id加进去
+									sonIds.add(ids.get(0));
+
+								} else {
+									// 3.1.2.1 有多个元素
+									// 根据ids查找对应的区域对象
+									List<Area> areas = areaMapper.selectAreaByIds(ids);
+									tag = IsNullUtil.isListNull(areas);
+									Integer areaLevel = null;
+
+									if (!tag) {
+										// 区域对象不为空
+										// 进行遍历
+										for (Area area : areas) {
+											areaLevel = area.getLevel();
+											tag = IsNullUtil.isIntegerNull(areaLevel);
+											List<String> tempIds = new ArrayList<>(); //
+
+											if (!tag) {
+												// 级别不为空
+												if (areaLevel == 0) {
+													// 省级用户
+													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
+													tempIds.add(area.getAreaId());
+												}
+												if (areaLevel == 1) {
+													// 市级用户
+													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
+													tempIds.add(area.getAreaId());
+												}
+											}
+											sonIds.addAll(tempIds);
+										}
+									}
+
+								}
+							}
+
+						}
+					}
+
+				}
+
+			}
+		}
+
+		return sonIds;
+	}
+	
+	
+	/**
+	 * 遍历集合，根据区域名称模糊查询区域
+	 * @param list
+	 * @param queryName
+	 * @return
+	 */
+	public List<Area> searchAreaListByName(List<Area> list,String queryName) {
+		 List<Area> resultList = new ArrayList<>();
+		 boolean tag = false;
+		 tag = IsNullUtil.isListNull(list);
+		 
+		 if ( !tag) {
+			 
+			 //查询的集合不为空
+			tag = IsNullUtil.isStrNull(queryName);
+			
+			if (!tag) {
+				//查询区域名不为空
+				for (Area area : list) {
+					if (area.getAreaName().contains(queryName)) {
+						resultList.add(area);
+					}
+				}
+			}else {
+				return list;
+			}
+		}
+		 
+		 
+		 return resultList;
+	}
+
+}

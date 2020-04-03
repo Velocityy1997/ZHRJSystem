@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuiji.dao.TbLogInfoMapper">
+  <resultMap id="BaseResultMap" type="com.zhihuiji.model.TbLogInfo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="result" jdbcType="VARCHAR" property="result" />
+    <result column="userName" jdbcType="VARCHAR" property="userName" />
+    <result column="zhjNum" jdbcType="VARCHAR" property="zhjNum" />
+    <result column="sender" jdbcType="VARCHAR" property="sender" />
+    <result column="receiver" jdbcType="VARCHAR" property="receiver" />
+    <result column="userIp" jdbcType="VARCHAR" property="userIp" />
+    <result column="zhjName" jdbcType="VARCHAR" property="zhjName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, type, content, time, result, userName, zhjNum, sender, receiver, userIp, zhjName
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_log_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_log_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zhihuiji.model.TbLogInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_log_info (type, content, time, 
+      result, userName, zhjNum, 
+      sender, receiver, userIp, 
+      zhjName)
+    values (#{type,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP}, 
+      #{result,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{zhjNum,jdbcType=VARCHAR}, 
+      #{sender,jdbcType=VARCHAR}, #{receiver,jdbcType=VARCHAR}, #{userIp,jdbcType=VARCHAR}, 
+      #{zhjName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhihuiji.model.TbLogInfo">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_log_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        type,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+      <if test="result != null">
+        result,
+      </if>
+      <if test="userName != null">
+        userName,
+      </if>
+      <if test="zhjNum != null">
+        zhjNum,
+      </if>
+      <if test="sender != null">
+        sender,
+      </if>
+      <if test="receiver != null">
+        receiver,
+      </if>
+      <if test="userIp != null">
+        userIp,
+      </if>
+      <if test="zhjName != null">
+        zhjName,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="result != null">
+        #{result,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjNum != null">
+        #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="sender != null">
+        #{sender,jdbcType=VARCHAR},
+      </if>
+      <if test="receiver != null">
+        #{receiver,jdbcType=VARCHAR},
+      </if>
+      <if test="userIp != null">
+        #{userIp,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjName != null">
+        #{zhjName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhihuiji.model.TbLogInfo">
+    update tb_log_info
+    <set>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="result != null">
+        result = #{result,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        userName = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjNum != null">
+        zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="sender != null">
+        sender = #{sender,jdbcType=VARCHAR},
+      </if>
+      <if test="receiver != null">
+        receiver = #{receiver,jdbcType=VARCHAR},
+      </if>
+      <if test="userIp != null">
+        userIp = #{userIp,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjName != null">
+        zhjName = #{zhjName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhihuiji.model.TbLogInfo">
+    update tb_log_info
+    set type = #{type,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR},
+      time = #{time,jdbcType=TIMESTAMP},
+      result = #{result,jdbcType=VARCHAR},
+      userName = #{userName,jdbcType=VARCHAR},
+      zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      sender = #{sender,jdbcType=VARCHAR},
+      receiver = #{receiver,jdbcType=VARCHAR},
+      userIp = #{userIp,jdbcType=VARCHAR},
+      zhjName = #{zhjName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

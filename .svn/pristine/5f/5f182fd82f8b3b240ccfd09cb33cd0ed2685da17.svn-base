@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhihuiji.dao.TbCurrentTaskMapper">
+  <resultMap id="BaseResultMap" type="com.zhihuiji.model.TbCurrentTask">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="startTime" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="userName" jdbcType="VARCHAR" property="userName" />
+    <result column="zhjNum" jdbcType="VARCHAR" property="zhjNum" />
+    <result column="sender" jdbcType="VARCHAR" property="sender" />
+    <result column="receiver" jdbcType="VARCHAR" property="receiver" />
+    <result column="planTime" jdbcType="TIMESTAMP" property="planTime" />
+    <result column="sendTimes" jdbcType="INTEGER" property="sendTimes" />
+    <result column="sendType" jdbcType="INTEGER" property="sendType" />
+    <result column="userIp" jdbcType="VARCHAR" property="userIp" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, type, content, description, startTime, userName, zhjNum, sender, receiver, planTime, 
+    sendTimes, sendType, userIp
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_current_task
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tb_current_task
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zhihuiji.model.TbCurrentTask">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_current_task (type, content, description, 
+      startTime, userName, zhjNum, 
+      sender, receiver, planTime, 
+      sendTimes, sendType, userIp
+      )
+    values (#{type,jdbcType=INTEGER}, #{content,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{userName,jdbcType=VARCHAR}, #{zhjNum,jdbcType=VARCHAR}, 
+      #{sender,jdbcType=VARCHAR}, #{receiver,jdbcType=VARCHAR}, #{planTime,jdbcType=TIMESTAMP}, 
+      #{sendTimes,jdbcType=INTEGER}, #{sendType,jdbcType=INTEGER}, #{userIp,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.zhihuiji.model.TbCurrentTask">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.String">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_current_task
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        type,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="startTime != null">
+        startTime,
+      </if>
+      <if test="userName != null">
+        userName,
+      </if>
+      <if test="zhjNum != null">
+        zhjNum,
+      </if>
+      <if test="sender != null">
+        sender,
+      </if>
+      <if test="receiver != null">
+        receiver,
+      </if>
+      <if test="planTime != null">
+        planTime,
+      </if>
+      <if test="sendTimes != null">
+        sendTimes,
+      </if>
+      <if test="sendType != null">
+        sendType,
+      </if>
+      <if test="userIp != null">
+        userIp,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjNum != null">
+        #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="sender != null">
+        #{sender,jdbcType=VARCHAR},
+      </if>
+      <if test="receiver != null">
+        #{receiver,jdbcType=VARCHAR},
+      </if>
+      <if test="planTime != null">
+        #{planTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sendTimes != null">
+        #{sendTimes,jdbcType=INTEGER},
+      </if>
+      <if test="sendType != null">
+        #{sendType,jdbcType=INTEGER},
+      </if>
+      <if test="userIp != null">
+        #{userIp,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zhihuiji.model.TbCurrentTask">
+    update tb_current_task
+    <set>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        startTime = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null">
+        userName = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="zhjNum != null">
+        zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      </if>
+      <if test="sender != null">
+        sender = #{sender,jdbcType=VARCHAR},
+      </if>
+      <if test="receiver != null">
+        receiver = #{receiver,jdbcType=VARCHAR},
+      </if>
+      <if test="planTime != null">
+        planTime = #{planTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sendTimes != null">
+        sendTimes = #{sendTimes,jdbcType=INTEGER},
+      </if>
+      <if test="sendType != null">
+        sendType = #{sendType,jdbcType=INTEGER},
+      </if>
+      <if test="userIp != null">
+        userIp = #{userIp,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zhihuiji.model.TbCurrentTask">
+    update tb_current_task
+    set type = #{type,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      startTime = #{startTime,jdbcType=TIMESTAMP},
+      userName = #{userName,jdbcType=VARCHAR},
+      zhjNum = #{zhjNum,jdbcType=VARCHAR},
+      sender = #{sender,jdbcType=VARCHAR},
+      receiver = #{receiver,jdbcType=VARCHAR},
+      planTime = #{planTime,jdbcType=TIMESTAMP},
+      sendTimes = #{sendTimes,jdbcType=INTEGER},
+      sendType = #{sendType,jdbcType=INTEGER},
+      userIp = #{userIp,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

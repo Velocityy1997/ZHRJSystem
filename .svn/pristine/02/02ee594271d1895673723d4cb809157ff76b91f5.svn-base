@@ -1,0 +1,100 @@
+package com.web.business.generator.system.user.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.web.business.generator.system.user.model.User;
+@Mapper
+public interface UserMapper {
+
+	 
+     /*****
+     *根据主键查询
+     ****/
+     User selectByPrimaryKey(String id);
+     
+     List<User> selectByAreaId(String areaId);
+     
+	
+	 /****
+	 *根据主键删除
+	 ****/
+     int deleteByPrimaryKey(String id);
+     
+     /****
+	 *根据主键批量删除
+	 ****/
+     int deleteBatchByPrimaryKey(List<String> list);
+     
+     /****
+	 *新增
+	 ****/
+     int insertSelective(User record);
+     
+     /****
+	 *根据属性分页查询（非管理员）
+	 ****/
+     List<User> selectByPropertyByPage(User record);
+     
+     /****
+ 	 *根据属性分页查询（管理员）
+ 	 ****/
+     List<User> selectByPropertyByAdminPage(User record);
+     
+	 /****
+     *根据主键更新记录
+	 ****/
+	 int updateByPrimaryKeySelective(User record);
+	 /**
+	  * 分页总数
+	  * 
+	  * 管理员
+	  * @param record
+	  * @return
+	  */
+	 int selectCountByAdminProperty(User record);
+	 /**
+	  * 分页总数
+	  * 普通用户
+	  * @param record
+	  * @return
+	  */
+	 int selectCountByUserProperty(User record);
+	 
+	 List<User> selectByUserName(String name);
+	 
+	 List<User> findUserByNameAndPassword(String userName ,String password);
+	 
+	 List<User> selectByUserPhone (String phone);
+	 
+	 /**
+	  * 根据区域id集合来遍历查找下属用户
+	  * @param areaIds
+	  * @return
+	  */
+	 Long selectUserByAreaIds(List<String> areaIds);
+
+	
+	 /**
+	  * 普通用户根据条件查询
+	  * @param model
+	  * @return
+	  */
+	 
+	 List<User> selectByPropertyByPageList(@Param("user")User record, @Param("idList")String idStr ,@Param("queryName")String queryName);
+	 
+	 /**
+	  * 管理员根据条件查询
+	  * @param model
+	  * @return
+	  */
+	
+	List<User> selectByPropertyByAdminLisr(@Param("user")User record, @Param("idList")String idStr);
+	 
+	 
+	 
+	 
+}

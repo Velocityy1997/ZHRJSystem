@@ -1,0 +1,476 @@
+package com.web.business.generator.comm.route.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.web.common.util.spring.PageTool;
+import com.shara.common.util.page.PageUtil;
+import com.shara.common.util.page.ValidateUtil;
+import com.sun.tools.classfile.Annotation.element_value;
+import com.sun.xml.internal.xsom.impl.scd.Iterators.Map;
+import com.web.common.util.spring.RestResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+import com.web.business.generator.comm.route.model.Route;
+import com.web.business.generator.comm.route.services.impl.RouteServiceImpl;
+import com.web.business.generator.util.log.SystemControllerLog;
+
+@Api(description = "routeAPI", tags = "routeAPI")
+@Controller
+@RequestMapping("/route")
+public class RouteController{
+	@Resource
+	private RouteServiceImpl routeServiceImpl;
+	/**
+	 * ADD管理跳转
+	 * 
+	 * @return
+	 */
+	@ApiOperation(value = "新增页面跳转..", notes = "新增页面跳转..")
+	@RequestMapping(value = "/route_add", method = RequestMethod.GET)
+	public String routeAddIndex(HttpServletRequest request) {
+		return "/business/generator/comm/route/jsp/add_route";
+	}
+
+	/**
+	 * EDIT管理跳转
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/route_edit", method = RequestMethod.GET)
+	public String routeIndex(HttpServletRequest request) {
+		String key = request.getParameter("routeId");
+		
+		Route route;
+		try {
+			route = routeServiceImpl.selectByPrimaryKey(key);
+			request.setAttribute("route", route);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "/business/generator/comm/route/jsp/edit_route";
+	}
+/**
+	 * 查询Jqgrid
+	 * @author 
+	 * @date 
+	 * @return json
+	 */
+	@ApiOperation(value = "查询Jqgrid..", notes = "查询Jqgrid..")
+	@ResponseBody
+	@RequestMapping(value = "/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<Route> list(HttpServletRequest request, String pagination, String route) {
+		RestResponse result = new RestResponse();
+		PageTool<Route> pageInfo = null;
+		try {
+			Route routeBean = new Route();
+			// 判断是否有查询条件
+			if (ValidateUtil.isNullAndIsStr(route)) {
+				routeBean = JSON.parseObject(route, Route.class);
+			}
+			
+			// 条件+分页查询
+			PageUtil pageUtil =  PageUtil.getPageBean(request);
+			// 条件+分页查询
+			  pageInfo =  routeServiceImpl.selectRouteByPage(routeBean == null ? new Route() : routeBean, pageUtil.getPage() == 0 ? 1 : pageUtil.getPage(), pageUtil.getRows() == pageUtil.getRows() ?
+                    10 : pageUtil.getRows());
+		} catch (Exception e) {
+			result.setSuccess(false).setMessage("操作失败");
+			e.printStackTrace();
+		}
+		return pageInfo;
+	}
+	
+	
+	/**
+	 * 处理路线相关（增删改）
+	 * @param request
+	 * @return
+	 * by:gyd
+	 */
+	@SystemControllerLog(type = "处理路线（增删改）", actionType = "2")
+	@ApiOperation(value = "处理路线（增删改）", notes = "处理路线（增删改）")
+	@ResponseBody
+	@RequestMapping(value = "/handleRoute", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public RestResponse list(String mapData) {
+
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		//String mapData = request.getParameter("mapData");
+		
+		try {
+			if (mapData == null || mapData.equals("")) {
+				// 空数据
+				result.setStatus("404");
+				result.setMessage("路线信息为空,无法进行操作");
+				result.setSuccess(false);
+				result.setDescription(sdf.format(System.currentTimeMillis()) + ":路线信息为空,无法进行操作");
+
+			} else {
+				// 1.转json对象
+				JSONObject jsonObject = JSONObject.parseObject(mapData);
+				
+				// "route":[{"title":"新建路线7","id":"qrnz0v1573707504813","flag":1},{"awayPoints":[],"wayPoints":[],"purpose":[]}]
+				// 2.转json数组
+				JSONArray jsonArray = jsonObject.getJSONArray("route");//
+				JSONObject rotes = (JSONObject) jsonArray.get(0);
+				JSONObject wayPoints = (JSONObject) jsonArray.get(1);
+				String wayInfo = wayPoints.toJSONString();
+				// 3.提取参数
+				String id = (String) rotes.get("id");
+				String routeName = (String) rotes.get("title");
+				Integer flag = (Integer) rotes.get("flag");
+				
+				if (routeName ==null || routeName.equals("")) {
+					//路线名为空，不进行操作
+					result.setMessage("路线名为空,无法进行操作，请重试");
+					result.setSuccess(false);
+					result.setStatus("404");
+					
+					return result;
+				}
+				
+				if (flag == 1) {
+					//删除路线
+					int tag = routeServiceImpl.deleteByName(routeName);
+					if (tag !=-1) {
+						result.setMessage("删除"+routeName+"成功");
+						result.setSuccess(true);
+						result.setStatus("200");
+					}else {
+						result.setMessage("删除"+routeName+"失败");
+						result.setSuccess(true);
+						result.setStatus("500");
+					}
+				}else {
+					//新增
+					//修改
+					List<Route> existRoutes = routeServiceImpl.selectAll();
+					
+					String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+					java.util.Map<String, Route>routeMap = new HashMap<>();
+					
+					Route newRoute = routeMap.get(routeName);//新路线
+					newRoute.setRouteId(uuid);
+					newRoute.setContent(wayInfo);
+					newRoute.setRouteName(routeName);
+					Date date = new Date();
+					newRoute.setCreateDate(date);
+					
+					if (existRoutes.size() > 0) {
+						
+						for (Route route : existRoutes) {
+							routeMap.put(route.getRouteName(), route);
+						}
+						
+						
+						if (routeMap.containsKey(routeName)) {
+							//路线存在，进行更新
+							int tag = routeServiceImpl.updateByPrimaryKeySelective(newRoute);
+							
+							if (tag !=-1) {
+								//更新成功
+								result.setStatus("200");
+								result.setMessage("更新"+routeName+"成功");
+								result.setSuccess(true);
+								
+							}else {
+								result.setStatus("500");
+								result.setMessage("更新"+routeName+"失败");
+								result.setSuccess(false);
+							}
+							
+						}else {
+							//不存在就新增
+							int tag = routeServiceImpl.insertSelective(newRoute);
+							
+							if (tag !=-1) {
+								// 成功
+								result.setStatus("200");
+								result.setMessage("新增"+routeName+"成功");
+								result.setSuccess(false);
+							} else {
+								//失败
+								result.setStatus("500");
+								result.setMessage("新增"+routeName+"失败");
+								result.setSuccess(false);
+							}
+							
+						}
+					} else {
+						//没有路线，直接新增
+						//不存在就新增
+						int tag = routeServiceImpl.insertSelective(newRoute);
+						
+						if (tag !=-1) {
+							// 成功
+							result.setStatus("200");
+							result.setMessage("新增"+routeName+"成功");
+							result.setSuccess(false);
+						} else {
+							//失败
+							result.setStatus("500");
+							result.setMessage("新增"+routeName+"失败");
+							result.setSuccess(false);
+						}
+					}
+					
+				}
+			}
+
+		} catch (Exception e) {
+
+			result.setSuccess(false).setMessage("操作失败");
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	
+	/**
+	 * 路线全查
+	 * @param request
+	 * @return
+	 */
+	@SystemControllerLog(type = "路线全查", actionType = "4")
+	@ApiOperation(value = "路线全查", notes = "路线全查")
+	@ResponseBody
+	@RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	public RestResponse getAll() {
+
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		
+		
+		try {
+			List<Route> routeList = new ArrayList<Route>();
+			routeList = routeServiceImpl.selectAll();
+			if (routeList.size() > 0) {
+				//
+				result.setData(routeList);
+				result.setStatus("200");
+				result.setSuccess(true);
+				
+			}else {
+				result.setData("");
+				result.setStatus("404");
+				result.setSuccess(false);
+			}
+		} catch (Exception e) {
+			result.setData("");
+			result.setStatus("500");
+			result.setSuccess(false);
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	
+	 /**
+         * 搜索查询
+     *
+     * @param page
+     * @param pageSize
+     * @Author:
+     * @return: com.code.base.util.utils.RestResponse
+     * <com.github.pagehelper.PageInfo>
+     * @exception:
+     * @date: 2018-8-28 20:02:42
+     */
+    @ApiOperation(value = "搜索..", notes = "搜索..")
+	@ResponseBody
+	@RequestMapping(value = "/search", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<Route> search(HttpServletRequest request, String route) {
+        RestResponse result = new RestResponse();
+		PageTool<Route> pageInfo = null;
+		Route routeBean = null;
+		try {
+			// 判断是否有查询条件
+			if (ValidateUtil.isNullAndIsStr(route))
+				 routeBean = JSON.parseObject(route, Route.class);
+			PageUtil pageUtil =  PageUtil.getPageBean(request);
+			// 条件+分页查询
+			  pageInfo =  routeServiceImpl.selectRouteByPage(routeBean == null ? new Route() : routeBean, pageUtil.getPage() == 0 ? 1 : pageUtil.getPage(), pageUtil.getRows() == pageUtil.getRows() ?
+                    10 : pageUtil.getRows());
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+		 return pageInfo;
+//        return new RestResponse().setSuccess(true).setMessage("success").setData(pageInfo);
+	}
+     /**
+         * 分页查询
+     *
+     * @param page
+     * @param pageSize
+     * @Author:
+     * @return: com.code.base.util.utils.RestResponse
+     * <com.github.pagehelper.PageInfo>
+     * @exception:
+     * @date: 2018-8-28 20:02:42
+     */
+    @ApiOperation(value = "查询..", notes = "查询..") 
+	@ResponseBody
+	@RequestMapping(value = "/lists", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	 public PageTool<Route> getList(@RequestBody(required = false) Route route,
+            		@RequestParam(value = "page", required = false,defaultValue="1") Integer page,
+            		@RequestParam(value = "pageSize", required = false,defaultValue="10") Integer pageSize
+            		) {
+         RestResponse result = new RestResponse();
+		 PageTool<Route> pageInfo = null;
+        try {
+            pageInfo = routeServiceImpl.selectRouteByPage(route == null ? new Route() : route, page == null ? 1 : page, pageSize == null ?
+                    Integer.MAX_VALUE : pageSize);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            result.setSuccess(false).setMessage("操作失败");
+        }
+ 			return pageInfo;
+//        return new RestResponse().setSuccess(true).setMessage("success").setData(pageInfo);
+	}
+	 /**
+     * 新增
+     *
+     * @param device
+     * @Author:
+     * @return: com.code.base.util.utils.RestResponse
+     * @exception:
+     * @date: 2018-8-28 20:02:42
+     */
+	@ApiOperation(value = "新增..", notes = "新增..")
+	@ResponseBody
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
+    public RestResponse doAdd(@RequestBody  Route route) {
+        RestResponse result = new RestResponse();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+        	String date = sdf.format(new Date());
+        	Date dateTime = sdf.parse(date);
+        	String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        	route.setRouteId(uuid);
+        	route.setCreateDate(dateTime);
+        	//route.setUpdateTime(date);
+            Integer r = routeServiceImpl.insertSelective(route);
+            if (r > 0) {
+                result.setSuccess(true).setMessage("操作成功");
+            } else {
+               result.setSuccess(false).setMessage("操作失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+           result.setSuccess(false).setMessage("操作失败");
+        }
+        return result;
+    }
+
+	 /**
+     * 根据主键更新
+     *
+     * @param id
+     * @param device
+     * @Author:
+     * @return: com.hollysys.haier.robot.bean.RestResponse
+     * @exception:
+     * @date: 2018-8-28 20:02:42
+     */
+	@ApiOperation(value = "修改..", notes = "修改..")
+	@ResponseBody
+	@RequestMapping(value = "/edit", method = RequestMethod.PUT)
+    public RestResponse doUpdate(@RequestBody  Route route) {
+        RestResponse result = new RestResponse();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+             	String date = sdf.format(new Date());
+             	//route.setUpdateTime(date);
+            Integer r = routeServiceImpl.updateByPrimaryKeySelective(route);
+            if (r > 0) {
+                result.setSuccess(true).setMessage("操作成功");
+            } else {
+                result.setSuccess(false).setMessage("操作失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setSuccess(false).setMessage("操作失败");
+        }
+
+        return result;
+    }
+	 /**
+     * 根据主键删除
+     *
+     * @param id
+     * @Author:
+     * @return: com.code.base.util.utils.RestResponse
+     * @exception:
+     * @date: 2018-8-28 20:02:42
+     */
+    @ApiOperation(value = "删除", notes = "删除")
+    @ResponseBody
+    @RequestMapping(value = "/del/{id}", method = RequestMethod.DELETE)
+    public RestResponse doDelete(@PathVariable String id) {
+        RestResponse result = new RestResponse();
+        try {
+            Integer r = routeServiceImpl.deleteBatchByPrimaryKey(id);
+            if (r > 0) {
+                result.setSuccess(true).setMessage("操作成功");
+            } else {
+                result.setSuccess(false).setMessage("操作失败");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+           result.setSuccess(false).setMessage("操作失败");
+        }
+
+        return result;
+    }
+
+	 /**
+     * 根据主键获取详情
+     *
+     * @param id
+     * @Author:
+     * @return: com.code.base.util.utils.RestResponse<>
+     * @exception:
+     * @date: 2018-8-28 20:02:42
+     */
+    @ApiOperation(value = "根据id获取信息", notes = "根据id获取信息")
+    @ResponseBody
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+    public RestResponse<Route> doGetDetail(@PathVariable String id) {
+        RestResponse result = new RestResponse();
+        try {
+        	Route route = routeServiceImpl.selectByPrimaryKey(id);
+            result.setSuccess(true).setMessage("success").setData(route);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setSuccess(false).setMessage("操作失败");
+        }
+
+        return result;
+    }
+
+}

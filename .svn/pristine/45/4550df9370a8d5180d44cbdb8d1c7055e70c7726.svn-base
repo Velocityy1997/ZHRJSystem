@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.logInfo.dao.LogInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.logInfo.model.LogInfo" >
+    <id column="logId" property="logId" jdbcType="VARCHAR" />
+    <result column="log_id" property="logId" jdbcType="VARCHAR" />
+    <result column="log_type" property="logType" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="log_time" property="logTime" jdbcType="VARCHAR" />
+    <result column="result" property="result" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="zhj_num" property="zhjNum" jdbcType="VARCHAR" />
+    <result column="sender" property="sender" jdbcType="VARCHAR" />
+    <result column="receiver" property="receiver" jdbcType="VARCHAR" />
+    <result column="user_ip" property="userIp" jdbcType="VARCHAR" />
+    <result column="zhj_name" property="zhjName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	log_id,
+     	log_type,
+     	content,
+     	log_time,
+     	result,
+     	user_name,
+     	zhj_num,
+     	sender,
+     	receiver,
+     	user_ip,
+     	zhj_name
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from log_info 
+    where  log_id = #{ logId,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from log_info 
+    where log_id =  #{ logId,jdbcType=VARCHAR}
+  </delete>
+  
+  <!--清空所有日志  -->
+  <delete id="deleteAllLog" parameterType="java.lang.String" >
+    delete from log_info 
+  </delete>
+  
+  
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from log_info
+    where log_id in
+    <foreach collection="list" item="logId" index="index"
+            open="(" close=")" separator=",">
+             #{ logId,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective" parameterType="com.web.business.generator.system.logInfo.model.LogInfo">
+		insert into log_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="logId != null">
+				log_id,
+			</if>
+			<if test="logType != null">
+				log_type,
+			</if>
+			<if test="content != null">
+				content,
+			</if>
+			<if test="logTime != null">
+				log_time,
+			</if>
+			<if test="result != null">
+				result,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="zhjNum != null">
+				zhj_num,
+			</if>
+			<if test="sender != null">
+				sender,
+			</if>
+			<if test="receiver != null">
+				receiver,
+			</if>
+			<if test="userIp != null">
+				user_ip,
+			</if>
+			<if test="zhjName != null">
+				zhj_name,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="logId != null">
+				 #{ logId,jdbcType= VARCHAR },
+			</if>
+			<if test="logType != null">
+				 #{ logType,jdbcType= VARCHAR },
+			</if>
+			<if test="content != null">
+				 #{ content,jdbcType= VARCHAR },
+			</if>
+			<if test="logTime != null">
+				 #{ logTime,jdbcType= VARCHAR },
+			</if>
+			<if test="result != null">
+				 #{ result,jdbcType= VARCHAR },
+			</if>
+			<if test="userName != null">
+				 #{ userName,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjNum != null">
+				 #{ zhjNum,jdbcType= VARCHAR },
+			</if>
+			<if test="sender != null">
+				 #{ sender,jdbcType= VARCHAR },
+			</if>
+			<if test="receiver != null">
+				 #{ receiver,jdbcType= VARCHAR },
+			</if>
+			<if test="userIp != null">
+				 #{ userIp,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjName != null">
+				 #{ zhjName,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   <!--管理员查询  -->
+   <select id="selectByPropertyByAdminPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.logInfo.model.LogInfo">
+		select
+		<include refid="Base_Column_List" />
+		from log_info
+		where 1=1
+		 <if test="logId != null">
+			AND log_id =  #{ logId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logType != null">
+			AND log_type =  #{ logType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logTime != null">
+			AND log_time =  #{ logTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="result != null">
+			AND result =  #{ result,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userName != null and userName !='' ">
+			AND user_name like CONCAT ( '%' #{ userName,jdbcType= VARCHAR } , '%' )
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null">
+			AND sender =  #{ sender,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiver != null">
+			AND receiver =  #{ receiver,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjName != null">
+			AND zhj_name =  #{ zhjName,jdbcType= VARCHAR }
+		  </if> 
+		ORDER BY log_time desc
+		
+	</select>
+	
+	
+	<!--  普通用户查询-->
+	<select id="selectByPropertyByNormalPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.logInfo.model.LogInfo">
+		select
+		<include refid="Base_Column_List" />
+		from log_info
+		where user_name =  #{ userName,jdbcType= VARCHAR }
+		 <!--  <if test="logId != null">
+			AND log_id =  #{ logId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logType != null">
+			AND log_type =  #{ logType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logTime != null">
+			AND log_time =  #{ logTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="result != null">
+			AND result =  #{ result,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userName != null">
+			AND user_name =  #{ userName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null">
+			AND sender =  #{ sender,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiver != null">
+			AND receiver =  #{ receiver,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjName != null">
+			AND zhj_name =  #{ zhjName,jdbcType= VARCHAR }
+		  </if> -->
+		ORDER BY log_time desc
+		
+	</select>
+	
+	
+	
+	<!--普通用户统计  -->
+	 <select id="selectCountByNormalProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.logInfo.model.LogInfo">
+		select
+		count(1)
+		from log_info
+		where user_name =  #{ userName,jdbcType= VARCHAR }
+		 <!--  <if test="logId != null">
+			AND log_id =  #{ logId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logType != null">
+			AND log_type =  #{ logType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logTime != null">
+			AND log_time =  #{ logTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="result != null">
+			AND result =  #{ result,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userName != null">
+			AND user_name =  #{ userName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null">
+			AND sender =  #{ sender,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiver != null">
+			AND receiver =  #{ receiver,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjName != null">
+			AND zhj_name =  #{ zhjName,jdbcType= VARCHAR }
+		  </if> -->
+	</select>
+	<!--管理员统计  -->
+	 <select id="selectCountByAdminProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.system.logInfo.model.LogInfo">
+		select
+		count(1)
+		from log_info
+		where 1=1
+		 <!--  <if test="logId != null">
+			AND log_id =  #{ logId,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logType != null">
+			AND log_type =  #{ logType,jdbcType= VARCHAR }
+		  </if>
+		  <if test="content != null">
+			AND content =  #{ content,jdbcType= VARCHAR }
+		  </if>
+		  <if test="logTime != null">
+			AND log_time =  #{ logTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="result != null">
+			AND result =  #{ result,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userName != null">
+			AND user_name =  #{ userName,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="sender != null">
+			AND sender =  #{ sender,jdbcType= VARCHAR }
+		  </if>
+		  <if test="receiver != null">
+			AND receiver =  #{ receiver,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIp != null">
+			AND user_ip =  #{ userIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjName != null">
+			AND zhj_name =  #{ zhjName,jdbcType= VARCHAR }
+		  </if> -->
+	</select>
+	
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.logInfo.model.LogInfo">
+		<if test="logId !=null">
+			update log_info
+			<set>
+     			 log_id =  #{ logId,jdbcType= VARCHAR },
+     			 log_type =  #{ logType,jdbcType= VARCHAR },
+     			 content =  #{ content,jdbcType= VARCHAR },
+     			 log_time =  #{ logTime,jdbcType= VARCHAR },
+     			 result =  #{ result,jdbcType= VARCHAR },
+     			 user_name =  #{ userName,jdbcType= VARCHAR },
+     			 zhj_num =  #{ zhjNum,jdbcType= VARCHAR },
+     			 sender =  #{ sender,jdbcType= VARCHAR },
+     			 receiver =  #{ receiver,jdbcType= VARCHAR },
+     			 user_ip =  #{ userIp,jdbcType= VARCHAR },
+     			 zhj_name =  #{ zhjName,jdbcType= VARCHAR }
+			</set>
+			where logId =  #{ logId,jdbcType=VARCHAR}
+		</if>
+	</update>
+  
+</mapper>

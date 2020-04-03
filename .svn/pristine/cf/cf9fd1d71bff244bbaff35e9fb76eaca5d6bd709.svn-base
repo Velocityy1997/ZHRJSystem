@@ -1,0 +1,114 @@
+package com.web.business.generator.util.listener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionBindingEvent;
+
+import com.web.business.generator.system.user.model.User;
+import com.web.business.generator.util.AnalysisService;
+
+
+/*
+ *  处理用户重复登录的监听器
+ *  @author: GouYudong
+ *  创建时间:  2019年8月7日下午1:33:32
+ */
+
+@WebListener
+public class LoginSessionListener implements HttpSessionAttributeListener{
+	
+	
+	// 存放当前所有的会话session
+	// 键：用户名；  值：当前会话session
+	public	static	Map<String,HttpSession> map= new HashMap<String,HttpSession>();
+	
+	// 1.下线同一账号的老用户
+	//更新在线用户列表
+	public void attributeAdded(HttpSessionBindingEvent sessionBindingEvent) {
+		
+		
+		String name = sessionBindingEvent.getName();
+		if(name.equals("loginInfo")){
+			User currentUser=(User)sessionBindingEvent.getValue();
+						
+			if(map.get(currentUser.getName())!=null)//返回映射的值，如果没有映射关系返回null
+			{
+				HttpSession session=map.get(currentUser.getName());
+				User oldUser=(User)session.getAttribute("loginInfo");//老用户
+				String msg= "账号【"+ oldUser.getName()+"】在【"+currentUser.getCurrentIp()+"】重新登录，您将被迫下线！";	
+				session.removeAttribute("loginInfo");//已经存在相同用户登录，把上一个老用户的session移除					
+				session.setAttribute("msg", msg);	
+				System.out.println(msg);	
+				
+			}
+			map.put(currentUser.getName(),sessionBindingEvent.getSession());	
+			AnalysisService.allSessions.add(sessionBindingEvent.getSession());
+			AnalysisService.loginUserList.add(currentUser);			
+		}			 
+	}
+
+	//用户自己下线
+	// session失效时的监听方法
+	public void attributeRemoved(HttpSessionBindingEvent sessionBindingEvent) {
+				
+		String name = sessionBindingEvent.getName();
+		if(name.equals("loginInfo")){
+			User outUser = (User)sessionBindingEvent.getValue();
+			if(AnalysisService.loginUserList != null &&AnalysisService.loginUserList.size()>0)
+			{
+				for(User info:AnalysisService.loginUserList)
+				{
+					if(info.getName().equals(outUser.getName()))
+					{
+						AnalysisService.loginUserList.remove(info);
+						AnalysisService.allSessions.remove(sessionBindingEvent.getSession());
+						break;
+					}					
+				}				
+			}
+			HttpSession session=map.get(outUser.getName());
+			if(session != null)
+			{
+				if(outUser != null)
+				{
+					session.removeAttribute("loginInfo");	
+				}	
+			}				
+			map.remove(outUser.getName());	
+			System.out.println("账号"+outUser.getName()+"注销。"+"最后登录IP为："+outUser.getCurrentIp());
+		}	
+	}
+
+	
+	// session覆盖时的监听方法.
+	public void attributeReplaced(HttpSessionBindingEvent arg0) {
+		 
+		String name=arg0.getName();
+		if(name.equals("loginInfo")){
+			User currentUser=(User)arg0.getValue();	
+			if(map.get(currentUser.getName())!=null)//返回映射的值，如果没有映射关系返回null
+			{
+				HttpSession session=map.get(currentUser.getName());
+				User oldUser=(User)session.getAttribute("loginInfo");//老用户
+				String msg= "账号【"+ oldUser.getName()+"】在【"+currentUser.getCurrentIp()+"】重新登录，您将被迫下线！";	
+				session.removeAttribute("loginInfo");//已经存在相同用户登录，把上一个老用户的session移除					
+				session.setAttribute("msg", msg);	
+				System.out.println(msg);	
+				
+			}
+			
+			map.remove(currentUser.getName());
+			map.put(currentUser.getName(),arg0.getSession());	
+			AnalysisService.allSessions.add(arg0.getSession());
+			AnalysisService.loginUserList.add(currentUser);	
+		}			
+		}			 
+	}				
+
+

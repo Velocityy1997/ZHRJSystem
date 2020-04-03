@@ -1,0 +1,647 @@
+package com.web.business.generator.system.user.controller;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.web.common.util.spring.PageTool;
+
+import com.web.common.util.spring.RestResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+import com.alibaba.druid.sql.visitor.functions.Isnull;
+import com.web.business.generator.system.area.services.impl.AreaServiceImpl;
+
+import com.web.business.generator.system.user.model.User;
+import com.web.business.generator.system.user.model.UserModel;
+import com.web.business.generator.system.user.services.impl.UserServiceImpl;
+import com.web.business.generator.util.isNull.IsNullUtil;
+import com.web.business.generator.util.listener.LoginSessionListener;
+import com.web.business.generator.util.log.SystemControllerLog;
+
+@Api(description = "userAPI", tags = "userAPI")
+@Controller
+@RequestMapping("/user")
+public class UserController {
+	@Autowired
+	private HttpServletRequest request;
+
+	@Resource
+	private UserServiceImpl userServiceImpl;
+	@Resource
+	private AreaServiceImpl areaServiceImpl;
+	/*
+	 * @Resource private LogInfoServiceImpl logInfoServiceImpl;
+	 */
+
+	@ApiOperation(value = "用户登录..", notes = "用户登录..")
+	@ResponseBody
+	@RequestMapping(value = "/checkUser", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	@SystemControllerLog(type = "用户登录", actionType = "1")
+	public RestResponse checkUser(HttpServletRequest request, String userName, String password) {
+
+		RestResponse result = new RestResponse();
+
+		// 1.获取会话
+		HttpSession session = request.getSession(); // 看LoginSessionListener add反应
+
+		password = DigestUtils.md5Hex(password);
+		String currentIp = request.getRemoteAddr();// 获取当前登录的ip
+
+		Timestamp ts = new Timestamp(new Date().getTime());
+
+		// 2.进行校验
+		List<User> userList = userServiceImpl.findUserByNameAndPassword(userName, password);
+		if (userList.size() > 0 && password.equals(userList.get(0).getPassword())) {
+			// 登录成功
+			User currentUser = userList.get(0);
+
+			if (currentIp != null && !(currentIp.equals(""))) {
+				currentUser.setCurrentIp(currentIp);
+				// 保存当前用户到session
+				session.setAttribute("loginInfo", currentUser);
+			}
+			result.setSuccess(true);
+			result.setMessage((String) session.getAttribute("msg"));
+			result.setDescription(userName + "登录成功");
+
+			return result;
+		} else {
+			result.setSuccess(false);
+			result.setDescription(userName + "登录失败，错误的用户名或密码");
+			result.setMessage("错误的用户名或密码");
+			return result;
+		}
+	}
+
+	@ApiOperation(value = "判断session是否存在MSG", notes = "判断session是否存在MSG")
+	@ResponseBody
+	@RequestMapping(value = "/checkSessionMsg", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public RestResponse checkSessionMsg(HttpServletRequest request, String userName) {
+
+		RestResponse result = new RestResponse();
+		boolean tag = false;
+		LoginSessionListener loginSessionListener = new LoginSessionListener();
+
+		// 1.获取用户名
+		// String userName = request.getParameter("userName");
+		tag = IsNullUtil.isStrNull(userName);
+
+		if (!tag) {
+			// 用户名不为空
+			// 2.获取登录时的session
+			HttpSession loginSession = loginSessionListener.map.get(userName);
+			tag = IsNullUtil.isObjectNull(loginSession);
+
+			if (!tag) {
+				// loginSession不为空
+				String msg = (String) loginSession.getAttribute("msg");
+
+				tag = IsNullUtil.isStrNull(msg);
+
+				if (!tag) {
+					// msg不为空
+					result.setSuccess(true).setMessage(msg);
+
+				} else {
+					// 为空
+					result.setSuccess(false).setMessage("msg为空");
+
+				}
+
+			} else {
+				// loginSession已经失效
+				result.setSuccess(false).setMessage(userName + "之前的会话session已经被销毁！");
+
+			}
+
+		} else {
+			// 用户名为空
+			result.setSuccess(false).setMessage("请求中用户名为空，请检查");
+
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param request
+	 * @param id
+	 * @return
+	 */
+	@ApiOperation(value = "退出登录", notes = "退出登录")
+	@ResponseBody
+	@RequestMapping(value = "/logOut", method = RequestMethod.POST)
+	public RestResponse doLogOut(HttpServletRequest request, String id) {
+		LoginSessionListener listener = new LoginSessionListener();
+		RestResponse result = new RestResponse();
+		try {
+
+			HttpSession session = request.getSession();
+			String userId = null;
+			userId = id;
+			boolean tag = false;
+			tag = IsNullUtil.isStrNull(userId);
+
+			if (!tag) {
+				// ID不为空
+				User user = (User) request.getSession().getAttribute("loginInfo");// 取得当前登录用户
+
+				if (user != null) {
+					User oldUser = userServiceImpl.selectByPrimaryKey(user.getId());
+					if (oldUser != null) {
+						// 1.更改最后一次ip
+						String currentIp = null;
+						currentIp = user.getCurrentIp();
+						tag = IsNullUtil.isStrNull(currentIp);
+
+						if (!tag) {
+							// 当前ip不为空,保存到最后一次ip
+							oldUser.setLastIp(currentIp);
+
+							// 进行更新
+							result = userServiceImpl.updateByPrimaryKeySelective(oldUser, session);
+
+							if (result.getSuccess()) {
+
+								result.setMessage("["+oldUser.getName() + "]退出成功，已保存最后登录的IP:["+oldUser.getLastIp()+"]").setSuccess(true);
+
+								// 清除session
+								session.removeAttribute("loginInfo"); // 会调用监听器中的attributeRemoved方法
+								listener.map.remove(oldUser.getName());
+								session.invalidate(); // 应该写在监听器里？
+								System.out.println("账号:[" + oldUser.getName() + "]注销,最后登录IP为:[" + oldUser.getLastIp()+"]");
+
+							} else {
+								result.setMessage(oldUser.getName() + "退出成功失败，请稍后重试！").setSuccess(false);
+
+							}
+
+						}
+
+					} else {
+						result.setSuccess(false).setMessage("用户账号信息异常！");
+
+					}
+				}
+
+			} else {
+				result.setSuccess(false).setMessage("退出登录提交的用户编号为空！");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+
+	}
+	
+	
+	/**
+	 * 退出系统
+	 * @param request
+	 * @return
+	 */
+	@ApiOperation(value = "退出系统", notes = "退出系统")
+	@ResponseBody
+	@RequestMapping(value = "/Logout", method = RequestMethod.POST)
+	public RestResponse doLogOut2(HttpServletRequest request) {
+		LoginSessionListener listener = new LoginSessionListener();
+		RestResponse result = new RestResponse();
+		try {
+
+			HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("loginInfo");
+			
+			if (user !=null) {
+				
+				session.removeAttribute("loginInfo");
+				User user2 = (User) session.getAttribute("loginInfo");
+				
+				if (user2 == null) {
+					result.setMessage("退出登录成功");
+					result.setSuccess(true);
+					result.setStatus("200");
+					result.setDescription(user.getName()+user.getCurrentIp()+"退出登录成功");
+					
+				} else {
+					result.setMessage("退出登录失败");
+					result.setSuccess(false);
+					result.setStatus("500");
+					result.setDescription(user.getName()+user.getCurrentIp()+"退出登录失败");
+				}
+				
+				
+			} else {
+				result.setMessage("退出登录成功");
+				result.setSuccess(false);
+				result.setStatus("200");
+				result.setDescription(user.getName()+user.getCurrentIp()+"退出登录成功");
+			}
+
+
+		} catch (Exception e) {
+			result.setMessage("退出登录失败");
+			result.setSuccess(false);
+			result.setStatus("500");
+			e.printStackTrace();
+		}
+
+		return result;
+
+	}
+	
+
+	/**
+	 * 
+	 * 查询Jqgrid
+	 * 
+	 * @author
+	 * @date
+	 * @return json
+	 */
+	@ApiOperation(value = "查询Jqgrid..", notes = "查询Jqgrid..")
+	@ResponseBody
+	@RequestMapping(value = "/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+
+	public PageTool<UserModel> getUserList(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String page = request.getParameter("page");
+		String rows = request.getParameter("rows");
+		String queryName = request.getParameter("queryName");
+		String queryAera = request.getParameter("queryAera");
+		RestResponse result = new RestResponse();
+		List<User> userList = new ArrayList<User>();
+		PageTool<UserModel> pageInfo = null;
+		User userBean = (User) session.getAttribute("loginInfo");
+		try {
+			// 条件+分页查询
+			pageInfo = userServiceImpl.selectUserByPage(queryName, queryAera, userBean, Integer.valueOf(page),
+					Integer.valueOf(rows));
+		} catch (Exception e) {
+			result.setSuccess(false).setMessage("操作失败");
+			e.printStackTrace();
+		}
+		return pageInfo;
+	}
+
+	/**
+	 * 搜索查询
+	 *
+	 * @param page
+	 * @param pageSize
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 *          <com.github.pagehelper.PageInfo>
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "分页查询用户", notes = "分页查询用户")
+	@ResponseBody
+	@RequestMapping(value = "/search", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+	public PageTool<UserModel> search(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		String page = request.getParameter("page");
+		String rows = request.getParameter("rows");
+		String queryName = request.getParameter("queryName");
+		String queryAera = request.getParameter("queryAera");
+		RestResponse result = new RestResponse();
+		PageTool<UserModel> pageInfo = null;
+		User userBean = (User) session.getAttribute("loginInfo");
+		try {
+			// 条件+分页查询
+			pageInfo = userServiceImpl.selectUserByPage(queryName, queryAera, userBean, Integer.valueOf(page),
+					Integer.valueOf(rows));
+		} catch (Exception e) {
+			result.setSuccess(false).setMessage("操作失败");
+			e.printStackTrace();
+		}
+		return pageInfo;
+
+	}
+
+	/**
+	 * 新增
+	 *
+	 * @param device
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 * @exception:添加用户：
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "新增..", notes = "新增..")
+
+	@ResponseBody
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
+	@SystemControllerLog(type = "新增用户", actionType = "1")
+	public RestResponse doAdd(HttpServletRequest request, User user) {
+		RestResponse result = new RestResponse();
+		String cityId = request.getParameter("city");
+		String provinceId = request.getParameter("province");
+		String countyId = request.getParameter("county");
+		String industryId = request.getParameter("industName");
+		try {
+
+			Timestamp ts = new Timestamp(new Date().getTime());
+			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+			String ip = request.getRemoteAddr();
+			user.setId(uuid);// 随机获取ID
+			String pdWord = "abc123456";
+			String mdPd = DigestUtils.md5Hex(pdWord);
+			user.setPassword(mdPd);
+			user.setCreateDate(ts);
+			user.setPasswordState(0);// 是否修改密码 0未修改 1修改
+			user.setType(0);// 用户类型 1 管理员 0普通同用户
+			user.setCurrentIp(ip);
+			user.setUserIndustry(industryId);
+			if (provinceId != null && cityId.equals("") && countyId == null) {
+				user.setUserArea(provinceId);
+			} else if (provinceId != null && cityId != null && countyId.equals("")) {
+				user.setUserArea(cityId);
+			} else {
+				user.setUserArea(countyId);
+			}
+
+			result = userServiceImpl.insertSelective(user);
+			result.setDescription("新增用户" + user.getName() + "成功");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setDescription("新增用户" + user.getName() + "失败");
+		}
+		return result;
+	}
+
+	/**
+	 * 根据主键更新
+	 *
+	 * @param id
+	 * @param device
+	 * @Author:
+	 * @return: com.hollysys.haier.robot.bean.RestResponse
+	 * @exception: 修改名字 、电话、备注
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "修改..", notes = "修改..")
+	@ResponseBody
+	@RequestMapping(value = "/edit", method = RequestMethod.POST)
+	@SystemControllerLog(type = "用户修改", actionType = "2")
+	public RestResponse doUpdate(HttpServletRequest request, User user) {
+		RestResponse result = new RestResponse();
+
+		String cityId = request.getParameter("city");
+		String provinceId = request.getParameter("province");
+		String countyId = request.getParameter("county");
+		String industryId = request.getParameter("industName");
+		try {
+			Timestamp ts = new Timestamp(new Date().getTime());
+			user.setCreateDate(ts);
+			user.setUserIndustry(industryId);
+			if (provinceId != null && cityId.equals("") && countyId == null) {
+				user.setUserArea(provinceId);
+			} else if (provinceId != null && cityId != null && countyId.equals("")) {
+				user.setUserArea(cityId);
+			} else {
+				user.setUserArea(countyId);
+			}
+			HttpSession session = request.getSession();// 修改用户本身要同时更新Session
+			result = userServiceImpl.updateByPrimaryKeySelective(user, session);
+			result.setDescription("修改用户" + user.getName() + "成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setDescription("修改用户" + user.getName() + "失败");
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+
+	/**
+	 * 根据主键删除
+	 *
+	 * @param id
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "删除", notes = "删除")
+	@ResponseBody
+	@RequestMapping(value = "/del", method = RequestMethod.POST)
+	@SystemControllerLog(type = "用户删除", actionType = "3")
+	public RestResponse doDelete(String id) {
+		User loginInfo = (User) request.getSession().getAttribute("loginInfo");
+		RestResponse result = new RestResponse();
+		User user = (User) request.getSession().getAttribute(id);
+		try {
+			result = userServiceImpl.deleteBatchByPrimaryKey(id, loginInfo);
+			result.setDescription("用户" + loginInfo.getName() + "删除一条数据成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setDescription("用户" + loginInfo.getName() + "删除一条数据失败");
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+
+	/**
+	 * @author lq 密码重置
+	 * @throws Exception
+	 */
+	@ApiOperation(value = "密码重置", notes = "密码重置")
+	@ResponseBody
+	@RequestMapping(value = "/initial", method = RequestMethod.POST)
+	@SystemControllerLog(type = "密码重置", actionType = "2")
+	public RestResponse intitial(String userId) throws Exception {
+		User loginInfo = (User) request.getSession().getAttribute("loginInfo");
+		RestResponse result = new RestResponse();
+		User userInfos = userServiceImpl.selectByPrimaryKey(userId);
+		try {
+
+			Timestamp ts = new Timestamp(new Date().getTime());
+			String pdWord = "abc123456";
+			String mdPd = DigestUtils.md5Hex(pdWord);
+			userInfos.setPassword(mdPd);
+			userInfos.setCreateDate(ts);
+			result = userServiceImpl.updateByPrimaryPwd(userInfos);
+			result.setDescription(loginInfo.getName() + "重置" + "用户" + userInfos.getName() + "的密码");
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			result.setDescription(loginInfo.getName() + "重置" + "用户" + userInfos.getName() + "的密码");
+		}
+		return result;
+
+	}
+
+	/**
+	 * @author lq 修改用户密码
+	 */
+	@ApiOperation(value = "修改用户密码", notes = "修改用户密码")
+	@ResponseBody
+	@RequestMapping(value = "/changePwd", method = RequestMethod.POST)
+	@SystemControllerLog(type = "修改用户密码", actionType = "2")
+	public RestResponse changeInfo(String id, String password1, String password) {
+		RestResponse result = new RestResponse();
+		User loginInfo = (User) request.getSession().getAttribute("loginInfo");
+		try {
+			if (password.equals(password1)) {
+				password = DigestUtils.md5Hex(password);
+				User userInfos = userServiceImpl.selectByPrimaryKey(loginInfo.getId());
+				userInfos.setPassword(password);
+				Timestamp ts = new Timestamp(new Date().getTime());
+				userInfos.setCreateDate(ts);
+				HttpSession session = request.getSession();// 修改用户本身要同时更新Session
+
+				result = userServiceImpl.updateByPrimaryChangePwd(userInfos, session);
+				result.setDescription(loginInfo.getName() + "修改" + userInfos.getName() + "的密码成功");
+
+			} else {
+				result.setSuccess(false).setMessage("输入两次密码不一致");
+				result.setDescription(loginInfo.getName() + "修改" + "密码失败");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	/**
+	 * 获取当前登录用户信息
+	 */
+	@ApiOperation(value = "获取当前信息", notes = "获取当前信息")
+	@ResponseBody
+	@RequestMapping(value = "/getUserInfo", method = RequestMethod.POST)
+	public RestResponse<User> getLoginUser(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		RestResponse result = new RestResponse();
+		User userBean = (User) session.getAttribute("loginInfo");
+		try {
+			if(userBean == null) {
+				result.setSuccess(true).setMessage("登录信息已失效").setData(null);
+			}
+			else {
+				result.setSuccess(true).setMessage("success").setData(userBean);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+
+	
+	
+	/**
+	 * 根据主键获取详情
+	 *
+	 * @param id
+	 * @Author:
+	 * @return: com.code.base.util.utils.RestResponse<>
+	 * @exception:
+	 * @date: 2018-8-28 20:02:42
+	 */
+	@ApiOperation(value = "根据id获取信息", notes = "根据id获取信息")
+	@ResponseBody
+	@RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+	public RestResponse<User> doGetDetail(@PathVariable String id) {
+		RestResponse result = new RestResponse();
+		try {
+			User user = userServiceImpl.selectByPrimaryKey(id);
+			result.setSuccess(true).setMessage("success").setData(user);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(false).setMessage("操作失败");
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@ApiOperation(value = "根据用户id获取当前位置省市区名称及对应id", notes = "根据用户id获取当前位置省市区名称及对应id")
+	@ResponseBody
+	@RequestMapping(value = "/getAreaInfo/{id}", method = RequestMethod.GET)
+	public RestResponse doGetUserAreaInfo(@PathVariable String id) {
+
+		RestResponse result = new RestResponse();
+
+		String userId = id;
+		Map<String, Map<String, String>> areaInfo = new HashMap<>();// 当前用户的省市区信息
+		Map<String, Map<String, Map<String, String>>> data = new HashMap<>();
+		if (userId == null || userId.equals("")) {
+			// 用户id为空
+			result.setSuccess(false).setMessage("查询的用户id为空");
+
+		} else {
+			// 用户id不为空
+			try {
+				areaInfo = userServiceImpl.getAreaInfoByUserId(userId);
+				if (areaInfo == null || areaInfo.isEmpty()) {
+					// 当前用户对应的位置id为空
+					result.setSuccess(false).setMessage("当前用户id不存在或用户对应的位置id为空");
+
+				} else {
+					data.put("areaInfo", areaInfo);
+					result.setSuccess(true).setData(data).setMessage("查询成功！");
+
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				result.setSuccess(false).setMessage("查询失败");
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * public UserController() throws Exception {
+	 * 
+	 * LogInfo log = new LogInfo(); String uuid =
+	 * UUID.randomUUID().toString().replaceAll("-", ""); log.setLogId(uuid);//随机获取ID
+	 * Object proceed = null ; HttpSession session = request.getSession(); User user
+	 * = (User) session.getAttribute("loginInfo"); log.setUserName(user.getName());
+	 * //获取请求的ip String ip = request.getRemoteAddr(); log.setUserIp(ip); //获取方法执行前时间
+	 * Timestamp ts = new Timestamp(new Date().getTime()); log.setLogTime(ts);
+	 * //提取controller中ExecutionResult的属性 RestResponse result = (RestResponse)
+	 * proceed; log.setResult(result.getMessage()); String description =
+	 * result.getDescription(); log.setContent(description); log.setLogType("用户登录");
+	 * logInfoServiceImpl.insertSelective(log);
+	 * 
+	 * 
+	 * 
+	 * }
+	 */
+
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>预置电文管理</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<!-- basic styles -->
+		<link href="../../../../plugins/assets/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../../../plugins/assets/css/font-awesome.min.css" />
+		<link rel="stylesheet" href="../../../../plugins/assets/css/jquery-ui-1.10.3.full.min.css" />
+		<link rel="stylesheet" href="../../../../plugins/assets/css/datepicker.css" />
+		<link rel="stylesheet" href="../../../../plugins/assets/css/ui.jqgrid.css" />
+
+		<!-- fonts -->
+		<!-- ace styles -->
+		<link rel="stylesheet" href="../../../../plugins/assets/css/ace.min.css" />
+		<link rel="stylesheet" href="../../../../plugins/assets/css/ace-rtl.min.css" />
+		<link rel="stylesheet" href="../../../../plugins/assets/css/ace-skins.min.css" />
+		
+		<!-- ztree样式 -->
+		<link rel="stylesheet" href="../../../../plugins/assets/css/metro.css" />
+		
+		<!-- toast.css -->
+		<link rel="stylesheet" href="../../../../plugins/assets/css/style.css">
+
+		<script type="text/javascript" src="../../../../plugins/assets/js/jquery-1.10.2.min.js"></script> 
+		<script type="text/javascript" src="../../../../plugins/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="../../../../plugins/assets/js/jquery.form.js"></script>
+		<script src="../../../../plugins/assets/js/ui.js"></script>
+		<script src="../../../../plugins/js/bootbox.js"></script>
+		<style>
+.ui-jqgrid tr.jqgrow td {
+  white-space: normal !important; 
+ }
+</style>		
+		<script>
+			if (document.referrer=='') {
+				window.location.href="/ZHRJSystem/index.html"; 
+			}
+		</script>
+	</head>
+	<body style="height: 100%;width:100%;">		
+	<div class="main-container" id="main-container">
+			<div class="main-container-inner">
+				<div class="main-content" style="margin-left:0px;">
+					<div class="breadcrumbs" id="breadcrumbs" style="height:45px; background-color: #83BFEA;">
+						<ul class="breadcrumb" style="margin-top:10px; margin-left:20px;">
+							<li>
+								<i class="icon-edit" style="color:#F4F8FF;"></i>
+								<i style="color:white; font-size:18px; font-family:KaiTi;">通信管理</i>
+							</li>
+							<li>
+								<i style="color:white; font-size:18px; font-family:KaiTi;">预置电文管理</i>
+							</li>
+						</ul>
+					</div>
+						
+          <div id="saveOrUpdatePreMessage" title="预置电文操作" style="display:none;"> 
+               <form id="saveOrUpdatePreMessageForm" enctype="multipart/form-data" onsubmit="return checkRule();">
+    	           <table class="exhibit_table" style="font-size:13px; text-align:left;">  										    
+				      <tr>  								        
+				         <td>
+				        	<input type="hidden" id="uuid" name="id" style="width:230px;"/>
+				         </td>
+				      </tr>				  
+				     <tr>  
+				        <td style="width:90px;" align="right">内容: <font color="red">*</font></td>
+				        <td style="padding:10px;" class="input-icon input-icon-right">				        	
+						 <input type="text" name="content" id="content" autocomplete="off" maxlength="50" style="width: 230px;"/>  						   						  
+				        </td>
+				    </tr>									
+				   										   
+					<tr>
+					    <td colspan='2'>
+					    	<button class="btn btn-info btn-sm" type="submit" onclick="editPreMessage()" style='border-radius:8px; margin-left:27%;'>
+								<i class="icon-ok bigger-110"></i>确定
+							</button>
+						    <span class="btn btn-sm" onclick="$('#saveOrUpdatePreMessage').dialog('close')" style='border-radius:8px; margin-left:40px;'>
+								<i class="icon-remove bigger-110"></i>取消
+							</span>
+						</td>
+					</tr>  
+				</table>					   					   				
+	 		</form>								
+		</div>	
+						
+		<div id="deletePreMessageDialog" title="删除预置电文" style="display:none;"> 
+    	   
+    	    <table  style="font-size:13px; text-align:right;border-collapse:separate;border-spacing:0px 20px;">  										    				    				    
+				    <tr>  
+				        <td style="width:150px;" align="right">确认删除所选记录吗？</td>
+				       
+				    </tr>				    				  				   							   
+					<tr >
+					    <td colspan='2'>
+					    	<button class="btn btn-info btn-sm" type="submit" onclick="deletePreMessage()" style='border-radius:8px;'>
+								<i class="icon-ok bigger-110"></i>确定
+							</button>
+						    
+						</td>
+						 <td colspan='2'>
+					    	
+						    <span class="btn btn-sm" onclick="$('#deletePreMessageDialog').dialog('close')" style='border-radius:8px; margin-left:40px;'>
+								<i class="icon-remove bigger-110"></i>取消
+							</span>
+						</td>
+					</tr>  
+				</table>					
+		</div>							
+					<div class="page-content">
+						<div class="row">
+							<div class="col-xs-12">
+								<table id="grid-table"></table>
+								<div id="grid-pager"></div>
+								<!-- PAGE CONTENT ENDS -->
+							</div><!-- /.col -->
+						</div><!-- /.row -->
+					</div><!-- /.page-content -->					   						
+				</div><!-- /.main-content -->
+			</div><!-- /.main-container-inner -->
+		</div>
+		
+		<script src="../../../../plugins/assets/js/bootstrap.min.js"></script>
+		<script src="../../../../plugins/assets/js/typeahead-bs2.min.js"></script>
+
+		<!-- page specific plugin scripts -->
+
+		<script src="../../../../plugins/assets/js/date-time/bootstrap-datepicker.min.js"></script>
+		<script src="../../../../plugins/assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+		<script src="../../../../plugins/assets/js/jqGrid/i18n/grid.locale-en.js"></script>
+		<!-- ace scripts -->
+		<script src="../../../../plugins/assets/js/ace-elements.min.js"></script>
+		<script src="../../../../plugins/assets/js/ace.min.js"></script>
+		<script src="../../../../plugins/assets/js/ace-extra.min.js"></script>	
+		<!-- ztree scripts -->
+		<script src="../../../../plugins/assets/js/jquery.ztree.all-3.5.min.js"></script>
+		<script src="../js/preMessage.js"></script>
+		<script src="../../../../plugins/js/jquery.jqGrid.extensions.topToolbar.js"></script>		
+		<script type="text/javascript">
+		
+			var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+			var isOpera = userAgent.indexOf("Opera") > -1;
+			var div1 = document.getElementById("breadcrumbs");  
+			if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera) {
+			    			  			
+		    } //判断是否IE浏览器
+		    else {
+		    	div1.style.background="-webkit-linear-gradient(left, #415F87 , #67C0E3)";
+		    }
+
+		</script>
+</body>
+</html>

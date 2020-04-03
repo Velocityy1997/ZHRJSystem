@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.system.user.dao.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.system.user.model.User" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="error_code" property="errorCode" jdbcType="INTEGER" />
+    <result column="last_time" property="lastTime" jdbcType="TIMESTAMP" />
+    <result column="current_ip" property="currentIp" jdbcType="VARCHAR" />
+    <result column="login_num" property="loginNum" jdbcType="INTEGER" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="last_ip" property="lastIp" jdbcType="VARCHAR" />
+    <result column="password_state" property="passwordState" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="user_area" property="userArea" jdbcType="VARCHAR" />
+    <result column="user_industry" property="userIndustry" jdbcType="VARCHAR" />
+    <result column="area_name" property="areaName" jdbcType="VARCHAR" />
+    <result column="industry_name" property="industryName" jdbcType="VARCHAR" />
+  	<collection property="areaList"
+			resultMap="com.web.business.generator.system.area.dao.AreaMapper.BaseResultMap">
+	</collection>
+	<collection property="industList"
+			resultMap="com.web.business.generator.system.industry.dao.IndustryMapper.BaseResultMap">
+	</collection>
+  </resultMap>
+   
+  
+ 
+  
+  
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	name,
+     	state,
+     	type,
+     	status,
+     	password,
+     	error_code,
+     	last_time,
+     	current_ip,
+     	login_num,
+     	phone,
+     	create_date,
+     	last_ip,
+     	password_state,
+     	remark,
+     	user_area,
+     	user_industry
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from user 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  <!-- 根据用户名和密码查询用户 -->
+  <select id="findUserByNameAndPassword" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from user 
+    where  name = #{userName} and password = #{password}
+  </select>
+  
+   
+  
+   <select id="selectByUserName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from user 
+    where  name = #{name}
+  </select>
+  
+<!--   根据区域id查用户 -->
+   <select id="selectByAreaId"  resultMap="BaseResultMap"  parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from user 
+    where  USER_AREA = #{areaId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByUserPhone" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from user 
+    where  phone = #{phone}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from user 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from user
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	 <insert id="insertSelective" parameterType="com.web.business.generator.system.user.model.User">
+		insert into user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="state != null">
+				state,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="password != null">
+				password,
+			</if>
+			<if test="errorCode != null">
+				error_code,
+			</if>
+			<if test="lastTime != null">
+				last_time,
+			</if>
+			<if test="currentIp != null">
+				current_ip,
+			</if>
+			<if test="loginNum != null">
+				login_num,
+			</if>
+			<if test="phone != null">
+				phone,
+			</if>
+			<if test="createDate != null">
+				create_date,
+			</if>
+			<if test="lastIp != null">
+				last_ip,
+			</if>
+			<if test="passwordState != null">
+				password_state,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="userArea != null">
+				user_area,
+			</if>
+			<if test="userIndustry != null">
+				user_industry
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="name != null">
+				 #{ name,jdbcType= VARCHAR },
+			</if>
+			<if test="state != null">
+				 #{ state,jdbcType= INTEGER },
+			</if>
+			<if test="type != null">
+				 #{ type,jdbcType= INTEGER },
+			</if>
+			<if test="status != null">
+				 #{ status,jdbcType= INTEGER },
+			</if>
+			<if test="password != null">
+				 #{ password,jdbcType= VARCHAR },
+			</if>
+			<if test="errorCode != null">
+				 #{ errorCode,jdbcType= INTEGER },
+			</if>
+			<if test="lastTime != null">
+				 #{ lastTime,jdbcType= VARCHAR },
+			</if>
+			<if test="currentIp != null">
+				 #{ currentIp,jdbcType= VARCHAR },
+			</if>
+			<if test="loginNum != null">
+				 #{ loginNum,jdbcType= INTEGER },
+			</if>
+			<if test="phone != null">
+				 #{ phone,jdbcType= VARCHAR },
+			</if>
+			<if test="createDate != null">
+				 #{ createDate,jdbcType= VARCHAR },
+			</if>
+			<if test="lastIp != null">
+				 #{ lastIp,jdbcType= VARCHAR },
+			</if>
+			<if test="passwordState != null">
+				 #{ passwordState,jdbcType= INTEGER },
+			</if>
+			<if test="remark != null">
+				 #{ remark,jdbcType= VARCHAR },
+			</if>
+			<if test="userArea != null">
+				 #{ userArea,jdbcType= VARCHAR },
+			</if>
+			<if test="userIndustry != null">
+				 #{ userIndustry,jdbcType= VARCHAR }
+			</if>
+		</trim>
+	</insert> 
+   <!-- 管理员分页 -->
+   <select id="selectByPropertyByAdminPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.system.user.model.User">
+		select
+		u.id,
+     	u.name,
+     	u.state,
+     	u.type,
+     	u.status,
+     	u.password,
+     	u.error_code,
+     	u.last_time,
+     	u.current_ip,
+     	u.login_num,
+     	u.phone,
+     	u.create_date,
+     	u.last_ip,
+     	u.password_state,
+     	u.remark,
+     	u.user_area,
+     	u.user_industry,
+     	i.Indust_name as  industry_name,
+     	a.area_name as area_name
+     	
+		from user AS u 
+
+		LEFT JOIN area  AS a  ON u.USER_AREA =  a.area_id
+
+		LEFT JOIN industry AS i ON  u.USER_INDUSTRY = i.indust_id
+
+		WHERE 1=1
+		
+		<!--  <if test="id != null">
+			AND u.id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null">
+			AND u.name =  #{ name,jdbcType= VARCHAR }
+		  </if>
+		  <if test="state != null">
+			AND u.state =  #{ state,jdbcType= INTEGER }
+		  </if>
+		  <if test="type != null">
+			AND u.type =  #{ type,jdbcType= INTEGER }
+		  </if>
+		  <if test="status != null">
+			AND u.status =  #{ status,jdbcType= INTEGER }
+		  </if>
+		  <if test="password != null">
+			AND u.password =  #{ password,jdbcType= VARCHAR }
+		  </if>
+		  <if test="errorCode != null">
+			AND u.error_code =  #{ errorCode,jdbcType= INTEGER }
+		  </if>
+		  <if test="lastTime != null">
+			AND u.last_time =  #{ lastTime,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="currentIp != null">
+			AND u.current_ip =  #{ currentIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="loginNum != null">
+			AND u.login_num =  #{ loginNum,jdbcType= INTEGER }
+		  </if>
+		  <if test="phone != null">
+			AND u.phone = #{ phone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND u.create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="lastIp != null">
+			AND u.last_ip =  #{ lastIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="passwordState != null">
+			AND u.password_state =  #{ passwordState,jdbcType= INTEGER }
+		  </if>
+		  <if test="remark != null">
+			AND u.remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userArea != null">
+			AND u.user_area =  #{ userArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIndustry != null">
+			AND u.user_industry =  #{ userIndustry,jdbcType= VARCHAR }
+		  </if> -->
+		
+		ORDER BY create_date desc
+		
+	</select>
+	
+	<!-- 普通用户查询分页 -->
+	<select id="selectByPropertyByPageList" resultMap="BaseResultMap"
+		>
+		select
+		u.id,
+     	u.name,
+     	u.state,
+     	u.type,
+     	u.status,
+     	u.password,
+     	u.error_code,
+     	u.last_time,
+     	u.current_ip,
+     	u.login_num,
+     	u.phone,
+     	u.create_date,
+     	u.last_ip,
+     	u.password_state,
+     	u.remark,
+     	u.user_area,
+     	u.user_industry,
+     	i.Indust_name as  industry_name,
+     	a.area_name as area_name
+		
+		from user AS u 
+
+		LEFT JOIN area  AS a  ON u.USER_AREA =  a.area_id
+
+		LEFT JOIN industry AS i ON  u.USER_INDUSTRY = i.indust_id
+		
+		where u.type = 0	
+	
+			<if test="queryName!= null or queryName != ''" >
+				AND (u.name like  CONCAT ('%',#{ queryName,jdbcType= VARCHAR },'%'))
+		  	</if>
+		  	
+		  	<if test = "idList != null">
+		  	and  FIND_IN_SET(u.user_area,(#{idList ,jdbcType=VARCHAR}))
+		  	</if>
+		
+		
+		
+		ORDER BY create_date desc
+		
+	</select>
+	
+	<!--管理员查询  -->
+	 <select id="selectByPropertyByAdminLisr" resultMap="BaseResultMap">
+		select
+		u.id,
+     	u.name,
+     	u.state,
+     	u.type,
+     	u.status,
+     	u.password,
+     	u.error_code,
+     	u.last_time,
+     	u.current_ip,
+     	u.login_num,
+     	u.phone,
+     	u.create_date,
+     	u.last_ip,
+     	u.password_state,
+     	u.remark,
+     	u.user_area,
+     	u.user_industry,
+     	i.Indust_name as  industry_name,
+     	a.area_name as area_name
+     	
+		from user AS u 
+
+		LEFT JOIN area  AS a  ON u.USER_AREA =  a.area_id
+
+		LEFT JOIN industry AS i ON  u.USER_INDUSTRY = i.indust_id
+
+		WHERE 1=1
+		
+			<if test="user.name != null and user.name != ''" >
+				AND (u.name like  CONCAT ('%',#{ user.name,jdbcType= VARCHAR },'%'))
+		  	</if>
+		  	
+		  	<if test = "idList != null  and  idList != '' ">
+		  	and  FIND_IN_SET(u.user_area,(#{idList ,jdbcType=VARCHAR}))
+		  	</if>
+			
+			
+		ORDER BY u.create_date desc
+		
+	</select>
+	
+	
+	
+	
+	
+	
+	<!-- 管理员统计 -->
+	 <select id="selectCountByAdminProperty"  resultType="java.lang.Integer">
+		select
+		count(1)
+		from user
+	</select>
+	<!-- 普通用户统计 -->
+	<select id="selectCountByUserProperty"  resultType="java.lang.Integer">
+		select
+		count(1)
+		from user
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="name != null">
+			AND name =  #{ name,jdbcType= VARCHAR }
+		  </if>
+		  <if test="state != null">
+			AND state =  #{ state,jdbcType= VARCHAR }
+		  </if>
+		  <if test="type != null">
+			AND type =  #{ type,jdbcType= VARCHAR }
+		  </if>
+		  <if test="status != null">
+			AND status =  #{ status,jdbcType= VARCHAR }
+		  </if>
+		  <if test="password != null">
+			AND password =  #{ password,jdbcType= VARCHAR }
+		  </if>
+		  <if test="errorCode != null">
+			AND error_code =  #{ errorCode,jdbcType= VARCHAR }
+		  </if>
+		  <if test="lastTime != null">
+			AND last_time =  #{ lastTime,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="currentIp != null">
+			AND current_ip =  #{ currentIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="loginNum != null">
+			AND login_num =  #{ loginNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="phone != null">
+			AND phone =  #{ phone,jdbcType= VARCHAR }
+		  </if>
+		  <if test="createDate != null">
+			AND create_date =  #{ createDate,jdbcType= TIMESTAMP }
+		  </if>
+		  <if test="lastIp != null">
+			AND last_ip =  #{ lastIp,jdbcType= VARCHAR }
+		  </if>
+		  <if test="passwordState != null">
+			AND password_state =  #{ passwordState,jdbcType= VARCHAR }
+		  </if>
+		  <if test="remark != null">
+			AND remark =  #{ remark,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userArea != null">
+			AND user_area =  #{ userArea,jdbcType= VARCHAR }
+		  </if>
+		  <if test="userIndustry != null">
+			AND user_industry =  #{ userIndustry,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.system.user.model.User">
+		<if test="id !=null">
+			update user
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 name =  #{ name,jdbcType= VARCHAR },
+     			 state =  #{ state,jdbcType= INTEGER },
+     			 type =  #{ type,jdbcType= INTEGER },
+     			 status =  #{ status,jdbcType= INTEGER },
+     			 password =  #{ password,jdbcType= VARCHAR },
+     			 error_code =  #{ errorCode,jdbcType= INTEGER },
+     			 last_time =  #{ lastTime,jdbcType= TIMESTAMP },
+     			 current_ip =  #{ currentIp,jdbcType= VARCHAR },
+     			 login_num =  #{ loginNum,jdbcType= INTEGER },
+     			 phone =  #{ phone,jdbcType= VARCHAR },
+     			 create_date =  #{ createDate,jdbcType= TIMESTAMP },
+     			 last_ip =  #{ lastIp,jdbcType= VARCHAR },
+     			 password_state =  #{ passwordState,jdbcType= INTEGER },
+     			 remark =  #{ remark,jdbcType= VARCHAR },
+     			 user_area =  #{ userArea,jdbcType= VARCHAR },
+     			 user_industry =  #{ userIndustry,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+	
+	
+	<!-- 根据区域id集合来遍历查找下属用户 -->
+  <select id="selectUserByAreaIds" resultType="java.lang.Long"
+		parameterType="java.util.List">
+		select
+		count(*)
+		from user
+		where user_area in
+    		<foreach collection="list" item="areaId" index="index" open="(" close=")" separator=",">
+             #{ areaId,jdbcType=VARCHAR}
+   			 </foreach>
+	</select>
+  
+</mapper>

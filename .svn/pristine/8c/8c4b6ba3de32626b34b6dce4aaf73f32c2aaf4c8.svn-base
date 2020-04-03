@@ -1,0 +1,69 @@
+/**
+ *  '__'
+ *  (00)____    (power by cupp.py)
+ *  (__)    )\
+ *     ||--|| *
+ *
+ *  jqGrid扩展---顶部工具栏(可将分页工具栏上的按钮添加到此扩展工具栏中)
+ *  添加如下扩展配置:
+ *      topToolbar:是否开启顶部工具栏（true|false）
+ *      topToolbarId:jqGrid顶部工具栏ID,此id必须唯一，在创建顶部工具栏时，将会使用此ID
+ *  
+ *  
+ *  注：先加载jqGrid相关的js文件，然后再加载此文件
+ *  
+ */
+
+(function(_jq)
+{
+	var _jqGrid = _jq.fn.jqGrid;
+    _jq.fn.jqGrid = function(_opt)
+    {
+        function _init(_element,_opt)
+        {
+            if(!_opt["topToolbar"])
+            {
+                return;
+            }
+
+            _element.each(function()
+            {
+                if(this["topToolbar_render"])
+                {
+                    return ;
+                }
+
+                var _topBar = _jq("<div>",{'id':_opt["topToolbarId"],'class':'ui-state-default ui-jqgrid-pager ui-corner-bottom'});
+                var _table = [];
+                _table.push("<div class='ui-pager-control' role='group'>");
+                _table.push("   <table cellspacing='0' cellpadding='0' border='0' class='ui-pg-table' style='width:100%;table-layout:fixed;height:100%;' role='row'>");
+                _table.push("      <tbody>");
+                _table.push("         <tr>");
+                _table.push("           <td id='" + _opt["topToolbarId"] + "_left'></td>");
+                _table.push("         </tr>");
+                _table.push("      </tbody>");
+                _table.push("   </table>");
+                _table.push("</div>");
+
+                _jq(_table.join("")).appendTo(_topBar);
+                
+                var _titlebar = _jq(this).parent().parent().prevAll().eq(1);
+                _titlebar.after(_topBar);
+                //添加渲染完成的标识
+                this["topToolbar_render"] = true;
+            });
+        };
+
+        if('string' === (typeof _opt))
+        {
+            return _jqGrid.apply(this,arguments);
+        }
+
+        var _result = _jqGrid.apply(this,arguments);
+        _init(this,_opt);
+
+        return _result;
+    };
+
+    _jq.extend(_jq.fn.jqGrid,_jqGrid);
+})(jQuery);

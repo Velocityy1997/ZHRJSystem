@@ -1,0 +1,23 @@
+L.Control.SearchBar = L.Control.extend({
+	options:{
+		position:  'topleft',
+	},
+	initialize:function(){
+		
+	},
+	onSearch: function(){
+		
+	},
+	onAdd:function(map){
+		return this.container;
+	},
+	onRemove:function(map){
+		
+	},
+	enable:function(){
+		return this;
+	},
+	disable:function(){
+		return this;
+	}
+});

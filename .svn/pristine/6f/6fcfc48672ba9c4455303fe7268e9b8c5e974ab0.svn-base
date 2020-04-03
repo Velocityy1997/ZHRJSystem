@@ -1,0 +1,377 @@
+body {
+	margin: 0;
+	padding: 0;
+	font: 12px "Microsoft YaHei",tahoma,Arial,SimSun,sans-serif,serif;
+}
+
+.containers {
+	height: auto !important;
+	min-width: 1276px;
+	min-height: 500px;
+}
+
+.body {
+	position: relative;
+}
+
+.east {
+	position: absolute;
+	top: 130px;
+	left: 0px;
+	width: 145px;
+	height: 680px;/*85%*/
+	/*border: 1px solid rgb(195, 217, 224);*/
+	overflow: hidden;
+}
+
+/* 去除导航菜单顶部间隙 */
+.nav > .tabs-header {
+	padding-top: 0px;
+}
+
+/* 去除导航菜单下边框 */
+.nav > .tabs-header ul.tabs {
+	border-bottom: 0px;
+}
+
+/* 去除导航菜单之间的间隙 */
+.nav .tabs li {
+	margin: 0;
+}
+
+/* 去除导航菜单的圆角和底部的边框 */
+.nav .tabs li a.tabs-inner {
+	border-width: 0px 0px 0px 0px;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+/* 修改选中导航菜单时的背景色 */
+.nav > .tabs-header li.tabs-selected a.tabs-inner {
+	background: none;
+	filter: none;
+	background-color: rgb(21,138,218);
+	border-bottom-color: rgb(54, 54, 52);
+}
+
+/* 修改鼠标悬停导航菜单时的背景色和边框颜色 */
+.nav > .tabs-header li a.tabs-inner:hover {
+	background-color: #1760D8;
+	border-color: #1760D8;
+}
+
+/* 修改导航tab页的背景色 */
+.nav > .tabs-header li a.tabs-inner {
+	background: none;
+	background-color: rgb(21,138,218);
+	filter: none;
+	border-bottom: 2px solid transparent;
+}
+
+.nav .tt-inner {
+	display: inline-block;
+	line-height: 12px;
+	padding-top: 8px;
+	color: white;
+	font-size: 14px;
+}
+
+.nav .tt-inner img {
+	border: 0;
+}
+
+.logo {
+	position: absolute;
+	top: 10px;
+	left: 20px;
+	width: 251px;
+	height: 60px;
+	z-index: 1;
+	background: url("images/d-3.png") no-repeat;
+}
+/*
+.version {
+	position: absolute;
+	top: 40px;
+	left: 60px;
+	color: rgb(255, 255, 255);
+	font-size: 11px;
+} */
+
+.nav-toolbar {
+	width: 235px;
+	height: 60px;
+	position: absolute;
+	right: 0px;
+	top: 18px;
+	z-index: 1;
+}
+/* IE下使用overflow:hidden包含浮动元素失效所以父元素也浮动*/
+.nav-toolbar ul {
+	float: left;
+	margin-top: 15px;
+}
+
+.nav-toolbar li {
+	float: left;
+	list-style-type: none;
+}
+
+.nav-toolbar a {
+	display: block;
+	padding: 0 10px;
+	text-decoration: none;
+}
+
+.nav-toolbar img {
+	border: 0;
+}
+
+/* 调整导航菜单的左侧边距、背景色、边框 */
+.nav > .tabs-header ul.tabs {
+	padding-left: 350px;
+	background-color: rgb(21,138,218);
+}
+
+.nav div.navTab {
+	padding: 15px;
+	border-top: 1px solid rgb(44, 88, 117);
+	background-color: rgb(51,55,58);
+}
+
+/*****************网络管理树标签页******************/
+.netWorkTab > .tabs-header {
+	/*border-color: #0073DD;*/
+	/* 设置网络管理标签页标题的背景色 */
+	background-color: rgb(51,55,58);
+}
+/* 去除网络管理标签页的左右和下边框 */
+.netWorkTab > .tabs-panels {
+	border: 0px none;
+}
+.netWorkTab > .tabs-panels .panel-body {
+	/* 设置网络管理标签页内容的背景色 */
+	background-color: rgb(51,55,58);
+}
+
+.netWorkTab .tabs {
+	padding: 0 0 0 8px;
+	border-bottom: 0px;
+}
+
+.netWorkTab .tabs li .tabs-title {
+	color: white;
+}
+
+.netWorkTab > .tabs-header li a.tabs-inner {
+	border: 1px solid transparent;
+	background-color: rgb(51,55,58);
+}
+
+.netWorkTab .tabs li a.tabs-inner:hover {
+	/*background-color: #1760D8;
+	border-color: #1760D8;*/
+	background-color: rgb(43,44,46);
+	border: 1px solid rgb(71,75,78);
+}
+
+.netWorkTab .tabs li.tabs-selected a.tabs-inner {
+	background-color: rgb(51,55,58);
+	border-bottom: 1px solid white;
+}
+/* 设置网络管理左侧树形字体颜色 */
+.networkTree > li {
+	color: white;
+}
+/* 设置网络管理左侧树选中样式 */
+.networkTree > li .tree-node-selected {
+	background-color: rgb(43,44,46);
+	border: 1px solid rgb(71,75,78);
+	-moz-border-radius: 3px 3px 3px 3px;
+	-webkit-border-radius: 3px 3px 3px 3px;
+	border-radius: 3px 3px 3px 3px;
+	color: white;
+}
+/* 设置网络管理左侧树鼠标悬停样式 */
+.networkTree > li .tree-node-hover {
+    background: rgb(83,84,86);
+    border: 1px solid rgb(71,75,78);
+    -moz-border-radius: 3px 3px 3px 3px;
+	-webkit-border-radius: 3px 3px 3px 3px;
+	border-radius: 3px 3px 3px 3px;
+    color: white;
+}
+
+/*****************终端站管理标签页******************/
+.termMgrTab  > .tabs-header li a.tabs-inner{
+	background-color: rgb(51,55,58);
+}
+
+/*****************第二级标签页*********************/
+/* 中心页面设置圆角,背景色 */
+.secondaryTab {
+	background-color: rgb(51,55,58);
+}
+
+/* 去除中心页面标签页默认的上边距 */
+.secondaryTab > .tabs-header {
+	padding-top: 0px;
+	
+}
+/* 中心页面修改为圆角 */
+.secondaryTab > .tabs-panels {
+	-moz-border-radius: 6px 6px 6px 6px;
+	-webkit-border-radius: 6px 6px 6px 6px;
+	border-radius: 6px 6px 6px 6px;
+}
+
+/* 中心页面标签页向左偏移 */
+.secondaryTab > .tabs-header .tabs-wrap {
+	left: -35px;
+}
+
+.secondaryTab .tabs li a.tabs-inner {
+	background-color: rgb(51,55,58);
+	color: white;
+	/*border: 0px none;*/
+	border-bottom: 2px solid transparent;
+	padding: 0 25px;
+	margin-bottom:1px;
+}
+
+.secondaryTab .tabs li.tabs-selected a.tabs-inner {
+	border-bottom: 2px solid white;
+	/*background-color: #0073DD;*/
+}
+
+.secondaryTab > .tabs-header li a.tabs-inner:hover {
+	/*color: white;*/
+	background-color: rgb(43,44,46);
+	border: 1px solid rgb(71,75,78);
+}
+
+.secondaryTab .tabs {
+	border-bottom: 0px;
+}
+
+/***************第三级标签页********************/
+.thirdTab {
+	padding-top: 10px;
+}
+
+.thirdTab > .tabs-header .tabs-wrap {
+	left: 35px;
+}
+
+.thirdTab .tabs-header {
+	border-color: white;
+	background-color: white;
+}
+
+.thirdTab .tabs li {
+	padding: 3px 0;
+}
+
+.thirdTab .tabs li a.tabs-inner {
+	background-color: white;
+	/*border: 0px none;*/
+	border-bottom: 2px solid transparent;
+}
+
+.thirdTab .tabs li .tabs-title {
+	color: #404040;
+}
+
+.thirdTab .tabs li a.tabs-inner:hover {
+	font-weight: bold;
+	background-color: white;
+	border-bottom: 2px solid transparent;
+}
+/*
+.thirdTab .tabs li a.tabs-inner:hover .tabs-title {
+	color: #0073DD;
+}*/
+
+.thirdTab .tabs li.tabs-selected {
+	border-bottom: 2px solid rgb(71,75,78);
+}
+
+.thirdTab .tabs li.tabs-selected a.tabs-inner {
+	background-color: white;
+	border-color: white;
+}
+
+.thirdTab .tabs li.tabs-selected .tabs-title {
+	color: rgb(43,44,46);
+}
+
+ /***************弹出层样式********************/
+ .window {
+ 	border-radius: 6px 6px 6px 6px;
+ }
+ .window-mask {
+ 	background: url("../images/pointer.png");
+ 	opacity: 0.6;
+ }
+ .window-shadow {
+  	background: none;
+  	-moz-box-shadow: none;
+  	-webkit-box-shadow: none;
+  	box-shadow: none;
+}
+
+ /***************首页告警状态栏样式********************/
+ .homepage-status {
+ 	border:1px solid rgb(74,75,77);
+ 	background-color:rgb(43,44,46);
+ 	-moz-border-radius: 6px 6px 6px 6px;
+	-webkit-border-radius: 6px 6px 6px 6px;
+	border-radius: 6px 6px 6px 6px;
+ }
+ 
+ /***************在线离线终端进度条样式****************/
+ #mainMonitorProgressBarTermOnline, #mainMonitorProgressBarTermOff {
+  	background-color: rgb(255,255,255);
+ }
+ #mainMonitorProgressBarTermOnline .progressbar-value .progressbar-text,
+ #mainMonitorProgressBarTermOff .progressbar-value .progressbar-text {
+	background-color: rgb(120,178,241);
+ }
+
+ /***************GIS面板样式****************/
+ .gis-panel {
+ 	padding-top:35px;
+ 	background-color: rgb(51,55,58);
+ }
+ .gis-panel > .layout {
+  	-moz-border-radius: 6px 6px 6px 6px;
+	-webkit-border-radius: 6px 6px 6px 6px;
+	border-radius: 6px 6px 6px 6px;
+ }
+  
+ /***************filebox样式****************/
+ .my-filebox { 
+    position: relative;
+    width: 340px
+  }
+  .my-filebox .textValue { 
+ 	height: 22px;
+ 	border: 1px solid #CDCDCD;
+ 	width: 180px;
+  }
+  .my-filebox .fileBtn {
+  	background-color: #FFF;
+  	border: 1px solid #CDCDCD;
+  	height: 26px;
+  	width: 70px;
+  }
+  .my-filebox .file {
+  	position: absolute;
+  	top: 0;
+  	left: 77px;
+  	height: 24px;
+  	filter: alpha(opacity:0);
+  	opacity: 0;
+  	width: 260px;
+  }

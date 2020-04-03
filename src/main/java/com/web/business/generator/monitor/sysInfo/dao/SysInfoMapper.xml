@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.business.generator.monitor.sysInfo.dao.SysInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.web.business.generator.monitor.sysInfo.model.SysInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="VARCHAR" />
+    <result column="zhj_num" property="zhjNum" jdbcType="VARCHAR" />
+    <result column="baud_rate" property="baudRate" jdbcType="VARCHAR" />
+    <result column="shake_time" property="shakeTime" jdbcType="VARCHAR" />
+    <result column="mm_time" property="mmTime" jdbcType="VARCHAR" />
+    <result column="re_connect" property="reConnect" jdbcType="VARCHAR" />
+    <result column="re_send" property="reSend" jdbcType="VARCHAR" />
+    <result column="baud" property="baud" jdbcType="VARCHAR" />
+    <result column="bdtime_frequence" property="bdtimeFrequence" jdbcType="VARCHAR" />
+    <result column="selfcheck_frequence" property="selfcheckFrequence" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <sql id="Base_Column_List" >
+     	id,
+     	port,
+     	zhj_num,
+     	baud_rate,
+     	shake_time,
+     	mm_time,
+     	re_connect,
+     	re_send,
+     	baud,
+     	bdtime_frequence,
+     	selfcheck_frequence
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from sys_info 
+    where  id = #{ id,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sys_info 
+    where id =  #{ id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteBatchByPrimaryKey" parameterType="java.util.List" >
+    delete from sys_info
+    where id in
+    <foreach collection="list" item="id" index="index"
+            open="(" close=")" separator=",">
+             #{ id,jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+  
+  
+	<insert id="insertSelective"  parameterType="java.lang.String" >
+		insert into sys_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="port != null">
+				port,
+			</if>
+			<if test="zhjNum != null">
+				zhj_num,
+			</if>
+			<if test="baudRate != null">
+				baud_rate,
+			</if>
+			<if test="shakeTime != null">
+				shake_time,
+			</if>
+			<if test="mmTime != null">
+				mm_time,
+			</if>
+			<if test="reConnect != null">
+				re_connect,
+			</if>
+			<if test="reSend != null">
+				re_send,
+			</if>
+			<if test="baud != null">
+				baud,
+			</if>
+			<if test="bdtimeFrequence != null">
+				bdtime_frequence,
+			</if>
+			<if test="selfcheckFrequence != null">
+				selfcheck_frequence,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				 #{ id,jdbcType= VARCHAR },
+			</if>
+			<if test="port != null">
+				 #{ port,jdbcType= VARCHAR },
+			</if>
+			<if test="zhjNum != null">
+				 #{ zhjNum,jdbcType= VARCHAR },
+			</if>
+			<if test="baudRate != null">
+				 #{ baudRate,jdbcType= VARCHAR },
+			</if>
+			<if test="shakeTime != null">
+				 #{ shakeTime,jdbcType= VARCHAR },
+			</if>
+			<if test="mmTime != null">
+				 #{ mmTime,jdbcType= VARCHAR },
+			</if>
+			<if test="reConnect != null">
+				 #{ reConnect,jdbcType= VARCHAR },
+			</if>
+			<if test="reSend != null">
+				 #{ reSend,jdbcType= VARCHAR },
+			</if>
+			<if test="baud != null">
+				 #{ baud,jdbcType= VARCHAR },
+			</if>
+			<if test="bdtimeFrequence != null">
+				 #{ bdtimeFrequence,jdbcType= VARCHAR },
+			</if>
+			<if test="selfcheckFrequence != null">
+				 #{ selfcheckFrequence,jdbcType= VARCHAR },
+			</if>
+		</trim>
+	</insert>
+   
+   <select id="selectByPropertyByPage" resultMap="BaseResultMap"
+		parameterType="com.web.business.generator.monitor.sysInfo.model.SysInfo">
+		select
+		<include refid="Base_Column_List" />
+		from sys_info
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="port != null">
+			AND port =  #{ port,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="baudRate != null">
+			AND baud_rate =  #{ baudRate,jdbcType= VARCHAR }
+		  </if>
+		  <if test="shakeTime != null">
+			AND shake_time =  #{ shakeTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="mmTime != null">
+			AND mm_time =  #{ mmTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="reConnect != null">
+			AND re_connect =  #{ reConnect,jdbcType= VARCHAR }
+		  </if>
+		  <if test="reSend != null">
+			AND re_send =  #{ reSend,jdbcType= VARCHAR }
+		  </if>
+		  <if test="baud != null">
+			AND baud =  #{ baud,jdbcType= VARCHAR }
+		  </if>
+		  <if test="bdtimeFrequence != null">
+			AND bdtime_frequence =  #{ bdtimeFrequence,jdbcType= VARCHAR }
+		  </if>
+		  <if test="selfcheckFrequence != null">
+			AND selfcheck_frequence =  #{ selfcheckFrequence,jdbcType= VARCHAR }
+		  </if>
+		ORDER BY update_time desc
+		<if test="start != null and max != null">
+			limit    #{  start},   #{  max }
+		 </if>
+	</select>
+	
+	 <select id="selectCountByProperty"  resultType="java.lang.Integer"
+		parameterType="com.web.business.generator.monitor.sysInfo.model.SysInfo">
+		select
+		count(1)
+		from sys_info
+		where 1=1
+		  <if test="id != null">
+			AND id =  #{ id,jdbcType= VARCHAR }
+		  </if>
+		  <if test="port != null">
+			AND port =  #{ port,jdbcType= VARCHAR }
+		  </if>
+		  <if test="zhjNum != null">
+			AND zhj_num =  #{ zhjNum,jdbcType= VARCHAR }
+		  </if>
+		  <if test="baudRate != null">
+			AND baud_rate =  #{ baudRate,jdbcType= VARCHAR }
+		  </if>
+		  <if test="shakeTime != null">
+			AND shake_time =  #{ shakeTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="mmTime != null">
+			AND mm_time =  #{ mmTime,jdbcType= VARCHAR }
+		  </if>
+		  <if test="reConnect != null">
+			AND re_connect =  #{ reConnect,jdbcType= VARCHAR }
+		  </if>
+		  <if test="reSend != null">
+			AND re_send =  #{ reSend,jdbcType= VARCHAR }
+		  </if>
+		  <if test="baud != null">
+			AND baud =  #{ baud,jdbcType= VARCHAR }
+		  </if>
+		  <if test="bdtimeFrequence != null">
+			AND bdtime_frequence =  #{ bdtimeFrequence,jdbcType= VARCHAR }
+		  </if>
+		  <if test="selfcheckFrequence != null">
+			AND selfcheck_frequence =  #{ selfcheckFrequence,jdbcType= VARCHAR }
+		  </if>
+	</select>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="com.web.business.generator.monitor.sysInfo.model.SysInfo">
+		<if test="id !=null">
+			update sys_info
+			<set>
+     			 id =  #{ id,jdbcType= VARCHAR },
+     			 port =  #{ port,jdbcType= VARCHAR },
+     			 zhj_num =  #{ zhjNum,jdbcType= VARCHAR },
+     			 baud_rate =  #{ baudRate,jdbcType= VARCHAR },
+     			 shake_time =  #{ shakeTime,jdbcType= VARCHAR },
+     			 mm_time =  #{ mmTime,jdbcType= VARCHAR },
+     			 re_connect =  #{ reConnect,jdbcType= VARCHAR },
+     			 re_send =  #{ reSend,jdbcType= VARCHAR },
+     			 baud =  #{ baud,jdbcType= VARCHAR },
+     			 bdtime_frequence =  #{ bdtimeFrequence,jdbcType= VARCHAR },
+     			 selfcheck_frequence =  #{ selfcheckFrequence,jdbcType= VARCHAR }
+			</set>
+			where id =  #{ id,jdbcType=VARCHAR}
+		</if>
+	</update>
+	
+	
+	<!--更新当前获取到的指挥机配置信息  -->
+	<update id="updateInfo" parameterType="com.web.business.generator.monitor.sysInfo.model.SysInfo" >
+		<if test="zhjNum !=null">
+			update sys_info 
+			 <set>		
+     			 port =  #{ port,jdbcType= VARCHAR },
+     			 baud_rate =  #{ baudRate,jdbcType= VARCHAR },
+     			 bdtime_frequence =  #{ bdtimeFrequence,jdbcType= VARCHAR }
+			</set> 
+			where zhj_num =  #{ zhjNum,jdbcType=VARCHAR}
+		</if>
+	</update>
+
+	<!--修改通讯频率-->
+	<update id="updateFrequency"  parameterType="Integer">
+			update sys_info
+			<set>
+				bdtime_frequence =  #{ num,jdbcType= INTEGER }
+			</set>
+			WHERE ID   = ( SELECT ID FROM (SELECT ID FROM  sys_info ) t1 )
+	</update>
+
+	<!--修改串口-->
+	<update id="updatePort">
+		update sys_info
+		<set>
+			port =  #{ port,jdbcType= VARCHAR },
+			BAUD_RATE =  #{ rate,jdbcType= INTEGER }
+		</set>
+		WHERE ID   = ( SELECT ID FROM (SELECT ID FROM  sys_info ) t1 )
+	</update>
+	
+	<!--获取当前指挥机配置信息  -->
+	 <select id="getInfo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+		<include refid="Base_Column_List" />
+    from sys_info 
+  </select>
+</mapper>
