@@ -1,0 +1,779 @@
+package com.web.business.generator.comm.taskList.controller;
+/*
+ *  与指挥机相关的任务
+ *  @author: GouYudong
+ *         创建时间:  2019年11月11日下午3:19:02
+ */
+
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
+
+import org.springframework.scheduling.config.Task;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ser.std.UUIDSerializer;
+import com.sun.xml.internal.xsom.impl.scd.Iterators.Map;
+import com.web.business.generator.comm.taskList.model.TaskList;
+import com.web.business.generator.comm.taskList.model.ZhjTaskInfo;
+import com.web.business.generator.comm.taskList.services.impl.TaskListServiceImpl;
+import com.web.business.generator.monitor.position.model.Position;
+import com.web.business.generator.monitor.position.services.impl.PositionServiceImpl;
+import com.web.business.generator.system.terminal.model.Terminal;
+import com.web.business.generator.system.terminal.services.impl.TerminalServiceImpl;
+import com.web.business.generator.system.user.model.User;
+import com.web.business.generator.system.zhj.model.Zhj;
+import com.web.business.generator.system.zhj.services.impl.ZhjServiceImpl;
+import com.web.business.generator.util.log.SystemControllerLog;
+import com.web.business.generator.util.task.TaskType;
+import com.web.common.util.spring.RestResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+@Api(description = "zhjTaskAPI", tags = "zhjTaskAPI")
+@Controller
+@RequestMapping("/zhjTask")
+public class ZhjTaskController {
+	
+	@Resource
+	private TaskListServiceImpl taskServiceImpl;
+	
+	@Resource
+	private ZhjServiceImpl zhjServiceImpl;
+	
+	@Resource
+	private PositionServiceImpl positionServiceImpl;
+	
+	@Resource
+	private TerminalServiceImpl terminalServiceImpl;
+	
+	/**
+	 * 本机属性查询
+	 * @param 
+	 * @return
+	 */
+	@ApiOperation(value = "指挥机本机属性查询", notes = "指挥机本机属性查询")
+	@RequestMapping(value = "/getZhjInfo", method = RequestMethod.GET)
+	@ResponseBody
+	@SystemControllerLog(type = "查询指挥机本机属性", actionType = "4")
+	public RestResponse getInfo1() {
+		
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		
+		try {
+			// 1、获取当前指挥机
+			Zhj zhj = zhjServiceImpl.getCurrentZhj();
+			ZhjTaskInfo taskInfo = new ZhjTaskInfo();//返前端对象
+			
+			if (zhj !=null) {
+				
+				if (zhj.getName() ==null || zhj.equals("")) {
+					taskInfo.setName("暂无");
+				}else {
+					
+					taskInfo.setName(zhj.getName());
+				}
+				
+				if (zhj.getTxlength() !=null) {
+					taskInfo.setTxlength(String.valueOf(zhj.getTxlength()));
+				} else {
+					taskInfo.setTxlength("暂无");
+
+				}
+				
+				if (zhj.getCardNum() ==null || zhj.getCardNum().equals("")) {
+					taskInfo.setCardNum("卡号未识别");
+				}else {
+					
+					taskInfo.setCardNum(zhj.getCardNum());
+				}
+				
+				if (zhj.getType() !=null) {
+					if (zhj.getType() == 0) {
+						taskInfo.setType("普通指挥机");
+					}else {
+						taskInfo.setType("超级指挥机");
+					}
+					
+				}else {
+					taskInfo.setType("类型不明确");
+				}
+				if (zhj.getBrocastAdd() ==null || zhj.getBrocastAdd().equals("")) {
+					
+					taskInfo.setBrocastAdd("暂无");
+				}else {
+					taskInfo.setBrocastAdd(zhj.getBrocastAdd());
+				}
+				
+				if (zhj.getFrequency() ==null || zhj.getFrequency().equals("")) {
+					taskInfo.setFrequency("暂无");
+				}else {
+				
+					taskInfo.setFrequency(String.valueOf(zhj.getFrequency()));
+				}
+				if (zhj.getStatus() ==null) {
+					if (zhj.getStatus() ==0) {
+						taskInfo.setStatus("停止");
+						
+					}else if (zhj.getStatus() ==1 ) {
+						taskInfo.setStatus("忙碌");
+						
+					}else {
+						taskInfo.setStatus("空闲");
+					}
+					
+				} else {
+					taskInfo.setStatus("停止");
+				}
+				
+				if (zhj.getTxlevel() !=null) {
+					taskInfo.setTxlevel(String.valueOf(zhj.getTxlevel()));
+					
+				}else {
+					taskInfo.setTxlevel("暂无");
+				}
+				
+				try {
+					//经纬度信息
+					//1.在position表中查
+					String longitude = "";//经度
+					String latitude = "";//纬度
+					Position terPosition = new Position();
+					
+					List<Position> positionList = positionServiceImpl.selectByTerminalId(zhj.getId());
+					
+					if (positionList.size() > 0) {
+						terPosition = positionList.get(0);
+						if (terPosition !=null) {
+							//定位时间
+							if (terPosition.getLocateTime() ==null || terPosition.getLocateTime().equals("")) {
+								taskInfo.setLocateTime("暂无");
+							}else {
+								
+								taskInfo.setLocateTime(terPosition.getLocateTime().toString());
+							}
+							
+							//经度
+							if (terPosition.getLongitude() ==null || terPosition.getLongitude().equals("")) {
+								taskInfo.setLongitude("0");
+								
+							} else {
+								
+								taskInfo.setLongitude(String.valueOf(terPosition.getLongitude()));
+							}
+							
+							//纬度
+							if (terPosition.getLatitude() ==null || terPosition.getLatitude().equals("")) {
+								taskInfo.setLatitude("0");
+							} else {
+								taskInfo.setLatitude(String.valueOf(terPosition.getLatitude()));
+								
+							}
+							
+						}else {
+							//指挥机定位信息获取失败---指挥机编号不存在
+							taskInfo.setLocateTime("暂无");
+							taskInfo.setLongitude("0");
+							taskInfo.setLatitude("0");
+						}
+					} else {
+						taskInfo.setLocateTime("暂无");
+						taskInfo.setLongitude("0");
+						taskInfo.setLatitude("0");
+					}
+					
+					
+					
+					
+					
+					
+				} catch (Exception e) {
+					taskInfo.setLocateTime("暂无");
+					taskInfo.setLongitude("0");
+					taskInfo.setLatitude("0");
+					
+					result.setData(taskInfo);
+					result.setMessage("查询中心指挥机信息失败");
+					result.setSuccess(false);
+					
+					result.setDescription("查询中心指挥机信息失败");
+					
+					e.printStackTrace();
+				}
+				
+				//封装结果集
+				result.setData(taskInfo);
+				result.setMessage("查询中心指挥机信息成功");
+				result.setSuccess(true);
+				result.setDescription("查询中心指挥机信息");
+			
+				
+			}else {
+				//当前指挥机未接入
+				result.setData("");
+				result.setMessage("当前中心指挥机未接入，请检查！");
+				result.setSuccess(false);
+				result.setDescription(sdf.format(System.currentTimeMillis())+":当前中心指挥机未接入，请检查");
+			}
+			
+		} catch (Exception e) {
+			result.setData("");
+			result.setMessage("出现异常，请重试检查！");
+			result.setDescription(sdf.format(System.currentTimeMillis())+":出现异常，请重试检查！");
+			result.setSuccess(false);
+		}
+		
+		return result;
+		
+	}
+	
+	/**
+	 * 	通播---给指挥机下属发送消息
+	 * @param 
+	 * @return
+	 */
+	@ApiOperation(value = "指挥机通播", notes = "指挥机通播 ")
+	@RequestMapping(value = "/broadcast", method = RequestMethod.POST)
+	@ResponseBody
+	@SystemControllerLog(type = "指挥机通播", actionType = "1")
+	public RestResponse getInfo2(HttpServletRequest request,  TaskList task) {
+		//  @RequestBody  TaskList taskList
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		//1.获取通播参数，次数，类型，内容
+		//2.将这条通播信息保存到任务表中
+		//3.保存结果返回前端
+		try {
+			 //1.获取用户信息
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("loginInfo");
+            
+            TaskList currentTask = new TaskList();
+            
+            // 2.获取当前中心指
+            Zhj centerZhj = new Zhj();
+            centerZhj = zhjServiceImpl.getCurrentZhj();
+            
+            if (centerZhj !=null) {
+				//中心指存在
+            	String zhjNum = centerZhj.getCardNum();
+            	
+            	if (task.getContent() ==null || task.getContent().equals("")) {
+            		currentTask.setContent("");
+            		
+				} else {
+					currentTask.setContent(task.getContent());
+				}
+            	
+            	if (task.getSentTimes() ==null || task.getSentTimes().equals("")) {
+					currentTask.setSentTimes(1);
+				} else {
+					currentTask.setSentTimes(task.getSentTimes());
+				}
+            	
+            	if (task.getSendType() ==null || task.getSendType().equals("")) {
+            		currentTask.setSendType(0);
+
+				} else {
+					currentTask.setSendType(task.getSendType());
+					
+				}
+            	
+            	//计划时间
+            	/*if (task.getPlanTime() !=null ) {
+					currentTask.setPlanTime(task.getPlanTime() );
+					
+				}else {
+					//currentTask.setPlanTime(planTime);
+				}*/
+            	
+            	//String content = (String) request.getAttribute("content");//内容
+                //String times = (String) request.getAttribute("times");//通播次数
+                //String sendType = (String) request.getAttribute("sendType");
+               // String planTimeStr = (String) request.getAttribute("planTime");//计划时间
+    			Integer type = TaskType.BROAST;//类型
+    			
+    			currentTask.setType(type);
+    			String date = sdf.format(new Date());
+            	Timestamp startTimeStamp = new java.sql.Timestamp(new Date().getTime());//开始时间戳
+            	
+            	String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+            	
+            	currentTask.setId(uuid);
+            	
+            	currentTask.setStartTime(startTimeStamp);
+            	currentTask.setUserIp(user.getCurrentIp());//当前ip
+            	currentTask.setUserName(user.getName());
+            	currentTask.setZhjNum(zhjNum);
+            	currentTask.setSender(zhjNum);//用户名
+            	currentTask.setReceiver(centerZhj.getBrocastAdd());//接受方 ---指挥机通播地址
+            	//currentTask.setPlanTime("");
+            	
+            	//将该任务保存到数据库表中
+                Integer r = taskServiceImpl.insertSelective(currentTask);
+                if (r != -1) {
+					result.setMessage("保存通播任务成功");
+                	result.setSuccess(true);
+                	result.setDescription(sdf.format(System.currentTimeMillis())+":保存通播任务成功");
+					
+				} else {
+					result.setMessage("保存通播任务失败");
+                	result.setSuccess(false);
+                	result.setDescription(sdf.format(System.currentTimeMillis())+":保存通播任务失败");
+				}
+
+            	
+			}else {
+				//中心指不存在
+				result.setMessage("中心指挥机未接入，请检查！");
+				result.setDescription(sdf.format(System.currentTimeMillis())+":中心指挥机未接入，请检查");
+            	result.setSuccess(false);
+			}
+            
+            
+            
+            
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			result.setMessage("下发任务过程中出现异常，请检查！");
+			result.setDescription(sdf.format(System.currentTimeMillis())+":下发任务过程中出现异常，请检查！");
+        	result.setSuccess(false);
+        	e.printStackTrace();
+        	return result;
+		}
+		
+		return result;
+		
+	}
+
+	
+	
+	
+	/**
+	 * 本机定位
+	 * @param request
+	 * @return
+	 */
+	@ApiOperation(value = "本机定位", notes = "本机定位")
+	@RequestMapping(value = "/getLoaction", method = RequestMethod.GET)
+	@ResponseBody
+	@SystemControllerLog(type = "本机定位", actionType = "1")
+	public RestResponse getInfo3(HttpServletRequest request) {
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		RestResponse result = new RestResponse();
+		
+		String date = sdf.format(new Date());
+    	Timestamp startTimeStamp = new java.sql.Timestamp(new Date().getTime());//开始时间戳
+		
+		try {			
+			HttpSession session = request.getSession();
+			User user = (User) session.getAttribute("loginInfo");
+			
+			Zhj centerZhj = new Zhj();
+            centerZhj = zhjServiceImpl.getCurrentZhj();                       
+            if (centerZhj == null) {
+            	result.setMessage("未找到当前指挥机");
+				result.setSuccess(false);
+				result.setData("");
+				result.setDescription(sdf.format(System.currentTimeMillis())+":未找到当前指挥机");
+				
+				return result;
+			}else {
+				
+				TaskList task = new TaskList();
+	            
+	            String cardNum = centerZhj.getCardNum();
+	            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+	            task.setId(uuid);
+				task.setSender(cardNum);
+				task.setReceiver(cardNum);
+				task.setType(TaskType.BDDW);
+				task.setSentTimes(0);
+				task.setSendType(0);
+				task.setZhjNum(cardNum);
+				task.setStartTime(startTimeStamp);//开始时间戳
+				task.setLevel(1);
+				task.setUserName(user.getName());
+				task.setUserIp(user.getCurrentIp());
+				Integer r = taskServiceImpl.insertSelective(task);
+                if (r != -1) {
+					result.setMessage("本机定位任务下发成功");
+                	result.setSuccess(true);
+                	result.setDescription(sdf.format(System.currentTimeMillis())+":本级定位任务下发成功");
+					
+				} else {
+					result.setMessage("本机定位任务下发失败");
+                	result.setSuccess(false);
+                	result.setDescription(sdf.format(System.currentTimeMillis())+":本级定位任务下发失败");
+				}
+			}
+        
+		} catch (Exception e) {
+			result.setMessage("本级定位任务下发失败");
+			result.setSuccess(false);
+			result.setData("");
+			e.printStackTrace();
+			result.setStatus("500");
+			result.setDescription(sdf.format(System.currentTimeMillis())+":本级定位任务下发失败");
+			
+		}
+		
+		return result;
+	
+	}
+	
+	
+	
+	/**
+	 * 任务重置
+	 * @param 
+	 * @return
+	 */
+	@ApiOperation(value = "任务重置", notes = "任务重置")
+	@RequestMapping(value = "/resetTask", method = RequestMethod.GET)
+	@ResponseBody
+	@SystemControllerLog(type = "任务重置", actionType = "2")
+	public RestResponse getInfo5(HttpServletRequest request) {
+		
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		
+		
+		try {
+			
+			Zhj centerZhj = new Zhj();
+			centerZhj = zhjServiceImpl.getCurrentZhj();
+			
+			HttpSession session = request.getSession();
+			User loginUser = (User) session.getAttribute("loginInfo");
+
+			TaskList task = new TaskList();
+			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+			task.setId(uuid);
+			task.setType(TaskType.RWCZ);
+			task.setContent(loginUser.getName()+"在"+loginUser.getCurrentIp()+":下发任务重置");
+			task.setSender(centerZhj.getCardNum());
+			task.setReceiver(centerZhj.getBrocastAdd());
+			Timestamp startTime = new Timestamp(System.currentTimeMillis());
+			task.setStartTime(startTime);
+			task.setZhjNum(centerZhj.getCardNum());
+			
+			task.setUserName(loginUser.getName());
+			task.setUserIp(loginUser.getCurrentIp());
+			
+			
+			String msg = "";
+			
+			int flag = taskServiceImpl.insertSelective(task);
+			
+			if (flag !=-1) {
+				
+				int tag =  taskServiceImpl.clearTaskList();
+				
+				if ( tag  !=-1 ) {
+					msg = "保存到任务列表中成功#任务重置成功";
+					result.setMessage(msg);
+					result.setSuccess(true);
+					result.setStatus("200");
+					result.setDescription(sdf.format(System.currentTimeMillis())+":任务重置成功");
+				}else {
+					msg = "保存到任务列表中成功#任务重置失败";
+					result.setMessage(msg);
+					result.setSuccess(false);
+					result.setStatus("500");
+					result.setDescription(sdf.format(System.currentTimeMillis())+":任务重置失败");
+				}
+				
+			}else {
+				msg = "保存到任务列表中失败";
+				result.setMessage(msg);
+				result.setSuccess(false);
+				result.setStatus("500");
+				result.setDescription(sdf.format(System.currentTimeMillis())+":保存到任务列表中失败");
+			}
+			
+			
+			
+			
+		} catch (Exception e) {
+			result.setMessage("任务重置失败");
+			result.setSuccess(false);
+			e.printStackTrace();
+			result.setStatus("500");
+			result.setDescription(sdf.format(System.currentTimeMillis())+":任务重置失败");
+			return result;
+		}
+		
+		return result;
+	
+	}
+	
+	
+	/**
+	 * 修改中心指名称
+	 * @param name
+	 * @return
+	 */
+	@SystemControllerLog(type = "修改中心指名称", actionType = "2")
+	@ApiOperation(value = "修改中心指名称", notes = "修改中心指名称")
+	@RequestMapping(value = "/modifyName", method = RequestMethod.POST)
+	@ResponseBody
+	public RestResponse getInfo6(String name) {
+		
+		RestResponse result = new RestResponse();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		
+		try {
+			String newName = name;
+			Zhj centerZhj = new Zhj();
+            centerZhj = zhjServiceImpl.getCurrentZhj();
+            
+            if ( newName !=null ) {
+				centerZhj.setName(newName);
+				//保存
+				int tag = zhjServiceImpl.updateByPrimaryKeySelective(centerZhj);
+				
+				if (tag !=-1) {
+					// 保存成功
+					result.setMessage("修改中心指名称成功");
+					result.setSuccess(true);
+					result.setDescription(sdf.format(System.currentTimeMillis())+":修改中心指名称成功");
+				}else {
+					//
+					result.setMessage("修改中心指名称失败");
+					result.setSuccess(false);
+					result.setDescription(sdf.format(System.currentTimeMillis())+":修改中心指名称失败");
+				}
+				
+			}else {
+				result.setMessage("新名称为空，请检查！");
+				result.setSuccess(false);
+				result.setDescription(sdf.format(System.currentTimeMillis())+":新名称为空，请检查！");
+			}
+			
+		} catch (Exception e) {
+			result.setMessage("出现异常，请重试！");
+			result.setSuccess(false);
+			e.printStackTrace();
+			result.setDescription(sdf.format(System.currentTimeMillis())+":出现异常，请重试！");
+			
+		}
+		
+		return result;
+	
+	}
+	
+	
+	/**
+	 * 发短信
+	 * @param request
+	 * @param cardNums
+	 * @param content
+	 * @param sendTime
+	 * @param sendType
+	 * @return
+	 */
+	@ApiOperation(value = "发短信", notes = "发短信")
+	@RequestMapping(value = "/sendMsg", method = RequestMethod.POST)
+	@ResponseBody
+	@SystemControllerLog(type = "发短信", actionType = "1")
+	public RestResponse getInfo7(HttpServletRequest request,String cardNums,String content ,String sendTime,String sendType) {
+		//HttpServletRequest request
+		RestResponse result = new RestResponse();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+		
+		try {
+			Zhj centerZhj = new Zhj();
+            centerZhj = zhjServiceImpl.getCurrentZhj();
+            String sender = centerZhj.getCardNum();
+            
+			String date = sdf.format(new Date());
+        	Timestamp startTimeStamp = new java.sql.Timestamp(new Date().getTime());//开始时间戳
+        	
+        	
+        	 HttpSession session = request.getSession();
+             User user = (User) session.getAttribute("loginInfo");
+             String userIP = user.getCurrentIp();
+             if (userIP ==null || userIP.equals("")) {
+            	 userIP="***";
+			}
+            
+			//1.拿到卡号列表
+			/*String cardNums = request.getParameter("receiver");//  "456888,556544,666555,778844"
+			String content = request.getParameter("content");// 
+			String sendTime = request.getParameter("times");//发送次数 
+			String sendType = request.getParameter("type");// 发送类型
+*/			
+			if (sendTime ==null || sendTime.equals("")) {
+				sendTime="1";
+			}
+			
+			if (content ==null || content.equals("")) {
+				sendTime="[短信内容为空]";
+			}
+			
+			if (sendType == null || sendType.equals("")) {
+				sendType = "0";
+			}
+			
+			if (cardNums == null || cardNums.equals("")) {
+				//卡号为空
+				result.setMessage("接收方卡号为空，请检查！");
+				result.setSuccess(false);
+				result.setDescription(sdf.format(System.currentTimeMillis())+":接收方卡号为空，请检查！");
+				
+			}else {
+				//2.取出单个卡号
+				String[]cardArr = cardNums.split(",");
+				List<String> msgList = new ArrayList<>();
+				String message = "";
+				//3.下发任务
+				for (String num : cardArr) {
+					for (int i=1;i<=Integer.parseInt(sendTime);i++) {
+						TaskList newTask = new TaskList();
+						String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+						
+						newTask.setSender(sender);
+						newTask.setReceiver(num);
+						newTask.setContent(content);
+						newTask.setSendType(Integer.parseInt(sendType));						
+						newTask.setSentTimes(i);
+						if(Integer.parseInt(sendTime) == 1) {
+							newTask.setSentTimes(0);
+						}
+						newTask.setType(TaskType.SEND_MESSAGE);
+						newTask.setStartTime(startTimeStamp);
+						newTask.setId(uuid);
+						newTask.setUserIp(userIP);
+						newTask.setUserName(user.getName());
+						newTask.setZhjNum(centerZhj.getCardNum());
+
+						newTask.setLevel(1);
+						int tag = taskServiceImpl.insertSelective(newTask);						
+					}									
+				}								
+				//封装结果集
+				result.setMessage(message);
+				result.setSuccess(true);
+				result.setDescription(sdf.format(System.currentTimeMillis())+":下发发送短信任务成功");				
+			}			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setMessage("下发发送短信任务失败");
+			result.setSuccess(false);
+			result.setDescription(sdf.format(System.currentTimeMillis())+":下发发送短信任务失败");			
+		}		
+		return result;	
+	}
+	
+	
+	/**
+	 * 友邻位置
+	 * @param request
+	 * @return
+	 */
+	@ApiOperation(value = "友邻位置", notes = "友邻位置")
+	@RequestMapping(value = "/sharePosition", method = RequestMethod.POST)
+	@ResponseBody
+	public RestResponse getInfo8(HttpServletRequest request) {
+		
+		RestResponse result = new RestResponse();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");		
+		HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("loginInfo");
+        String userName = user.getName();
+        String userIP = user.getCurrentIp();		
+		//友邻位置,利用指挥机向其他下属卡发送位置信息
+		try {
+			Zhj centerZhj = new Zhj();
+            centerZhj = zhjServiceImpl.getCurrentZhj();
+            if (centerZhj == null) {
+				//中心指为空
+				result.setMessage("中心指未接入！");
+				result.setSuccess(false);
+				result.setData("");
+				result.setStatus("404");
+				result.setDescription(sdf.format(System.currentTimeMillis())+":中心指未接入！");				
+				return result;				
+			}	
+                     	            	   			
+    			String terminalId = request.getParameter("terminalId");
+    			//terminalId = terIds;
+    			String terminalIdArr[] = terminalId.split(",");
+    			boolean flag = true;
+    			String message = "";
+    			for(String tId: terminalIdArr) {
+    				Terminal terminal = terminalServiceImpl.selectByPrimaryKey(tId);
+    				if(terminal == null) {
+    					result.setMessage("找不到终端！");
+    					result.setSuccess(false);
+    					result.setData("");
+    					result.setStatus("404");
+    					result.setDescription(sdf.format(System.currentTimeMillis())+":找不到终端！");				
+    					return result;	
+    				}
+    				String posiId = terminal.getPositionId();
+    				Position position = positionServiceImpl.selectByPrimaryKey(posiId);
+    				if(position == null) {
+    					flag = false;
+    					message += terminal.getName() + "(" + terminal.getCardNum() + ")没有位置信息";    					
+    				}
+    			}
+    			if(!flag) { //存在终端没有位置信息
+    				result.setMessage(message);
+					result.setSuccess(false);
+					result.setData("");
+					result.setStatus("404");
+					result.setDescription(message);				
+					return result;	
+    			}
+    			String taskId = taskServiceImpl.sendYLWZTask(userName,userIP,
+    					centerZhj.getCardNum(),centerZhj.getBrocastAdd(),terminalIdArr);
+    			if (null == taskId) {
+    				result.setMessage("友邻位置任务下发失败!");
+    				result.setSuccess(false);
+    				result.setData("");
+    				result.setStatus("500");
+    				
+    			} else {
+    				result.setMessage("友邻位置任务下发成功!");
+    				result.setSuccess(false);
+    				result.setData("");
+    				result.setStatus("500");
+    			}	
+  		 														
+		} catch (Exception e) {
+			
+			result.setMessage("出现异常");
+			result.setSuccess(false);
+			result.setData("");
+			result.setStatus("500");
+			e.printStackTrace();			
+		}					
+		return result;	
+	}				
+}
+

@@ -951,144 +951,26 @@ public class AreaServiceImpl implements IAreaService {
 		String areaId = null; // 区域id
 		boolean tag = false; // 校验标志位
 
-		// 1.判断入参合法非空
-		tag = IsNullUtil.isObjectNull(onlineUser);
-
-		if (!tag) {
-			// 1.1用户不为空
-			tag = IsNullUtil.isStrNull(searchName);
-
-			if (!tag) {
 				// 1.1.1区域名不为空
 				userType = onlineUser.getType();
-				tag = IsNullUtil.isIntegerNull(userType);
-
-				if (!tag) {
 					// 用户类型不为空
 					// 2.管理员
-					if (userType == 1) {
-						// 2.1 全查
-						areaId = onlineUser.getUserArea();
-						tag = IsNullUtil.isStrNull(areaId);
+	
+				// 3.普通用户
+				// 3.1 查当前用户区域及下属id
+				areaId = onlineUser.getUserArea();
+				tag = IsNullUtil.isStrNull(areaId);
 
-						if (!tag) {
-							// 用户当前区域不为空
-							// 管理员根据区域名称来模糊搜索区域id
-							idList = areaMapper.selectBySonIdsByName(searchName);
-							tag = IsNullUtil.isListNull(idList);
-
-							if (!tag) {
-								// 查询结果不为空
-								if (idList.size() == 1) {
-									// 只有一个查询结果，查询下属区域id
-									sonIds = areaMapper.selectSonIdListByParentId(idList.get(0));
-									sonIds.add(idList.get(0));
-
-								} else {
-									// 有多个查询结果，查询下属区域id
-									// 3.1.2.1 有多个元素
-									// 根据ids查找对应的区域对象
-									List<Area> areas = areaMapper.selectAreaByIds(idList);
-									tag = IsNullUtil.isListNull(areas);
-									Integer areaLevel = null;
-
-									if (!tag) {
-										// 区域对象不为空
-										// 进行遍历
-										for (Area area : areas) {
-											areaLevel = area.getLevel();
-											tag = IsNullUtil.isIntegerNull(areaLevel);
-											List<String> tempIds = new ArrayList<>(); //
-
-											if (!tag) {
-												// 级别不为空
-												if (areaLevel == 0) {
-													// 省级用户
-													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
-													tempIds.add(area.getAreaId());
-												}
-												if (areaLevel == 1) {
-													// 市级用户
-													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
-													tempIds.add(area.getAreaId());
-												}
-												if (areaLevel == 2) {
-													// 区级用户
-													tempIds.add(area.getAreaId());
-												}
-											}
-											sonIds.addAll(tempIds);
-										}
-									}
-
-								}
-							}
-						}
-
-					} else {
-						// 3.普通用户
-						// 3.1 查当前用户区域及下属id
-						areaId = onlineUser.getUserArea();
-						tag = IsNullUtil.isStrNull(areaId);
-
-						if (!tag) {
-							// 3.1.1 用户区域不为空
-							idList = areaMapper.selectSonIdsByParentIdAndName(areaId, searchName);
-							tag = IsNullUtil.isListNull(idList);
-
-							if (!tag) {
-								// 3.1.2 ids不为空
-								if (idList.size() == 1) {
-									// 3.1.2.1 只有一个元素
-									// 查下属区域
-									sonIds = areaMapper.selectSonIdListByParentId(idList.get(0));
-
-									// 将当前查询到的区域id加进去
-									sonIds.add(idList.get(0));
-
-								} else {
-									// 3.1.2.1 有多个元素
-									// 根据ids查找对应的区域对象
-									List<Area> areas = areaMapper.selectAreaByIds(idList);
-									tag = IsNullUtil.isListNull(areas);
-									Integer areaLevel = null;
-
-									if (!tag) {
-										// 区域对象不为空
-										// 进行遍历
-										for (Area area : areas) {
-											areaLevel = area.getLevel();
-											tag = IsNullUtil.isIntegerNull(areaLevel);
-											List<String> tempIds = new ArrayList<>(); //
-
-											if (!tag) {
-												// 级别不为空
-												if (areaLevel == 0) {
-													// 省级用户
-													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
-													tempIds.add(area.getAreaId());
-												}
-												if (areaLevel == 1) {
-													// 市级用户
-													tempIds = areaMapper.selectSonIdListByParentId(area.getAreaId());
-													tempIds.add(area.getAreaId());
-												}
-											}
-											sonIds.addAll(tempIds);
-										}
-									}
-
-								}
-							}
-
-						}
+				if (!tag) {
+					// 3.1.1 用户区域不为空
+					sonIds = areaMapper.selectSonIdsByParentIdAndName(areaId, searchName);
+					if(searchName== null || (searchName.equals(""))) {
+						sonIds.add(areaId);
 					}
-
+					
 				}
-
-			}
-		}
-
+								
+		
 		return sonIds;
 	}
 	

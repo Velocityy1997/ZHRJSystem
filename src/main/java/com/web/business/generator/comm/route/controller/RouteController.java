@@ -260,7 +260,7 @@ public class RouteController{
 	@SystemControllerLog(type = "路线全查", actionType = "4")
 	@ApiOperation(value = "路线全查", notes = "路线全查")
 	@ResponseBody
-	@RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+	@RequestMapping(value = "/getAll", method = RequestMethod.GET )
 	public RestResponse getAll() {
 
 		RestResponse result = new RestResponse();

@@ -35,6 +35,7 @@ import com.web.business.generator.system.industry.dao.IndustryMapper;
 import com.web.business.generator.system.industry.model.Industry;
 import com.web.business.generator.system.user.dao.UserMapper;
 import com.web.business.generator.system.user.services.IUserService;
+import com.web.business.generator.util.AnalysisService;
 import com.web.business.generator.util.isNull.IsNullUtil;
 
 @Service
@@ -159,6 +160,7 @@ public class UserServiceImpl implements IUserService {
 		int r = userMapper.updateByPrimaryKeySelective(userInfo);
 		
 		if (userLogin.equals(userName)) {
+			AnalysisService.userFlag = 1;
 			session.setAttribute("loginInfo", userInfo);// 修改用户本身要同时更新Session
 		}
 
@@ -288,28 +290,25 @@ public class UserServiceImpl implements IUserService {
 
 		Map<String, Map<String, String>> areaData = new HashMap<>();
 
-		PageHelper.startPage(page, pageSize);
+		
 		User userQuery = new User();
 		
 		
 		try {
 			if (record.getType() == 1) {
 				String idStr = "";
-				List<String> sonIds = new ArrayList<String>();
+				List<String> sonIds = new ArrayList<String>();				
 				userQuery.setName(queryName);
-					//模糊查询区域及下属区域
-				sonIds = areaServiceImpl.getSonAreasByAreaName(record , queryArea);
-				
-				
-				
-				if (sonIds.size() > 0) {
-					idStr = String.join(",", sonIds);
+				List<Area> queryAreaList = areaMapper.selectByName(queryArea);
+				//模糊查询区域及下属区域
+				if(queryAreaList != null && queryAreaList.size() > 0) {
+					for(Area area:queryAreaList) {
+						sonIds.add(area.getAreaId());
+					}
+					
 				}
-			
-						
-				// 管理员查询
-				list = userMapper.selectByPropertyByAdminLisr(userQuery , idStr );	
-				
+				PageHelper.startPage(page, pageSize);
+				list = userMapper.selectByUserNameAndAreaIds(queryName,sonIds);
 				// 加入省市区对应的id,name,level
 				for (User user : list) {
 
@@ -352,25 +351,9 @@ public class UserServiceImpl implements IUserService {
 			} else {
 				String areaStrId = null;
 				List<String> areaIds  = areaServiceImpl.getSonAreasByAreaName(record , queryArea);
-				for(String id : areaIds ) {
-					areaStrId += id + ",";	
-				}
 				
-				// 根据UserArea 查询其所有下级
-				List<String> sonAreaIds = areaMapper.selectSonIdListByParentId(record.getUserArea());
-				sonAreaIds.add(record.getUserArea());// 将当前用户的区域添加
-				// 根据区域id集合来查用户
-				String idStrTemp = "";
-				for (String id : sonAreaIds) {
-					idStrTemp =idStrTemp += id + ",";
-				}
-				String idStr = idStrTemp.substring(0, idStrTemp.length() - 1);
-				if(areaStrId != null) {
-					list = userMapper.selectByPropertyByPageList(record, areaStrId ,queryName);
-				}else {
-					// list = userMapper.selectByPropertyByPage(record);
-					list = userMapper.selectByPropertyByPageList(record, idStr ,queryName);
-				}
+				PageHelper.startPage(page, pageSize);
+				list = userMapper.selectByUserNameAndAreaIds(queryName,areaIds);
 				// 加入省市区对应的id,name,level
 				for (User user : list) {
 
@@ -503,6 +486,7 @@ public class UserServiceImpl implements IUserService {
 		int r = userMapper.updateByPrimaryKeySelective(record);
 		if (r > 0) {
 			result.setSuccess(true).setMessage("修改用户密码成功");
+			AnalysisService.userFlag = 1;
 			session.setAttribute("loginInfo", record);// 修改用户本身要同时更新Session
 		} else {
 			result.setSuccess(false).setMessage("修改用户密码失败");

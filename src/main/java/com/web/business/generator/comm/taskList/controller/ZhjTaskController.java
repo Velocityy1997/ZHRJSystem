@@ -214,7 +214,7 @@ public class ZhjTaskController {
 					result.setMessage("查询中心指挥机信息失败");
 					result.setSuccess(false);
 					
-					result.setDescription(sdf.format(System.currentTimeMillis())+":查询中心指挥机信息失败");
+					result.setDescription("查询中心指挥机信息失败");
 					
 					e.printStackTrace();
 				}
@@ -223,7 +223,7 @@ public class ZhjTaskController {
 				result.setData(taskInfo);
 				result.setMessage("查询中心指挥机信息成功");
 				result.setSuccess(true);
-				result.setDescription(sdf.format(System.currentTimeMillis())+":查询中心指挥机信息成功");
+				result.setDescription("查询中心指挥机信息");
 			
 				
 			}else {
@@ -739,7 +739,7 @@ public class ZhjTaskController {
     				Position position = positionServiceImpl.selectByPrimaryKey(posiId);
     				if(position == null) {
     					flag = false;
-    					message += terminal.getName() + "(" + terminal.getCardNum() + "),";    					
+    					message += terminal.getName() + "(" + terminal.getCardNum() + ")没有位置信息";    					
     				}
     			}
     			if(!flag) { //存在终端没有位置信息
